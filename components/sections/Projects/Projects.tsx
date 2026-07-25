@@ -22,14 +22,15 @@ type Project = {
 const projects: Project[] = [
   {
     name: 'Workflow Execution Engine',
-    kind: 'Open source · MVP · M1.3/M1.15',
+    kind: 'Open source · Thesis',
     area: 'Engineering platform',
-    intent: 'Engineering knowledge lives in docs and people’s heads. WEE turns well-defined workflows into versioned, replayable, budgeted pipelines, and the engine owns the loops, not the model. Workflows are software; LLMs are an implementation detail.',
-    decision: 'Hand-rolled net/http over the official SDKs. Anthropic’s alone drags in ~50 transitive modules and forces a Go upgrade the project doesn’t need.',
+    intent: 'Engineering knowledge lives in docs and people’s heads. WEE turns well-defined workflows into versioned, replayable, budgeted pipelines, and the engine owns the loops, not the model. It has already reviewed a real PR and opened a real pull request on a public repo, end to end.',
+    decision: 'core/tool/git deliberately has no push op. Landing a fix on GitHub goes through the generic http tool speaking GitHub’s own Git Data API directly, instead of a one-off integration bolted onto git.',
     stack: ['Go', 'TypeScript', 'JSON Schema', 'LLM APIs'],
     repo: 'tzpereira/workflow-execution-engine',
     links: [
       { label: 'GitHub', href: 'https://github.com/tzpereira/workflow-execution-engine' },
+      { label: 'Case study', href: 'https://github.com/tzpereira/workflow-execution-engine/blob/main/docs/CASE-STUDY.md' },
       { label: 'Architecture', href: 'https://github.com/tzpereira/workflow-execution-engine/blob/main/docs/ARCHITECTURE.md' },
       { label: 'ADRs', href: 'https://github.com/tzpereira/workflow-execution-engine/tree/main/docs/adr' },
       { label: 'Vision', href: 'https://github.com/tzpereira/workflow-execution-engine/blob/main/docs/VISION.md' },
