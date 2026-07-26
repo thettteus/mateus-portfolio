@@ -27,13 +27,13 @@ const projects: Project[] = [
     intent: 'Engineering knowledge lives in docs and people’s heads. WEE turns well-defined workflows into versioned, replayable, budgeted pipelines, and the engine owns the loops, not the model. It has already reviewed a real PR and opened a real pull request on a public repo, end to end.',
     decision: 'core/tool/git deliberately has no push op. Landing a fix on GitHub goes through the generic http tool speaking GitHub’s own Git Data API directly, instead of a one-off integration bolted onto git.',
     stack: ['Go', 'TypeScript', 'JSON Schema', 'LLM APIs'],
-    repo: 'tzpereira/workflow-execution-engine',
+    repo: 'thettteus/workflow-execution-engine',
     links: [
-      { label: 'GitHub', href: 'https://github.com/tzpereira/workflow-execution-engine' },
-      { label: 'Case study', href: 'https://github.com/tzpereira/workflow-execution-engine/blob/main/docs/CASE-STUDY.md' },
-      { label: 'Architecture', href: 'https://github.com/tzpereira/workflow-execution-engine/blob/main/docs/ARCHITECTURE.md' },
-      { label: 'ADRs', href: 'https://github.com/tzpereira/workflow-execution-engine/tree/main/docs/adr' },
-      { label: 'Vision', href: 'https://github.com/tzpereira/workflow-execution-engine/blob/main/docs/VISION.md' },
+      { label: 'GitHub', href: 'https://github.com/thettteus/workflow-execution-engine' },
+      { label: 'Case study', href: 'https://github.com/thettteus/workflow-execution-engine/blob/main/docs/CASE-STUDY.md' },
+      { label: 'Architecture', href: 'https://github.com/thettteus/workflow-execution-engine/blob/main/docs/ARCHITECTURE.md' },
+      { label: 'ADRs', href: 'https://github.com/thettteus/workflow-execution-engine/tree/main/docs/adr' },
+      { label: 'Vision', href: 'https://github.com/thettteus/workflow-execution-engine/blob/main/docs/VISION.md' },
     ],
   },
   {
@@ -53,8 +53,8 @@ const projects: Project[] = [
     intent: 'Every Kafka service re-implements the same connection, retry and error handling, each with its own bugs. This SDK packages those patterns once, so services ship events instead of plumbing.',
     decision: 'Defaults to acks=all and auto.offset.reset=earliest: safe out of the box, one config map away from full librdkafka control.',
     stack: ['Go', 'Apache Kafka'],
-    href: 'https://github.com/tzpereira/go-kafka-sdk',
-    repo: 'tzpereira/go-kafka-sdk',
+    href: 'https://github.com/thettteus/go-kafka-sdk',
+    repo: 'thettteus/go-kafka-sdk',
   },
   {
     name: 'bandit-brain',
@@ -63,8 +63,8 @@ const projects: Project[] = [
     intent: 'A/B tests waste traffic on losing variants while waiting for significance. bandit-brain shifts traffic to winners in real time, as they win.',
     decision: 'Core engine depends on numpy and pydantic, nothing else. No DB, no web server, no framework to fight to reuse the math elsewhere.',
     stack: ['Python', 'Multi-armed bandits'],
-    href: 'https://github.com/tzpereira/bandit-brain',
-    repo: 'tzpereira/bandit-brain',
+    href: 'https://github.com/thettteus/bandit-brain',
+    repo: 'thettteus/bandit-brain',
   },
 ];
 

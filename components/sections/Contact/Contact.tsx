@@ -43,7 +43,7 @@ export default function Contact() {
                     <path d="M3 11L11 3M5 3h6v6" />
                   </svg>
                 </a>
-                <a className="contact-link" href="https://github.com/tzpereira" target="_blank" rel="noopener noreferrer" aria-label="GitHub (opens in new tab)">
+                <a className="contact-link" href="https://github.com/thettteus" target="_blank" rel="noopener noreferrer" aria-label="GitHub (opens in new tab)">
                   GitHub
                   <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                     <path d="M3 11L11 3M5 3h6v6" />

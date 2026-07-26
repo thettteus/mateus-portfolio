@@ -14,7 +14,7 @@ import { Contact } from '@/components/sections/Contact';
 import { Analytics } from "@vercel/analytics/next"
 
 export default async function Home() {
-  const weeks = await getContributions('tzpereira');
+  const weeks = await getContributions('thettteus');
   return (
     <>
       <Analytics/>

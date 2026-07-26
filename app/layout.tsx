@@ -79,7 +79,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               email: 'mailto:mateuspdasilva369@gmail.com',
               description: 'Product engineer building the systems that let products ship faster: from ambiguous problems to production, across backend, AI, data, and product engineering.',
               knowsAbout: ['Software architecture', 'Developer platforms', 'AI infrastructure', 'Product engineering', 'TypeScript', 'Go', 'Python', 'PostgreSQL', 'AWS', 'LLM applications', 'RAG'],
-              sameAs: ['https://www.linkedin.com/in/mateuspdasilva', 'https://github.com/tzpereira'],
+              sameAs: ['https://www.linkedin.com/in/mateuspdasilva', 'https://github.com/thettteus'],
             }),
           }}
         />
