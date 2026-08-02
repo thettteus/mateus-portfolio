@@ -17,7 +17,7 @@ export default function ScrollReveal() {
     const updateActive = () => {
       const y = window.scrollY + 120;
       const sections = NAV_SECTIONS.map(id => document.getElementById(id)).filter(Boolean) as HTMLElement[];
-      let activeId = sections[0]?.id ?? '';
+      let activeId = '';
       for (const s of sections) {
         if (s.offsetTop <= y) activeId = s.id;
       }
