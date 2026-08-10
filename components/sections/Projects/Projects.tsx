@@ -56,16 +56,6 @@ const projects: Project[] = [
     href: 'https://github.com/thettteus/go-kafka-sdk',
     repo: 'thettteus/go-kafka-sdk',
   },
-  {
-    name: 'bandit-brain',
-    kind: 'Open source',
-    area: 'Machine learning',
-    intent: 'A/B tests waste traffic on losing variants while waiting for significance. bandit-brain shifts traffic to winners in real time, as they win.',
-    decision: 'Core engine depends on numpy and pydantic, nothing else. No DB, no web server, no framework to fight to reuse the math elsewhere.',
-    stack: ['Python', 'Multi-armed bandits'],
-    href: 'https://github.com/thettteus/bandit-brain',
-    repo: 'thettteus/bandit-brain',
-  },
 ];
 
 async function lastCommit(repo: string): Promise<string | undefined> {
