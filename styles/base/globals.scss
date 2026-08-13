@@ -59,6 +59,8 @@
   /* no separate display/mono web fonts anymore — every element renders Helvetica */
   --font-display: var(--font-sans);
   --font-mono: var(--font-sans);
+  /* the only exception: real code blocks, using system monospace (no web font) */
+  --font-code: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
   /* soft floating-card shadows (editorial), aliased onto legacy names */
   --shadow-card:  0 1px 2px rgba(20,20,30,0.05), 0 18px 40px -24px rgba(20,20,30,0.28);
@@ -1251,11 +1253,64 @@ a.ac-read:hover svg { transform: translate(2px, -2px); }
   color: var(--ink);
   margin: clamp(40px, 5vw, 60px) 0 18px;
 }
-.article-body ul {
+.article-body ul,
+.article-body ol {
   margin: 0 0 20px;
   padding-left: 22px;
 }
 .article-body li { margin-bottom: 8px; }
+.article-body em { font-style: italic; }
+/* inline links inside the prose: underlined at rest, accent on hover */
+.article-body a {
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-decoration-color: var(--ink-4);
+  text-underline-offset: 3px;
+  transition: color 0.2s var(--ease), text-decoration-color 0.2s var(--ease);
+}
+.article-body a:hover {
+  color: var(--accent);
+  text-decoration-color: var(--accent);
+}
+/* code keeps a real monospace stack — system fonts only, no web font added.
+   the metric/ascii blocks depend on column alignment. */
+.article-body pre {
+  margin: 0 0 24px;
+  padding: 18px 20px;
+  background: var(--panel-2);
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.article-body pre code {
+  display: block;
+  font-family: var(--font-code);
+  font-size: 13px;
+  line-height: 1.62;
+  letter-spacing: 0;
+  color: var(--ink);
+  white-space: pre;
+  tab-size: 4;
+}
+.article-body :not(pre) > code {
+  font-family: var(--font-code);
+  font-size: 0.86em;
+  letter-spacing: 0;
+  color: var(--ink);
+  background: var(--panel-2);
+  border: 1px solid var(--rule);
+  border-radius: 5px;
+  padding: 1px 5px;
+  white-space: nowrap;
+}
+.article-refs {
+  font-size: 0.88em;
+  color: var(--ink-3);
+}
+.article-refs li { margin-bottom: 10px; }
+.article-refs a { color: var(--ink-2); }
 .article-body hr {
   border: none;
   border-top: 1px solid var(--rule);
