@@ -11,6 +11,13 @@ type Article = {
 
 const articles: Article[] = [
   {
+    slug: 'stop-using-the-best-model-for-everything',
+    kind: 'Essay',
+    year: '2026',
+    title: 'Stop using the best model for everything: designing an AI stack around cost, risk, and complexity',
+    dek: 'The strongest model has plenty of work to do. It just should not be responsible for everything.',
+  },
+  {
     slug: 'artificial-intelligence-and-human-vanity',
     kind: 'Essay',
     year: '2026',
