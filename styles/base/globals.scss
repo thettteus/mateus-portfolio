@@ -1106,6 +1106,30 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
   justify-content: flex-start;
   padding: clamp(24px, 3.2vw, 44px) clamp(24px, 3.2vw, 44px);
 }
+.projects .ac-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 38%);
+  align-items: stretch;
+  gap: clamp(22px, 3.2vw, 44px);
+}
+.projects .ac-copy {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.projects .ac-media {
+  position: relative;
+  align-self: center;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  min-height: 210px;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.projects .ac-media img {
+  object-fit: contain;
+  border-radius: 10px;
+}
 .ac-meta {
   display: flex;
   flex-wrap: wrap;
@@ -1555,7 +1579,12 @@ a.ac-read:hover svg { transform: translate(2px, -2px); }
   .topbar-inner { display: flex; justify-content: space-between; }
   .mobile-nav { display: flex; }
   .contact-grid { grid-template-columns: 1fr; }
-  /* ac-link is already block — no mobile override needed */
+  .projects .ac-body { grid-template-columns: 1fr; }
+  .projects .ac-media {
+    order: -1;
+    min-height: 0;
+    max-height: 320px;
+  }
 }
 @media (max-width: 620px) {
   /* multi-link cards: right-aligned wrap leaves an orphan link on its own row —

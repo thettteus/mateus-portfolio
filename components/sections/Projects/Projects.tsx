@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { FadeIn } from '@/components/ui/FadeIn';
 
 type ProjectLink = {
@@ -17,6 +18,10 @@ type Project = {
   links?: ProjectLink[];
   repo?: string;
   note?: string;
+  image: {
+    src: string;
+    alt: string;
+  };
 };
 
 const projects: Project[] = [
@@ -28,6 +33,10 @@ const projects: Project[] = [
     decision: 'core/tool/git deliberately has no push op. Landing a fix on GitHub goes through the generic http tool speaking GitHub’s own Git Data API directly, instead of a one-off integration bolted onto git.',
     stack: ['Go', 'TypeScript', 'JSON Schema', 'LLM APIs'],
     repo: 'thettteus/workflow-execution-engine',
+    image: {
+      src: '/assets/projects/wee.avif',
+      alt: 'Workflow Execution Engine project preview',
+    },
     links: [
       { label: 'GitHub', href: 'https://github.com/thettteus/workflow-execution-engine' },
       { label: 'Case study', href: 'https://github.com/thettteus/workflow-execution-engine/blob/main/docs/CASE-STUDY.md' },
@@ -45,6 +54,10 @@ const projects: Project[] = [
     href: 'https://planpatagonia.com/',
     linkLabel: 'Visit site',
     note: 'Launched Aug 2026',
+    image: {
+      src: '/assets/projects/plan_patagonia.avif',
+      alt: 'Plan Patagonia project preview',
+    },
   },
   {
     name: 'go-kafka-sdk',
@@ -55,6 +68,10 @@ const projects: Project[] = [
     stack: ['Go', 'Apache Kafka'],
     href: 'https://github.com/thettteus/go-kafka-sdk',
     repo: 'thettteus/go-kafka-sdk',
+    image: {
+      src: '/assets/projects/go_kafka_sdk.avif',
+      alt: 'go-kafka-sdk project preview',
+    },
   },
 ];
 
@@ -97,7 +114,7 @@ export default async function Projects() {
         </FadeIn>
 
         <div className="writing-list">
-          {projects.map(({ name, kind, area, intent, decision, stack, href, linkLabel, links, note }, i) => {
+          {projects.map(({ name, kind, area, intent, decision, stack, href, linkLabel, links, note, image }, i) => {
             const label = linkLabel ?? 'GitHub';
             const pulse = note ?? (commits[i] && `Last commit ${commits[i]}`);
             const arrow = (
@@ -107,37 +124,42 @@ export default async function Projects() {
             );
             const body = (
               <div className="ac-body">
-                <div className="ac-meta">
-                  <span>{kind}</span>
-                  <span>{area}</span>
-                  {pulse && <span className="ac-pulse">{pulse}</span>}
-                </div>
-                <h3>{name}</h3>
-                <p className="ac-dek">{intent}</p>
-                {decision && (
-                  <p className="ac-decision">
-                    <span>Key call</span>
-                    {decision}
-                  </p>
-                )}
-                <div className="proj-stack">
-                  {stack.map(t => <span className="t" key={t}>{t}</span>)}
-                </div>
-                {links ? (
-                  <div className="ac-links">
-                    {links.map(l => (
-                      <a className="ac-read" key={l.label} href={l.href} target="_blank" rel="noopener noreferrer" aria-label={`${name} — ${l.label}`}>
-                        {l.label}
-                        {arrow}
-                      </a>
-                    ))}
+                <div className="ac-copy">
+                  <div className="ac-meta">
+                    <span>{kind}</span>
+                    <span>{area}</span>
+                    {pulse && <span className="ac-pulse">{pulse}</span>}
                   </div>
-                ) : href ? (
-                  <span className="ac-read">
-                    {label}
-                    {arrow}
-                  </span>
-                ) : null}
+                  <h3>{name}</h3>
+                  <p className="ac-dek">{intent}</p>
+                  {decision && (
+                    <p className="ac-decision">
+                      <span>Key call</span>
+                      {decision}
+                    </p>
+                  )}
+                  <div className="proj-stack">
+                    {stack.map(t => <span className="t" key={t}>{t}</span>)}
+                  </div>
+                  {links ? (
+                    <div className="ac-links">
+                      {links.map(l => (
+                        <a className="ac-read" key={l.label} href={l.href} target="_blank" rel="noopener noreferrer" aria-label={`${name} — ${l.label}`}>
+                          {l.label}
+                          {arrow}
+                        </a>
+                      ))}
+                    </div>
+                  ) : href ? (
+                    <span className="ac-read">
+                      {label}
+                      {arrow}
+                    </span>
+                  ) : null}
+                </div>
+                <div className="ac-media">
+                  <Image src={image.src} alt={image.alt} fill sizes="(max-width: 900px) calc(100vw - 96px), 34vw" unoptimized />
+                </div>
               </div>
             );
             return (
