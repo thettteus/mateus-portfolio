@@ -40,7 +40,7 @@ export const metadata: Metadata = {
     description: 'From ambiguous problems to production systems: backend, AI, data, and product engineering, proven with real repos and architecture decisions.',
     url: 'https://mateusps.vercel.app/',
     siteName: 'Mateus P. S.',
-    images: [{ url: 'https://mateusps.vercel.app/og-image.png', width: 1200, height: 630, alt: 'Mateus P. S. — Product Engineer' }],
+    images: [{ url: 'https://mateusps.vercel.app/og.png', width: 1200, height: 630, type: 'image/png', alt: 'Mateus P. S. — Product Engineer. From ambiguity to production.' }],
     locale: 'en_US',
     type: 'website',
   },
@@ -48,7 +48,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Mateus P. S. — Product Engineer',
     description: 'Product Engineer taking ambiguous problems to production. The proof is real repos, not claims.',
-    images: ['https://mateusps.vercel.app/og-image.png'],
+    images: ['https://mateusps.vercel.app/og.png'],
   },
   alternates: { canonical: 'https://mateusps.vercel.app/' },
 };

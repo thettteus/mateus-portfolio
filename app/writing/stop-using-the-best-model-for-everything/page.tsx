@@ -16,6 +16,7 @@ export const metadata: Metadata = {
     url: 'https://mateusps.vercel.app/writing/stop-using-the-best-model-for-everything',
     type: 'article',
     authors: ['Mateus Pereira da Silva'],
+    images: [{ url: 'https://mateusps.vercel.app/og.png', width: 1200, height: 630, type: 'image/png', alt: 'Mateus P. S. — Product Engineer' }],
   },
 };
 
