@@ -44,7 +44,7 @@ const projects: Project[] = [
     stack: ['TypeScript', 'Next.js', 'Prisma', 'Neon Postgres', 'Claude API'],
     href: 'https://planpatagonia.com/',
     linkLabel: 'Visit site',
-    note: 'Launching Aug 2026',
+    note: 'Launched Aug 2026',
   },
   {
     name: 'go-kafka-sdk',
