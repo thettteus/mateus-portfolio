@@ -141,24 +141,24 @@ export default async function Projects() {
                   <div className="proj-stack">
                     {stack.map(t => <span className="t" key={t}>{t}</span>)}
                   </div>
-                  {links ? (
-                    <div className="ac-links">
-                      {links.map(l => (
+                </div>
+                <div className="ac-media">
+                  <Image src={image.src} alt={image.alt} fill sizes="(max-width: 900px) calc(100vw - 96px), 34vw" unoptimized />
+                </div>
+                <div className="ac-links">
+                  {links
+                    ? links.map(l => (
                         <a className="ac-read" key={l.label} href={l.href} target="_blank" rel="noopener noreferrer" aria-label={`${name} — ${l.label}`}>
                           {l.label}
                           {arrow}
                         </a>
-                      ))}
-                    </div>
-                  ) : href ? (
-                    <span className="ac-read">
-                      {label}
-                      {arrow}
-                    </span>
-                  ) : null}
-                </div>
-                <div className="ac-media">
-                  <Image src={image.src} alt={image.alt} fill sizes="(max-width: 900px) calc(100vw - 96px), 34vw" unoptimized />
+                      ))
+                    : (
+                        <span className="ac-read">
+                          {label}
+                          {arrow}
+                        </span>
+                      )}
                 </div>
               </div>
             );

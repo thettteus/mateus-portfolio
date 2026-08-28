@@ -870,7 +870,8 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
   border-radius: 6px;
   background: var(--bg);
 }
-.article-card .proj-stack { margin-bottom: 14px; }
+/* stack chips close the copy column — the proof links row supplies the gap below */
+.article-card .proj-stack { margin-bottom: 0; }
 
 /* ============================================================
    PROCESS — transformation pipeline (Ambiguity → Production)
@@ -1110,7 +1111,8 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(280px, 38%);
   align-items: stretch;
-  gap: clamp(22px, 3.2vw, 44px);
+  column-gap: clamp(22px, 3.2vw, 44px);
+  row-gap: clamp(18px, 2vw, 26px);
 }
 .projects .ac-copy {
   display: flex;
@@ -1200,6 +1202,14 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
   margin-top: auto;
 }
 .ac-links .ac-read { margin-top: 0; align-self: auto; }
+/* proof links get their own row under copy + shot — never squeezed beside the
+   image, where they pushed the column out of alignment */
+.projects .ac-links {
+  grid-column: 1 / -1;
+  margin-top: 0;
+  padding-top: clamp(14px, 1.6vw, 20px);
+  border-top: 1px solid var(--rule);
+}
 a.ac-read:hover { color: var(--accent); }
 a.ac-read:hover svg { transform: translate(2px, -2px); }
 
