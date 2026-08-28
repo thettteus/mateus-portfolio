@@ -1435,11 +1435,19 @@ a.ac-read:hover svg { transform: translate(2px, -2px); }
 }
 .contact-link-primary svg { width: 16px; height: 16px; }
 
+/* four short links on one line, always — no wrap, so nothing can orphan.
+   Type and gap shrink with the viewport instead, down to a 320px screen. */
 .contact-links {
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px 24px;
+  flex-wrap: nowrap;
+  gap: clamp(10px, 3.4vw, 24px);
 }
+.contact-links .contact-link {
+  white-space: nowrap;
+  font-size: clamp(12px, 3.5vw, 16px);
+  gap: 0.5em;
+}
+.contact-links .contact-link svg { width: 0.9em; height: 0.9em; }
 
 @media (max-width: 620px) {
   .contact-cta-group { width: 100%; }
