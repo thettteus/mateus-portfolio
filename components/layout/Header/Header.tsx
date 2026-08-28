@@ -7,7 +7,7 @@ import { motion, useScroll, useSpring } from 'framer-motion';
 // site's manual toggle — override the rendered meta tags so the iOS status
 // bar / Dynamic Island area matches whichever theme is actually active.
 function syncThemeColorMeta(theme: 'light' | 'dark') {
-  const color = theme === 'dark' ? '#0a0a0f' : '#fbfbfc';
+  const color = theme === 'dark' ? '#0b0c0e' : '#f5f6f7';
   document.querySelectorAll('meta[name="theme-color"]').forEach((m) => m.setAttribute('content', color));
 }
 

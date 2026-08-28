@@ -5,8 +5,11 @@ import type { CSSProperties } from 'react';
 import { FadeIn } from '@/components/ui/FadeIn';
 
 /* ── refraction motif geometry ──────────────────────────────────────────
-   scattered possibilities (multicolor rays) converge at the prism's left
-   vertex; judgment focuses them into one accent beam → directed impact. */
+   scattered possibilities converge at the prism's left vertex; judgment
+   focuses them into one accent beam → directed impact. The scatter is carried
+   by value, not hue: each ray sits at its own point on the metal ramp, from
+   dim titanium to full specular, so the palette stays monochrome and both
+   themes stay legible (a fixed hex would vanish on one of them). */
 const CX = 300;
 const CY = 250;
 const PRISM = {
@@ -18,25 +21,30 @@ const PRISM = {
 };
 const IMPACT_X = 720;
 
-const RAY_DEFS: { a: number; l: number; c: string }[] = [
-  { a: -38, l: 196, c: '#818cf8' },
-  { a: -31, l: 232, c: '#6366f1' },
-  { a: -24, l: 250, c: '#4338ca' },
-  { a: -17, l: 212, c: '#818cf8' },
-  { a: -9, l: 244, c: '#a855f7' },
-  { a: -2, l: 224, c: '#c084fc' },
-  { a: 6, l: 250, c: '#ec4899' },
-  { a: 13, l: 214, c: '#f472b6' },
-  { a: 20, l: 242, c: '#f59e0b' },
-  { a: 28, l: 206, c: '#fbbf24' },
-  { a: 35, l: 232, c: '#c7cad6' },
-  { a: 41, l: 190, c: '#818cf8' },
+/* t = position on the ramp between --ink-4 (dim) and --accent (specular) */
+const RAY_DEFS: { a: number; l: number; t: number }[] = [
+  { a: -38, l: 196, t: 0.55 },
+  { a: -31, l: 232, t: 0.8 },
+  { a: -24, l: 250, t: 1 },
+  { a: -17, l: 212, t: 0.5 },
+  { a: -9, l: 244, t: 0.72 },
+  { a: -2, l: 224, t: 0.34 },
+  { a: 6, l: 250, t: 0.92 },
+  { a: 13, l: 214, t: 0.45 },
+  { a: 20, l: 242, t: 0.66 },
+  { a: 28, l: 206, t: 0.28 },
+  { a: 35, l: 232, t: 0.6 },
+  { a: 41, l: 190, t: 0.86 },
 ];
 const RAY_SCALE = 1.28; // longer threads, reaching further left
-const RAYS = RAY_DEFS.map(({ a, l, c }) => {
+const RAYS = RAY_DEFS.map(({ a, l, t }) => {
   const r = (a * Math.PI) / 180;
   const L = l * RAY_SCALE;
-  return { x: +(CX - L * Math.cos(r)).toFixed(1), y: +(CY + L * Math.sin(r)).toFixed(1), c };
+  return {
+    x: +(CX - L * Math.cos(r)).toFixed(1),
+    y: +(CY + L * Math.sin(r)).toFixed(1),
+    c: `color-mix(in srgb, var(--accent) ${Math.round(t * 100)}%, var(--ink-4))`,
+  };
 });
 
 const STAGES: { x: number; k: string; s: [string, string] }[] = [

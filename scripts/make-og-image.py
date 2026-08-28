@@ -22,12 +22,12 @@ FONT = "/System/Library/Fonts/HelveticaNeue.ttc"
 REG, BOLD, MED = 0, 1, 10
 
 # --- tokens, lifted from styles/base/globals.scss (light theme) -------------
-BG = (251, 251, 252)        # --bg      #fbfbfc
-INK = (21, 22, 26)          # --ink     #15161a
-INK_2 = (74, 77, 87)        # --ink-2   #4a4d57
-INK_3 = (121, 125, 136)     # --ink-3   #797d88
-RULE = (230, 231, 235)      # --rule    #e6e7eb
-ACCENT = (79, 70, 229)      # --accent  #4f46e5
+BG = (245, 246, 247)        # --bg      #f5f6f7  platinum paper
+INK = (35, 38, 42)          # --ink     #23262a  graphite
+INK_2 = (82, 87, 93)        # --ink-2   #52575d
+INK_3 = (130, 135, 142)     # --ink-3   #82878e
+RULE = (223, 225, 228)      # --rule    #dfe1e4
+ACCENT = (8, 9, 10)         # --accent  #08090a  obsidian
 
 
 def over(fg, alpha, bg=BG):

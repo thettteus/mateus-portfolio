@@ -1,54 +1,72 @@
 /* ============================================================
    Mateus P. S. — Full-Stack / Product Software Engineer
    System: Helvetica only, everywhere (no display/mono web fonts)
-   Aesthetic: editorial tech · neutral paper · indigo accent · generative graphics
+   Aesthetic: editorial tech · monochrome metal · titanium / platinum / chrome
+   No hue anywhere: emphasis is carried by value and material, not color.
    ============================================================ */
 
 /* ---------------- THEME TOKENS ---------------- */
 :root,
 [data-theme="light"] {
-  --bg:        #fbfbfc;
+  /* PLATINUM — brushed paper, graphite type, obsidian emphasis */
+  --bg:        #f5f6f7;
   --panel-1:   #ffffff;
-  --panel-2:   #f4f5f7;
-  --ink:       #15161a;
-  --ink-2:     #4a4d57;
-  --ink-3:     #797d88;
-  --ink-4:     #aeb1ba;
-  --rule:      #e6e7eb;
-  --rule-soft: #eff0f3;
-  --accent:    #4f46e5;
-  --accent-2:  #4338ca;
+  --panel-2:   #eaebed;
+  --ink:       #23262a;
+  --ink-2:     #52575d;
+  --ink-3:     #82878e;
+  --ink-4:     #b0b5bb;
+  --rule:      #dfe1e4;
+  --rule-soft: #ebedee;
+  /* the accent is a VALUE, not a hue: darker than the body text, so emphasis
+     still steps forward instead of falling back into gray */
+  --accent:    #08090a;
+  --accent-2:  #2c3035;
   --accent-ink:#ffffff;
-  --accent-dim:#ecebfb;
-  --ascii:     #15161a;
+  --accent-dim:#e4e6e9;
+  --ascii:     #23262a;
+  /* brushed metal for display emphasis. Diagonal, not vertical: background-clip
+     paints across the whole line box, so a vertical ramp puts its light stops
+     in the ascender and descender space and the x-height reads as flat black.
+     Angled, the sheen crosses the word and every letter catches a different
+     part of it. The lit stops stay dark enough to hold contrast on paper. */
+  --metal: linear-gradient(160deg, #0b0d0f 0%, #4f555d 36%, #0b0d0f 58%, #3a3f45 100%);
+  /* light paper: metal casts a shadow rather than glowing */
+  --glow: rgba(10,12,14,0.2);
   --grain-blend: multiply;
   --grain-opacity: 0.035;
   --panel-sheen: linear-gradient(180deg, rgba(255,255,255,0.6), rgba(255,255,255,0) 42%);
-  --shadow: 0 1px 2px rgba(20,20,30,0.04), 0 30px 64px -38px rgba(20,20,30,0.2);
-  --selection: rgba(79,70,229,0.16);
+  --shadow: 0 1px 2px rgba(10,12,14,0.05), 0 30px 64px -38px rgba(10,12,14,0.22);
+  --selection: rgba(35,38,42,0.15);
   color-scheme: light;
 }
 
 [data-theme="dark"] {
-  --bg:        #0a0a0f;
-  --panel-1:   #121319;
-  --panel-2:   #181a22;
-  --ink:       #ecedf2;
-  --ink-2:     #aeb0bc;
-  --ink-3:     #797c89;
-  --ink-4:     #4f5260;
-  --rule:      #24262f;
-  --rule-soft: #181a21;
-  --accent:    #8b82f7;
-  --accent-2:  #a39cf9;
-  --accent-ink:#0a0a0f;
-  --accent-dim:#1c1b33;
-  --ascii:     #ecedf2;
+  /* MACHINED GRAPHITE — cold body, specular emphasis */
+  --bg:        #0b0c0e;
+  --panel-1:   #141619;
+  --panel-2:   #1c1f23;
+  --ink:       #e8eaed;
+  --ink-2:     #a6abb2;
+  --ink-3:     #737a82;
+  --ink-4:     #474d55;
+  --rule:      #23262b;
+  --rule-soft: #16181b;
+  /* inverted, same logic: emphasis is the brightest value on the page */
+  --accent:    #f7f9fa;
+  --accent-2:  #cfd5db;
+  --accent-ink:#0b0c0e;
+  --accent-dim:#21252a;
+  --ascii:     #e8eaed;
+  /* chrome: specular top, shadowed band, lit again at the base */
+  --metal: linear-gradient(180deg, #ffffff 0%, #dfe4e9 40%, #9aa1a9 56%, #eceff2 100%);
+  /* dark: metal glints */
+  --glow: rgba(247,249,250,0.4);
   --grain-blend: overlay;
   --grain-opacity: 0.05;
-  --panel-sheen: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0) 42%);
-  --shadow: 0 1px 2px rgba(0,0,0,0.4), 0 30px 64px -34px rgba(0,0,0,0.7);
-  --selection: rgba(139,130,247,0.3);
+  --panel-sheen: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0) 42%);
+  --shadow: 0 1px 2px rgba(0,0,0,0.45), 0 30px 64px -34px rgba(0,0,0,0.72);
+  --selection: rgba(232,234,237,0.22);
   color-scheme: dark;
 }
 
@@ -71,6 +89,30 @@
 [data-theme="dark"] {
   --shadow-card: 0 1px 2px rgba(0,0,0,0.5), 0 18px 40px -22px rgba(0,0,0,0.7);
   --shadow-lift: 0 1px 2px rgba(0,0,0,0.55), 0 30px 60px -26px rgba(0,0,0,0.8);
+}
+
+/* ---------------- METAL TYPE ----------------
+   The one place the palette behaves like a material instead of a color: the
+   display emphases get the brushed gradient, so emphasis reads as sharper
+   than the body text. Without this a hueless accent flattens into gray —
+   exactly the problem the colored <em> was introduced to solve. Solid
+   --accent is the fallback where background-clip: text is unsupported. */
+.sec-head h2 em,
+.contact-statement em,
+.hero-copy .hl-w,
+.po-foot em {
+  color: var(--accent);
+}
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  .sec-head h2 em,
+  .contact-statement em,
+  .hero-copy .hl-w,
+  .po-foot em {
+    background-image: var(--metal);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
 }
 
 /* ---------------- BASE RESET ---------------- */
@@ -312,7 +354,7 @@ section {
   color: var(--ink);
   text-wrap: balance;
 }
-.sec-head h2 em { color: var(--accent); font-style: normal; }
+.sec-head h2 em { font-style: normal; }
 .sec-head .sub {
   font-size: clamp(18px, 1.5vw, 21px);
   color: var(--ink-2);
@@ -644,10 +686,9 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
   color: var(--ink-2);
   margin: 0 0 36px;
 }
-.hero-copy .hl-w { 
-  font-weight: 700; 
-  white-space: nowrap; 
-  color: var(--accent); 
+.hero-copy .hl-w {
+  font-weight: 700;
+  white-space: nowrap;
 }
 
 .br-mobile { display: none; }
@@ -896,7 +937,7 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
   stroke: var(--accent);
   stroke-width: 1.5;
   stroke-opacity: 0.9;
-  filter: drop-shadow(0 0 9px color-mix(in srgb, var(--accent) 45%, transparent));
+  filter: drop-shadow(0 0 9px var(--glow));
 }
 
 /* labels — font-size is set per-ring inline so it grows toward the outcome */
@@ -913,7 +954,7 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
 }
 .po-lbl.acc .po-nm {
   fill: var(--accent);
-  filter: drop-shadow(0 0 12px color-mix(in srgb, var(--accent) 45%, transparent));
+  filter: drop-shadow(0 0 12px var(--glow));
 }
 
 .po-foot {
@@ -923,7 +964,7 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
   font-size: clamp(14px, 1.4vw, 15.5px);
   color: var(--ink-2);
 }
-.po-foot em { font-style: normal; color: var(--accent); }
+.po-foot em { font-style: normal; }
 
 /* ── reveal: rings trace in from the core, labels rise ── */
 .po-ring { stroke-dashoffset: 1; stroke-dasharray: 1; }
@@ -1391,7 +1432,7 @@ a.ac-read:hover svg { transform: translate(2px, -2px); }
   margin: 0 0 24px;
   text-wrap: balance;
 }
-.contact-statement em { color: var(--accent); font-style: normal; }
+.contact-statement em { font-style: normal; }
 .contact-lead {
   font-size: clamp(15px, 2.2vw, 18px);
   line-height: 1.6;
