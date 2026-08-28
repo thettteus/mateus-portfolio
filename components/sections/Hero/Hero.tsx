@@ -52,8 +52,8 @@ function makeGrid(cols: number, rows: number = ROWS): Grid {
         dx: (scatter() - 0.5) * 100,
         dy: (scatter() - 0.5) * 80,
         dr: (scatter() - 0.5) * 160,
-        delay: 0.25 + scatter() * 0.85,
-        dur: 1.0 + scatter() * 0.8,
+        delay: 0.12 + scatter() * 0.42,
+        dur: 0.55 + scatter() * 0.35,
       });
     }
   }
@@ -146,8 +146,8 @@ const CG_STEP = CG_CELL + CG_GAP;
 /* must match the ignite delay factor below and the commit-ignite
    animation-duration in globals.scss — used to time the caption's
    fade-in to when the last cell finishes igniting */
-const CG_IGNITE_STEP = 0.008;
-const CG_IGNITE_DURATION = 0.35;
+const CG_IGNITE_STEP = 0.005;
+const CG_IGNITE_DURATION = 0.24;
 /* ~3 months, so the mobile graph and its caption stay in sync */
 const CG_MOBILE_WEEKS = 13;
 
@@ -194,7 +194,7 @@ export default function Hero({ weeks }: { weeks: ContribWeek[] | null }) {
       : {
           initial: { opacity: 0, y: 20 },
           animate: { opacity: 1, y: 0 },
-          transition: { duration: 0.8, ease: EASE, delay },
+          transition: { duration: 0.45, ease: EASE, delay: delay * 0.7 },
         };
 
   const mobileWeeks = weeks ? weeks.slice(-CG_MOBILE_WEEKS) : null;
@@ -231,13 +231,13 @@ export default function Hero({ weeks }: { weeks: ContribWeek[] | null }) {
           </>
         )}
 
-        <motion.p className="hero-copy" {...fadeUp(0.28)}>
+        <motion.p className="hero-copy" {...fadeUp(0.18)}>
           Bringing <span className="hl-w">product thinking</span>
           <br className="br-mobile" /> into{' '}
           <span className="hl-w">engineering execution</span>.
         </motion.p>
 
-        <motion.div className="hero-actions" {...fadeUp(0.4)}>
+        <motion.div className="hero-actions" {...fadeUp(0.26)}>
           <a className="hero-link" href="#projects">
             See work
             <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">

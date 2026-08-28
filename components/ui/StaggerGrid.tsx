@@ -4,11 +4,11 @@ import { ReactNode } from 'react';
 
 const containerVariants: Variants = {
   hidden: {},
-  show: { transition: { staggerChildren: 0.055 } },
+  show: { transition: { staggerChildren: 0.035 } },
 };
 
 const itemVariants: Variants = {
-  hidden: { opacity: 0, y: 20 },
+  hidden: { opacity: 0, y: 14 },
   show: { opacity: 1, y: 0 },
 };
 
@@ -56,7 +56,7 @@ export function StaggerItem({ as = 'div', children, className }: StaggerItemProp
     <Tag
       className={className}
       variants={reduced ? {} : itemVariants}
-      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
       // scroll-triggered: mark the item once it enters view so its motif can
       // draw itself in (previously the motif only animated on hover, which on
       // touch meant a tap was required)

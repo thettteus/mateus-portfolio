@@ -20,10 +20,10 @@ export function FadeIn({ as = 'div', children, className, delay = 0, style }: Fa
     <Tag
       className={className}
       style={style}
-      initial={reduced ? false : { opacity: 0, y: 22 }}
+      initial={reduced ? false : { opacity: 0, y: 16 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-32px' }}
-      transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay }}
+      transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1], delay: delay * 0.65 }}
     >
       {children}
     </Tag>
