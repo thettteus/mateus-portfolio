@@ -8,65 +8,74 @@
 /* ---------------- THEME TOKENS ---------------- */
 :root,
 [data-theme="light"] {
-  /* PLATINUM — brushed paper, graphite type, obsidian emphasis */
-  --bg:        #f5f6f7;
+  /* PLATINUM — a cool sheet with machined plates floating on it. The premium
+     read lives at the extremes: true black type, bright plates, nothing
+     parked in the middle of the scale. Mid-gray fields on mid-gray paper is
+     what makes a monochrome look like e-ink. */
+  --bg:        #f2f3f5;
   --panel-1:   #ffffff;
-  --panel-2:   #eaebed;
-  --ink:       #23262a;
-  --ink-2:     #52575d;
-  --ink-3:     #82878e;
-  --ink-4:     #b0b5bb;
-  --rule:      #dfe1e4;
-  --rule-soft: #ebedee;
-  /* the accent is a VALUE, not a hue: darker than the body text, so emphasis
-     still steps forward instead of falling back into gray */
-  --accent:    #08090a;
-  --accent-2:  #2c3035;
+  --panel-2:   #e8eaed;
+  --ink:       #0b0d10;
+  --ink-2:     #43484f;
+  --ink-3:     #767c84;
+  --ink-4:     #a9aeb6;
+  --rule:      #dcdee2;
+  --rule-soft: #e9eaed;
+  /* emphasis is pure black — in a hueless system the accent is the extreme,
+     never a lighter gray */
+  --accent:    #000000;
+  --accent-2:  #23272c;
   --accent-ink:#ffffff;
-  --accent-dim:#e4e6e9;
-  --ascii:     #23262a;
+  --accent-dim:#e2e4e8;
+  --ascii:     #0b0d10;
+  /* the machined plate: a face that is lit at the top and settles at the base */
+  --plate: linear-gradient(180deg, #ffffff 0%, #fafbfc 45%, #f1f2f5 100%);
+  /* the two edges that separate a milled surface from a printed rectangle */
+  --edge-hi: rgba(255,255,255,0.95);
+  --edge-lo: rgba(11,13,16,0.09);
   /* brushed metal for display emphasis. Diagonal, not vertical: background-clip
-     paints across the whole line box, so a vertical ramp puts its light stops
-     in the ascender and descender space and the x-height reads as flat black.
-     Angled, the sheen crosses the word and every letter catches a different
-     part of it. The lit stops stay dark enough to hold contrast on paper. */
-  --metal: linear-gradient(160deg, #0b0d0f 0%, #4f555d 36%, #0b0d0f 58%, #3a3f45 100%);
-  /* light paper: metal casts a shadow rather than glowing */
-  --glow: rgba(10,12,14,0.2);
-  --grain-blend: multiply;
-  --grain-opacity: 0.035;
-  --panel-sheen: linear-gradient(180deg, rgba(255,255,255,0.6), rgba(255,255,255,0) 42%);
-  --shadow: 0 1px 2px rgba(10,12,14,0.05), 0 30px 64px -38px rgba(10,12,14,0.22);
-  --selection: rgba(35,38,42,0.15);
+     paints the whole line box, so a vertical ramp hides its light stops in the
+     ascender space and the x-height reads flat black. Angled, the sheen crosses
+     the word and every letter catches a different part of it. */
+  --metal: linear-gradient(160deg, #000000 0%, #5b616a 34%, #05060a 58%, #2f343a 100%);
+  --glow: rgba(11,13,16,0.2);
+  /* brushed, not papery: the noise is stretched into horizontal streaks, so the
+     film reads as a milled surface instead of pulp */
+  --grain-blend: overlay;
+  --grain-opacity: 0.05;
+  --panel-sheen: var(--plate);
+  --shadow: 0 1px 2px rgba(11,13,16,0.05), 0 30px 64px -38px rgba(11,13,16,0.24);
+  --selection: rgba(11,13,16,0.14);
   color-scheme: light;
 }
 
 [data-theme="dark"] {
-  /* MACHINED GRAPHITE — cold body, specular emphasis */
-  --bg:        #0b0c0e;
-  --panel-1:   #141619;
-  --panel-2:   #1c1f23;
-  --ink:       #e8eaed;
-  --ink-2:     #a6abb2;
-  --ink-3:     #737a82;
-  --ink-4:     #474d55;
-  --rule:      #23262b;
-  --rule-soft: #16181b;
-  /* inverted, same logic: emphasis is the brightest value on the page */
-  --accent:    #f7f9fa;
-  --accent-2:  #cfd5db;
-  --accent-ink:#0b0c0e;
-  --accent-dim:#21252a;
-  --ascii:     #e8eaed;
-  /* chrome: specular top, shadowed band, lit again at the base */
-  --metal: linear-gradient(180deg, #ffffff 0%, #dfe4e9 40%, #9aa1a9 56%, #eceff2 100%);
-  /* dark: metal glints */
-  --glow: rgba(247,249,250,0.4);
+  /* MACHINED GRAPHITE — the plate is brighter than the field it sits on and
+     catches light along its top edge. This is the metal-card read. */
+  --bg:        #0a0b0d;
+  --panel-1:   #16191d;
+  --panel-2:   #1d2126;
+  --ink:       #f2f4f7;
+  --ink-2:     #a3a9b1;
+  --ink-3:     #6f767e;
+  --ink-4:     #454b53;
+  --rule:      #262a30;
+  --rule-soft: #16181c;
+  --accent:    #ffffff;
+  --accent-2:  #d5dae0;
+  --accent-ink:#0a0b0d;
+  --accent-dim:#20242a;
+  --ascii:     #f2f4f7;
+  --plate: linear-gradient(180deg, #1e2229 0%, #171a1f 46%, #101317 100%);
+  --edge-hi: rgba(255,255,255,0.12);
+  --edge-lo: rgba(0,0,0,0.55);
+  --metal: linear-gradient(160deg, #ffffff 0%, #cbd1d8 34%, #8d949d 56%, #f4f6f8 100%);
+  --glow: rgba(255,255,255,0.42);
   --grain-blend: overlay;
-  --grain-opacity: 0.05;
-  --panel-sheen: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0) 42%);
-  --shadow: 0 1px 2px rgba(0,0,0,0.45), 0 30px 64px -34px rgba(0,0,0,0.72);
-  --selection: rgba(232,234,237,0.22);
+  --grain-opacity: 0.055;
+  --panel-sheen: var(--plate);
+  --shadow: 0 1px 2px rgba(0,0,0,0.5), 0 30px 64px -34px rgba(0,0,0,0.8);
+  --selection: rgba(242,244,247,0.22);
   color-scheme: dark;
 }
 
@@ -81,15 +90,19 @@
   --font-code: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
   /* soft floating-card shadows (editorial), aliased onto legacy names */
-  --shadow-card:  0 1px 2px rgba(20,20,30,0.05), 0 18px 40px -24px rgba(20,20,30,0.28);
-  --shadow-lift:  0 1px 2px rgba(20,20,30,0.06), 0 30px 60px -28px rgba(20,20,30,0.34);
+  --shadow-card:  0 1px 1px rgba(11,13,16,0.06), 0 3px 8px -2px rgba(11,13,16,0.07), 0 22px 44px -22px rgba(11,13,16,0.26);
+  --shadow-lift:  0 1px 1px rgba(11,13,16,0.07), 0 8px 18px -4px rgba(11,13,16,0.12), 0 38px 66px -26px rgba(11,13,16,0.34);
   --shadow-hard:   var(--shadow-card);
   --shadow-harder: var(--shadow-lift);
 }
 [data-theme="dark"] {
-  --shadow-card: 0 1px 2px rgba(0,0,0,0.5), 0 18px 40px -22px rgba(0,0,0,0.7);
-  --shadow-lift: 0 1px 2px rgba(0,0,0,0.55), 0 30px 60px -26px rgba(0,0,0,0.8);
+  --shadow-card: 0 1px 1px rgba(0,0,0,0.6), 0 3px 8px -2px rgba(0,0,0,0.5), 0 22px 44px -20px rgba(0,0,0,0.75);
+  --shadow-lift: 0 1px 1px rgba(0,0,0,0.65), 0 8px 18px -4px rgba(0,0,0,0.55), 0 38px 66px -24px rgba(0,0,0,0.85);
 }
+
+/* Hairlines are engraved, not printed: --rule draws the cut and --edge-hi
+   catches light on the lip just below it. Applied wherever a rule separates
+   two blocks of content (card link row, contact meta blocks). */
 
 /* ---------------- METAL TYPE ----------------
    The one place the palette behaves like a material instead of a color: the
@@ -135,7 +148,9 @@ body {
   overflow-x: hidden;
 }
 
-/* soft grain — subtle film over the whole page */
+/* brushed film over the whole page — the turbulence is stretched along x
+   (low horizontal frequency, high vertical) so the noise resolves into fine
+   horizontal streaks: a milled surface, not paper grain */
 body::after {
   content: "";
   position: fixed;
@@ -144,7 +159,7 @@ body::after {
   pointer-events: none;
   opacity: var(--grain-opacity);
   mix-blend-mode: var(--grain-blend);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.012 1.4' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   background-size: 180px 180px;
 }
 @media (prefers-reduced-motion: reduce) {
@@ -560,7 +575,8 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
 .btn-ghost {
   border: 1px solid var(--rule);
   color: var(--ink);
-  background: var(--panel-1);
+  background: var(--plate);
+  box-shadow: inset 0 1px 0 var(--edge-hi);
 }
 .btn-ghost:hover { border-color: color-mix(in srgb, var(--ink) 28%, transparent); transform: translateY(-2px); box-shadow: var(--shadow-card); }
 .btn-primary svg, .btn-ghost svg { width: 14px; height: 14px; transition: transform 0.25s var(--ease); }
@@ -909,7 +925,8 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
   padding: 4px 9px;
   border: 1px solid var(--rule);
   border-radius: 6px;
-  background: var(--bg);
+  background: var(--plate);
+  box-shadow: inset 0 1px 0 var(--edge-hi);
 }
 /* stack chips close the copy column — the proof links row supplies the gap below */
 .article-card .proj-stack { margin-bottom: 0; }
@@ -1126,18 +1143,20 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
   flex-direction: column;
   gap: 16px;
 }
+/* a milled plate, not a printed rectangle: the lit top edge and the shaded
+   base are what give the surface thickness */
 .article-card {
   border: 1px solid var(--rule);
   border-radius: 14px;
-  background: var(--panel-1);
-  background-image: var(--panel-sheen);
+  background: var(--plate);
   overflow: hidden;
+  box-shadow: inset 0 1px 0 var(--edge-hi), inset 0 -1px 0 var(--edge-lo);
   transition: transform 0.2s var(--ease), border-color 0.2s var(--ease), box-shadow 0.2s var(--ease);
 }
 .article-card:hover {
   transform: translateY(-3px);
   border-color: color-mix(in srgb, var(--ink) 22%, transparent);
-  box-shadow: var(--shadow-card);
+  box-shadow: inset 0 1px 0 var(--edge-hi), inset 0 -1px 0 var(--edge-lo), var(--shadow-card);
 }
 .ac-link {
   display: block;
@@ -1250,6 +1269,7 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
   margin-top: 0;
   padding-top: clamp(14px, 1.6vw, 20px);
   border-top: 1px solid var(--rule);
+  box-shadow: inset 0 1px 0 var(--edge-hi);
 }
 a.ac-read:hover { color: var(--accent); }
 a.ac-read:hover svg { transform: translate(2px, -2px); }
@@ -1498,8 +1518,8 @@ a.ac-read:hover svg { transform: translate(2px, -2px); }
   flex-direction: column;
   gap: 0;
 }
-.contact-meta .cm-block { padding: 20px 0; border-top: 1px solid var(--rule); }
-.contact-meta .cm-block:first-child { border-top: none; padding-top: 0; }
+.contact-meta .cm-block { padding: 20px 0; border-top: 1px solid var(--rule); box-shadow: inset 0 1px 0 var(--edge-hi); }
+.contact-meta .cm-block:first-child { border-top: none; box-shadow: none; padding-top: 0; }
 .contact-meta .cmk {
   font-family: var(--font-mono);
   font-size: 14px;
