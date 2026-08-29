@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const WORDS = ['Product', 'Architecture', 'Engineering', 'Data', 'AI'];
 
@@ -17,6 +17,20 @@ export default function Marquee() {
       ))}
     </div>
   );
+
+  /* Release is watched on the window, not just the band: a pointer that comes
+     up outside it — dragged past the edge, or interrupted by a system gesture
+     — fires nothing on the element itself, and the band would stay paused. */
+  useEffect(() => {
+    if (!held) return;
+    const release = () => setHeld(false);
+    window.addEventListener('pointerup', release);
+    window.addEventListener('pointercancel', release);
+    return () => {
+      window.removeEventListener('pointerup', release);
+      window.removeEventListener('pointercancel', release);
+    };
+  }, [held]);
 
   // press-and-hold pauses the scroll and lights the band accent; release resumes.
   // pointer events cover mouse + touch, so it works the same on mobile.

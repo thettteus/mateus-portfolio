@@ -732,7 +732,6 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
   animation: mq-scroll 32s linear infinite;
 }
 /* press-and-hold (pointer/touch) pauses the scroll and lights the whole band */
-.mq-track:has(.mq-item:hover) { animation-play-state: paused; }
 .marquee.is-held .mq-track { animation-play-state: paused; }
 .marquee.is-held .mq-item { color: var(--accent); }
 .mq-copy {
@@ -753,7 +752,14 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
   color: color-mix(in srgb, var(--ink) 16%, transparent);
   transition: color 0.4s var(--ease);
 }
-.mq-item:hover { color: var(--accent); }
+/* Hover pause and hover color are gated to real pointers. A tap on a touch
+   screen latches :hover on the word and never clears it until you tap
+   somewhere else, which left the band paused for good. Touch reaches the same
+   behaviour through .is-held, which releases on pointerup/cancel. */
+@media (hover: hover) and (pointer: fine) {
+  .mq-track:has(.mq-item:hover) { animation-play-state: paused; }
+  .mq-item:hover { color: var(--accent); }
+}
 .mq-dot {
   width: clamp(8px, 1vw, 12px);
   aspect-ratio: 1;
