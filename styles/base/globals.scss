@@ -15,11 +15,16 @@
   --panel-1:   #ffffff;
   --panel-2:   #ebebe8;
   --ink:       #1d1d1f;
-  --ink-2:     #6e6e73;
-  --ink-3:     #8e8e93;
-  --ink-4:     #aeaeb2;
-  --rule:      #e1e1de;
-  --rule-soft: #edede9;
+  /* the secondary ramp runs one step darker than the spec: on this paper
+     #6e6e73 measures 4.65:1 and #8e8e93 only 3.34:1, against 6.98 and 4.51
+     for their dark-side counterparts — which is why light read as the weaker
+     of the two themes. Shifted down a slot, the spec value keeps its place in
+     the palette as the tertiary and every level gains. */
+  --ink-2:     #5b5b60;
+  --ink-3:     #6e6e73;
+  --ink-4:     #93939a;
+  --rule:      #dadad6;
+  --rule-soft: #e9e9e5;
   /* THE SIGNATURE — display type, graphics, fills, dots, borders */
   --accent:    #008c95;
   /* hover / pressed: more contrast against the paper */
@@ -34,7 +39,7 @@
   /* the machined plate: a face lit at the top that settles at the base */
   --plate: linear-gradient(180deg, #ffffff 0%, #fdfdfc 45%, #f7f7f5 100%);
   --edge-hi: rgba(255,255,255,0.95);
-  --edge-lo: rgba(29,29,31,0.08);
+  --edge-lo: rgba(29,29,31,0.1);
   --glow: rgba(0,140,149,0.3);
   --grain-blend: overlay;
   --grain-opacity: 0.035;

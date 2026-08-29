@@ -24,9 +24,9 @@ REG, BOLD, MED = 0, 1, 10
 # --- tokens, lifted from styles/base/globals.scss (light theme) -------------
 BG = (245, 245, 243)        # --bg      #f5f5f3
 INK = (29, 29, 31)          # --ink     #1d1d1f
-INK_2 = (110, 110, 115)     # --ink-2   #6e6e73
-INK_3 = (142, 142, 147)     # --ink-3   #8e8e93
-RULE = (225, 225, 222)      # --rule    #e1e1de
+INK_2 = (91, 91, 96)        # --ink-2   #5b5b60
+INK_3 = (110, 110, 115)     # --ink-3   #6e6e73
+RULE = (218, 218, 214)      # --rule    #dadad6
 ACCENT = (0, 140, 149)      # --accent  #008c95  signature teal
 
 

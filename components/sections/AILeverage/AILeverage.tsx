@@ -6,10 +6,12 @@ import { FadeIn } from '@/components/ui/FadeIn';
 
 /* ── refraction motif geometry ──────────────────────────────────────────
    scattered possibilities converge at the prism's left vertex; judgment
-   focuses them into one accent beam → directed impact. The scatter is carried
-   by value, not hue: each ray sits at its own point on the metal ramp, from
-   dim titanium to full specular, so the palette stays monochrome and both
-   themes stay legible (a fixed hex would vanish on one of them). */
+   focuses them into one accent beam → directed impact. Only the chosen path
+   and the outcome carry the signature: the possibilities are graphite, so the
+   color marks the decision rather than the noise it was picked out of. Their
+   scatter is carried by value — each ray sits at its own point between
+   --ink-4 and --ink, which keeps both themes legible where a fixed hex
+   would vanish on one of them. */
 const CX = 300;
 const CY = 250;
 const PRISM = {
@@ -21,7 +23,7 @@ const PRISM = {
 };
 const IMPACT_X = 720;
 
-/* t = position on the ramp between --ink-4 (dim) and --accent (specular) */
+/* t = position on the graphite ramp between --ink-4 (faint) and --ink */
 const RAY_DEFS: { a: number; l: number; t: number }[] = [
   { a: -38, l: 196, t: 0.55 },
   { a: -31, l: 232, t: 0.8 },
@@ -43,7 +45,7 @@ const RAYS = RAY_DEFS.map(({ a, l, t }) => {
   return {
     x: +(CX - L * Math.cos(r)).toFixed(1),
     y: +(CY + L * Math.sin(r)).toFixed(1),
-    c: `color-mix(in srgb, var(--accent) ${Math.round(t * 100)}%, var(--ink-4))`,
+    c: `color-mix(in srgb, var(--ink) ${Math.round(t * 100)}%, var(--ink-4))`,
   };
 });
 
