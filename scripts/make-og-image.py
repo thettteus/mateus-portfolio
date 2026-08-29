@@ -27,6 +27,7 @@ INK = (29, 29, 31)          # --ink     #1d1d1f
 INK_2 = (91, 91, 96)        # --ink-2   #5b5b60
 INK_3 = (110, 110, 115)     # --ink-3   #6e6e73
 RULE = (218, 218, 214)      # --rule    #dadad6
+EDGE_HI = (253, 253, 252)   # --edge-hi over the paper
 ACCENT = (0, 140, 149)      # --accent  #008c95  signature teal
 
 
@@ -81,8 +82,10 @@ d.rectangle([x, y_eyebrow + 3 * S, x + S, y_eyebrow + 29 * S], fill=RULE)
 x += 26 * S
 tracked(d, x, y_eyebrow + 9 * S, [("PRODUCT ENGINEER", f_role, INK_3)], tracking=0.14)
 
-# section hairline, the same device the site uses under its section heads
+# section hairline — engraved like the site's: --rule cuts the groove and
+# --edge-hi catches light on the lip just below it
 d.rectangle([M, 124 * S, W - M, 124 * S + S], fill=RULE)
+d.rectangle([M, 125 * S + S, W - M, 125 * S + 2 * S], fill=EDGE_HI)
 
 # --- headline: the hero line, verbatim ------------------------------------
 f_h = font(100, REG)
