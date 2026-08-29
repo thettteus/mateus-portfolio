@@ -7,8 +7,8 @@ antialiasing. Rather than redrawing the mark, every pixel is projected onto the
 background→mark axis and re-plotted on the new axis, so the letterform and its
 edge softness survive byte for byte — only the two endpoints move.
 
-Light-UI icons get an obsidian mark on white; the dark-UI variants get a
-platinum mark, and their near-black square loses its faint blue cast.
+The mark carries the signature teal in both variants — brightened in the dark
+one so it keeps its weight against the darker square.
 """
 from pathlib import Path
 
@@ -16,8 +16,8 @@ from PIL import Image
 
 PUBLIC = Path(__file__).resolve().parent.parent / "public"
 
-LIGHT_BG, LIGHT_INK = (255, 255, 255), (13, 15, 17)   # paper / obsidian
-DARK_BG, DARK_INK = (11, 12, 14), (242, 244, 246)     # graphite / platinum
+LIGHT_BG, LIGHT_INK = (255, 255, 255), (0, 140, 149)  # white / signature teal
+DARK_BG, DARK_INK = (22, 23, 24), (0, 178, 186)       # graphite / teal, brightened
 
 LIGHT = ["icon-512.png", "icon-192.png", "apple-touch-icon.png",
          "favicon-32x32.png", "favicon-16x16.png", "icon_light.png"]
@@ -26,20 +26,18 @@ ICO = "favicon.ico"
 
 
 def endpoints(img):
-    """Background = a corner pixel; mark = the most saturated color present.
+    """Background = a corner pixel; mark = the color furthest from it.
 
-    Chroma, not frequency: at 16x16 every pixel of the mark is its own
-    antialiased blend, so no single value is frequent enough to spot by count,
-    and a frequency floor picks the paper instead. The backgrounds here are
-    neutral and the mark is the only saturated thing in the file, so the
-    highest-chroma pixel is the mark at full strength.
+    Plain Euclidean distance, with no frequency floor: at 16x16 every pixel of
+    the mark is its own antialiased blend, so nothing is frequent enough to
+    spot by count and a floor picks the background back. Distance holds whether
+    the mark is saturated or neutral, so this survives repeated recolors.
     """
     bg = img.load()[0, 0][:3]
     colors = [c for _, c in img.convert("RGB").getcolors(maxcolors=1 << 24) or []]
-    chroma = lambda c: max(c) - min(c)
-    ink = max(colors, key=lambda c: (chroma(c), sum((a - b) ** 2 for a, b in zip(c, bg))))
-    if chroma(ink) < 30:
-        raise SystemExit(f"no saturated mark found in {img.filename} — nothing to recolor")
+    ink = max(colors, key=lambda c: sum((a - b) ** 2 for a, b in zip(c, bg)))
+    if sum((a - b) ** 2 for a, b in zip(ink, bg)) < 900:
+        raise SystemExit(f"{img.size} image has no mark to recolor")
     return bg, ink
 
 

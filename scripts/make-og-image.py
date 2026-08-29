@@ -22,12 +22,12 @@ FONT = "/System/Library/Fonts/HelveticaNeue.ttc"
 REG, BOLD, MED = 0, 1, 10
 
 # --- tokens, lifted from styles/base/globals.scss (light theme) -------------
-BG = (245, 246, 247)        # --bg      #f5f6f7  platinum paper
-INK = (35, 38, 42)          # --ink     #23262a  graphite
-INK_2 = (82, 87, 93)        # --ink-2   #52575d
-INK_3 = (130, 135, 142)     # --ink-3   #82878e
-RULE = (223, 225, 228)      # --rule    #dfe1e4
-ACCENT = (8, 9, 10)         # --accent  #08090a  obsidian
+BG = (245, 245, 243)        # --bg      #f5f5f3
+INK = (29, 29, 31)          # --ink     #1d1d1f
+INK_2 = (110, 110, 115)     # --ink-2   #6e6e73
+INK_3 = (142, 142, 147)     # --ink-3   #8e8e93
+RULE = (225, 225, 222)      # --rule    #e1e1de
+ACCENT = (0, 140, 149)      # --accent  #008c95  signature teal
 
 
 def over(fg, alpha, bg=BG):

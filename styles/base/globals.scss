@@ -8,74 +8,70 @@
 /* ---------------- THEME TOKENS ---------------- */
 :root,
 [data-theme="light"] {
-  /* PLATINUM — a cool sheet with machined plates floating on it. The premium
-     read lives at the extremes: true black type, bright plates, nothing
-     parked in the middle of the scale. Mid-gray fields on mid-gray paper is
-     what makes a monochrome look like e-ink. */
-  --bg:        #f2f3f5;
+  /* Apple-neutral paper, teal signature. The neutrals are warm (R=G>B), so the
+     derived grays and rules follow that cast — a cool gray on this paper reads
+     as a different material. */
+  --bg:        #f5f5f3;
   --panel-1:   #ffffff;
-  --panel-2:   #e8eaed;
-  --ink:       #0b0d10;
-  --ink-2:     #43484f;
-  --ink-3:     #767c84;
-  --ink-4:     #a9aeb6;
-  --rule:      #dcdee2;
-  --rule-soft: #e9eaed;
-  /* emphasis is pure black — in a hueless system the accent is the extreme,
-     never a lighter gray */
-  --accent:    #000000;
-  --accent-2:  #23272c;
+  --panel-2:   #ebebe8;
+  --ink:       #1d1d1f;
+  --ink-2:     #6e6e73;
+  --ink-3:     #8e8e93;
+  --ink-4:     #aeaeb2;
+  --rule:      #e1e1de;
+  --rule-soft: #edede9;
+  /* THE SIGNATURE — display type, graphics, fills, dots, borders */
+  --accent:    #008c95;
+  /* hover / pressed: more contrast against the paper */
+  --accent-2:  #00767d;
+  /* small text only. The signature measures 3.71:1 on --bg, which clears the
+     3:1 bar for graphics and large display but sits under AA's 4.5:1 for body
+     copy — this is the same teal, one step darker, for anything under 18px. */
+  --accent-text: #00767d;
   --accent-ink:#ffffff;
-  --accent-dim:#e2e4e8;
-  --ascii:     #0b0d10;
-  /* the machined plate: a face that is lit at the top and settles at the base */
-  --plate: linear-gradient(180deg, #ffffff 0%, #fafbfc 45%, #f1f2f5 100%);
-  /* the two edges that separate a milled surface from a printed rectangle */
+  --accent-dim:#dceced;
+  --ascii:     #1d1d1f;
+  /* the machined plate: a face lit at the top that settles at the base */
+  --plate: linear-gradient(180deg, #ffffff 0%, #fdfdfc 45%, #f7f7f5 100%);
   --edge-hi: rgba(255,255,255,0.95);
-  --edge-lo: rgba(11,13,16,0.09);
-  /* brushed metal for display emphasis. Diagonal, not vertical: background-clip
-     paints the whole line box, so a vertical ramp hides its light stops in the
-     ascender space and the x-height reads flat black. Angled, the sheen crosses
-     the word and every letter catches a different part of it. */
-  --metal: linear-gradient(160deg, #000000 0%, #5b616a 34%, #05060a 58%, #2f343a 100%);
-  --glow: rgba(11,13,16,0.2);
-  /* brushed, not papery: the noise is stretched into horizontal streaks, so the
-     film reads as a milled surface instead of pulp */
+  --edge-lo: rgba(29,29,31,0.08);
+  --glow: rgba(0,140,149,0.3);
   --grain-blend: overlay;
-  --grain-opacity: 0.05;
+  --grain-opacity: 0.035;
   --panel-sheen: var(--plate);
-  --shadow: 0 1px 2px rgba(11,13,16,0.05), 0 30px 64px -38px rgba(11,13,16,0.24);
-  --selection: rgba(11,13,16,0.14);
+  --shadow: 0 1px 2px rgba(29,29,31,0.05), 0 30px 64px -38px rgba(29,29,31,0.22);
+  --selection: rgba(0,140,149,0.18);
   color-scheme: light;
 }
 
 [data-theme="dark"] {
-  /* MACHINED GRAPHITE — the plate is brighter than the field it sits on and
-     catches light along its top edge. This is the metal-card read. */
-  --bg:        #0a0b0d;
-  --panel-1:   #16191d;
-  --panel-2:   #1d2126;
-  --ink:       #f2f4f7;
-  --ink-2:     #a3a9b1;
-  --ink-3:     #6f767e;
-  --ink-4:     #454b53;
-  --rule:      #262a30;
-  --rule-soft: #16181c;
-  --accent:    #ffffff;
-  --accent-2:  #d5dae0;
-  --accent-ink:#0a0b0d;
-  --accent-dim:#20242a;
-  --ascii:     #f2f4f7;
-  --plate: linear-gradient(180deg, #1e2229 0%, #171a1f 46%, #101317 100%);
-  --edge-hi: rgba(255,255,255,0.12);
-  --edge-lo: rgba(0,0,0,0.55);
-  --metal: linear-gradient(160deg, #ffffff 0%, #cbd1d8 34%, #8d949d 56%, #f4f6f8 100%);
-  --glow: rgba(255,255,255,0.42);
+  /* the same system inverted; the teal brightens so it keeps its weight
+     against the dark field, and the plate stays lighter than what it sits on */
+  --bg:        #161718;
+  --panel-1:   #1d1d1f;
+  --panel-2:   #242426;
+  --ink:       #f5f5f3;
+  --ink-2:     #a1a1a6;
+  --ink-3:     #7c7c81;
+  --ink-4:     #55555a;
+  --rule:      #2c2c2e;
+  --rule-soft: #202022;
+  --accent:    #00a0a8;
+  --accent-2:  #00b2ba;
+  /* 5.64:1 on --bg — the signature clears AA here, so small text keeps it */
+  --accent-text: #00a0a8;
+  --accent-ink:#0b0b0c;
+  --accent-dim:#0c2a2c;
+  --ascii:     #f5f5f3;
+  --plate: linear-gradient(180deg, #232325 0%, #1d1d1f 46%, #171719 100%);
+  --edge-hi: rgba(255,255,255,0.1);
+  --edge-lo: rgba(0,0,0,0.5);
+  --glow: rgba(0,178,186,0.42);
   --grain-blend: overlay;
-  --grain-opacity: 0.055;
+  --grain-opacity: 0.05;
   --panel-sheen: var(--plate);
-  --shadow: 0 1px 2px rgba(0,0,0,0.5), 0 30px 64px -34px rgba(0,0,0,0.8);
-  --selection: rgba(242,244,247,0.22);
+  --shadow: 0 1px 2px rgba(0,0,0,0.5), 0 30px 64px -34px rgba(0,0,0,0.78);
+  --selection: rgba(0,160,168,0.32);
   color-scheme: dark;
 }
 
@@ -90,8 +86,8 @@
   --font-code: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
   /* soft floating-card shadows (editorial), aliased onto legacy names */
-  --shadow-card:  0 1px 1px rgba(11,13,16,0.06), 0 3px 8px -2px rgba(11,13,16,0.07), 0 22px 44px -22px rgba(11,13,16,0.26);
-  --shadow-lift:  0 1px 1px rgba(11,13,16,0.07), 0 8px 18px -4px rgba(11,13,16,0.12), 0 38px 66px -26px rgba(11,13,16,0.34);
+  --shadow-card:  0 1px 1px rgba(29,29,31,0.06), 0 3px 8px -2px rgba(29,29,31,0.07), 0 22px 44px -22px rgba(29,29,31,0.26);
+  --shadow-lift:  0 1px 1px rgba(29,29,31,0.07), 0 8px 18px -4px rgba(29,29,31,0.12), 0 38px 66px -26px rgba(29,29,31,0.34);
   --shadow-hard:   var(--shadow-card);
   --shadow-harder: var(--shadow-lift);
 }
@@ -103,30 +99,6 @@
 /* Hairlines are engraved, not printed: --rule draws the cut and --edge-hi
    catches light on the lip just below it. Applied wherever a rule separates
    two blocks of content (card link row, contact meta blocks). */
-
-/* ---------------- METAL TYPE ----------------
-   The one place the palette behaves like a material instead of a color: the
-   display emphases get the brushed gradient, so emphasis reads as sharper
-   than the body text. Without this a hueless accent flattens into gray —
-   exactly the problem the colored <em> was introduced to solve. Solid
-   --accent is the fallback where background-clip: text is unsupported. */
-.sec-head h2 em,
-.contact-statement em,
-.hero-copy .hl-w,
-.po-foot em {
-  color: var(--accent);
-}
-@supports ((-webkit-background-clip: text) or (background-clip: text)) {
-  .sec-head h2 em,
-  .contact-statement em,
-  .hero-copy .hl-w,
-  .po-foot em {
-    background-image: var(--metal);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-  }
-}
 
 /* ---------------- BASE RESET ---------------- */
 * { box-sizing: border-box; }
@@ -352,7 +324,7 @@ section {
   font-family: var(--font-mono);
   font-size: 11px;
   letter-spacing: 0.1em;
-  color: var(--accent);
+  color: var(--accent-text);
 }
 .sec-eyebrow .lbl {
   font-family: var(--font-mono);
@@ -369,7 +341,7 @@ section {
   color: var(--ink);
   text-wrap: balance;
 }
-.sec-head h2 em { font-style: normal; }
+.sec-head h2 em { color: var(--accent); font-style: normal; }
 .sec-head .sub {
   font-size: clamp(18px, 1.5vw, 21px);
   color: var(--ink-2);
@@ -463,7 +435,7 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
   color: var(--ink-2);
   transition: color 0.2s;
 }
-.nav a:hover { color: var(--accent); }
+.nav a:hover { color: var(--accent-text); }
 .nav a.nav-active { color: var(--ink); }
 .nav a.nav-active::after {
   content: "";
@@ -705,6 +677,7 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
 .hero-copy .hl-w {
   font-weight: 700;
   white-space: nowrap;
+  color: var(--accent);
 }
 
 .br-mobile { display: none; }
@@ -830,7 +803,7 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
   font-family: var(--font-mono);
   font-size: 13px;
   letter-spacing: 0.14em;
-  fill: var(--accent);
+  fill: var(--accent-text);
 }
 .flow-sub {
   font-family: var(--font-sans);
@@ -960,7 +933,7 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
 /* labels — font-size is set per-ring inline so it grows toward the outcome */
 .po-lbl { text-anchor: middle; }
 .po-num {
-  fill: var(--accent);
+  fill: var(--accent-text);
   font-family: var(--font-mono);
   letter-spacing: 0.1em;
 }
@@ -970,7 +943,7 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
   letter-spacing: -0.015em;
 }
 .po-lbl.acc .po-nm {
-  fill: var(--accent);
+  fill: var(--accent-text);
   filter: drop-shadow(0 0 12px var(--glow));
 }
 
@@ -981,7 +954,7 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
   font-size: clamp(14px, 1.4vw, 15.5px);
   color: var(--ink-2);
 }
-.po-foot em { font-style: normal; }
+.po-foot em { color: var(--accent-text); font-style: normal; }
 
 /* ── reveal: rings trace in from the core, labels rise ── */
 .po-ring { stroke-dashoffset: 1; stroke-dasharray: 1; }
@@ -1205,7 +1178,7 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
 }
 /* chips wrap as whole units — a slot must never split mid-label */
 .ac-meta span { white-space: nowrap; }
-.ac-meta .ac-pulse { color: var(--accent); }
+.ac-meta .ac-pulse { color: var(--accent-text); }
 .article-card h3 {
   font-family: var(--font-display);
   font-weight: 400;
@@ -1238,7 +1211,7 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
   font-size: 11px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--accent);
+  color: var(--accent-text);
 }
 .ac-read {
   display: inline-flex;
@@ -1296,7 +1269,7 @@ a.ac-read:hover svg { transform: translate(2px, -2px); }
   color: var(--ink-3);
   transition: color 0.2s var(--ease);
 }
-.article-back:hover { color: var(--accent); }
+.article-back:hover { color: var(--accent-text); }
 .article-head {
   margin: clamp(28px, 4vw, 48px) 0 clamp(32px, 4vw, 48px);
   padding-bottom: clamp(24px, 3vw, 36px);
@@ -1308,7 +1281,7 @@ a.ac-read:hover svg { transform: translate(2px, -2px); }
   font-size: 11px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--accent);
+  color: var(--accent-text);
   margin-bottom: 18px;
 }
 .article-head h1 {
@@ -1365,8 +1338,8 @@ a.ac-read:hover svg { transform: translate(2px, -2px); }
   transition: color 0.2s var(--ease), text-decoration-color 0.2s var(--ease);
 }
 .article-body a:hover {
-  color: var(--accent);
-  text-decoration-color: var(--accent);
+  color: var(--accent-text);
+  text-decoration-color: var(--accent-text);
 }
 /* code keeps a real monospace stack — system fonts only, no web font added.
    the metric/ascii blocks depend on column alignment. */
@@ -1452,7 +1425,7 @@ a.ac-read:hover svg { transform: translate(2px, -2px); }
   margin: 0 0 24px;
   text-wrap: balance;
 }
-.contact-statement em { font-style: normal; }
+.contact-statement em { color: var(--accent); font-style: normal; }
 .contact-lead {
   font-size: clamp(15px, 2.2vw, 18px);
   line-height: 1.6;
@@ -1491,7 +1464,7 @@ a.ac-read:hover svg { transform: translate(2px, -2px); }
 .contact-link-primary {
   font-size: 19px;
   font-weight: 600;
-  color: var(--accent);
+  color: var(--accent-text);
   border-bottom-color: color-mix(in srgb, var(--accent) 35%, transparent);
 }
 .contact-link-primary svg { width: 16px; height: 16px; }
@@ -1537,7 +1510,7 @@ a.ac-read:hover svg { transform: translate(2px, -2px); }
 .contact-meta .cmv a.dl-pdf:hover svg { transform: translate(2px, -2px); }
 .contact-meta .opp { display: flex; flex-direction: column; gap: 8px; }
 .contact-meta .opp span { font-size: 16px; color: var(--ink-2); display: flex; gap: 9px; align-items: baseline; }
-.contact-meta .opp span::before { content: "→"; color: var(--accent); font-size: 16px; }
+.contact-meta .opp span::before { content: "→"; color: var(--accent-text); font-size: 16px; }
 
 /* ============================================================
    FOOTER
@@ -1641,7 +1614,7 @@ a.ac-read:hover svg { transform: translate(2px, -2px); }
   white-space: nowrap;
 }
 .ai-flow-stages span { display: inline-flex; align-items: center; white-space: nowrap; }
-.ai-flow-stages i { font-style: normal; color: var(--accent); margin-left: 6px; }
+.ai-flow-stages i { font-style: normal; color: var(--accent-text); margin-left: 6px; }
 
 /* ============================================================
    RESPONSIVE
