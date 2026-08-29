@@ -290,10 +290,11 @@ img { max-width: 100%; height: auto; }
   padding: 0 var(--gutter);
 }
 
+/* No rule between sections — the eyebrow number and the headline mark the
+   boundary, and the 144–232px of stacked padding carries the separation. */
 section {
   position: relative;
   padding: clamp(72px, 8vw, 116px) 0;
-  border-top: 1px solid var(--rule-soft);
 }
 
 .mono {
@@ -564,7 +565,6 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
    ============================================================ */
 .hero {
   position: relative;
-  border-top: none;
   /* tight vertical chrome — the whole stack must fit the first fold.
      +env keeps the same gap below the header now that the header is offset
      down by the iOS safe-area inset */
@@ -720,7 +720,6 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
 .marquee {
   padding: clamp(30px, 4vw, 52px) 0;
   overflow: hidden;
-  border-top: 1px solid var(--rule-soft);
   user-select: none;
   cursor: grab;
   touch-action: pan-y; /* keep vertical page scroll working over the band */
