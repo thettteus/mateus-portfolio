@@ -1,54 +1,82 @@
 /* ============================================================
    Mateus P. S. — Full-Stack / Product Software Engineer
    System: Helvetica only, everywhere (no display/mono web fonts)
-   Aesthetic: editorial tech · neutral paper · indigo accent · generative graphics
+   Aesthetic: editorial tech · monochrome metal · titanium / platinum / chrome
+   No hue anywhere: emphasis is carried by value and material, not color.
    ============================================================ */
 
 /* ---------------- THEME TOKENS ---------------- */
 :root,
 [data-theme="light"] {
-  --bg:        #fbfbfc;
+  /* Apple-neutral paper, teal signature. The neutrals are warm (R=G>B), so the
+     derived grays and rules follow that cast — a cool gray on this paper reads
+     as a different material. */
+  --bg:        #f5f5f3;
   --panel-1:   #ffffff;
-  --panel-2:   #f4f5f7;
-  --ink:       #15161a;
-  --ink-2:     #4a4d57;
-  --ink-3:     #797d88;
-  --ink-4:     #aeb1ba;
-  --rule:      #e6e7eb;
-  --rule-soft: #eff0f3;
-  --accent:    #4f46e5;
-  --accent-2:  #4338ca;
+  --panel-2:   #ebebe8;
+  --ink:       #1d1d1f;
+  /* the secondary ramp runs one step darker than the spec: on this paper
+     #6e6e73 measures 4.65:1 and #8e8e93 only 3.34:1, against 6.98 and 4.51
+     for their dark-side counterparts — which is why light read as the weaker
+     of the two themes. Shifted down a slot, the spec value keeps its place in
+     the palette as the tertiary and every level gains. */
+  --ink-2:     #5b5b60;
+  --ink-3:     #6e6e73;
+  --ink-4:     #93939a;
+  --rule:      #dadad6;
+  --rule-soft: #e9e9e5;
+  /* THE SIGNATURE — display type, graphics, fills, dots, borders */
+  --accent:    #008c95;
+  /* hover / pressed: more contrast against the paper */
+  --accent-2:  #00767d;
+  /* small text only. The signature measures 3.71:1 on --bg, which clears the
+     3:1 bar for graphics and large display but sits under AA's 4.5:1 for body
+     copy — this is the same teal, one step darker, for anything under 18px. */
+  --accent-text: #00767d;
   --accent-ink:#ffffff;
-  --accent-dim:#ecebfb;
-  --ascii:     #15161a;
-  --grain-blend: multiply;
+  --accent-dim:#dceced;
+  --ascii:     #1d1d1f;
+  /* the machined plate: a face lit at the top that settles at the base */
+  --plate: linear-gradient(180deg, #ffffff 0%, #fdfdfc 45%, #f7f7f5 100%);
+  --edge-hi: rgba(255,255,255,0.95);
+  --edge-lo: rgba(29,29,31,0.1);
+  --glow: rgba(0,140,149,0.3);
+  --grain-blend: overlay;
   --grain-opacity: 0.035;
-  --panel-sheen: linear-gradient(180deg, rgba(255,255,255,0.6), rgba(255,255,255,0) 42%);
-  --shadow: 0 1px 2px rgba(20,20,30,0.04), 0 30px 64px -38px rgba(20,20,30,0.2);
-  --selection: rgba(79,70,229,0.16);
+  --panel-sheen: var(--plate);
+  --shadow: 0 1px 2px rgba(29,29,31,0.05), 0 30px 64px -38px rgba(29,29,31,0.22);
+  --selection: rgba(0,140,149,0.18);
   color-scheme: light;
 }
 
 [data-theme="dark"] {
-  --bg:        #0a0a0f;
-  --panel-1:   #121319;
-  --panel-2:   #181a22;
-  --ink:       #ecedf2;
-  --ink-2:     #aeb0bc;
-  --ink-3:     #797c89;
-  --ink-4:     #4f5260;
-  --rule:      #24262f;
-  --rule-soft: #181a21;
-  --accent:    #8b82f7;
-  --accent-2:  #a39cf9;
-  --accent-ink:#0a0a0f;
-  --accent-dim:#1c1b33;
-  --ascii:     #ecedf2;
+  /* the same system inverted; the teal brightens so it keeps its weight
+     against the dark field, and the plate stays lighter than what it sits on */
+  --bg:        #161718;
+  --panel-1:   #1d1d1f;
+  --panel-2:   #242426;
+  --ink:       #f5f5f3;
+  --ink-2:     #a1a1a6;
+  --ink-3:     #7c7c81;
+  --ink-4:     #55555a;
+  --rule:      #2c2c2e;
+  --rule-soft: #202022;
+  --accent:    #00a0a8;
+  --accent-2:  #00b2ba;
+  /* 5.64:1 on --bg — the signature clears AA here, so small text keeps it */
+  --accent-text: #00a0a8;
+  --accent-ink:#0b0b0c;
+  --accent-dim:#0c2a2c;
+  --ascii:     #f5f5f3;
+  --plate: linear-gradient(180deg, #232325 0%, #1d1d1f 46%, #171719 100%);
+  --edge-hi: rgba(255,255,255,0.1);
+  --edge-lo: rgba(0,0,0,0.5);
+  --glow: rgba(0,178,186,0.42);
   --grain-blend: overlay;
   --grain-opacity: 0.05;
-  --panel-sheen: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0) 42%);
-  --shadow: 0 1px 2px rgba(0,0,0,0.4), 0 30px 64px -34px rgba(0,0,0,0.7);
-  --selection: rgba(139,130,247,0.3);
+  --panel-sheen: var(--plate);
+  --shadow: 0 1px 2px rgba(0,0,0,0.5), 0 30px 64px -34px rgba(0,0,0,0.78);
+  --selection: rgba(0,160,168,0.32);
   color-scheme: dark;
 }
 
@@ -63,15 +91,19 @@
   --font-code: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
   /* soft floating-card shadows (editorial), aliased onto legacy names */
-  --shadow-card:  0 1px 2px rgba(20,20,30,0.05), 0 18px 40px -24px rgba(20,20,30,0.28);
-  --shadow-lift:  0 1px 2px rgba(20,20,30,0.06), 0 30px 60px -28px rgba(20,20,30,0.34);
+  --shadow-card:  0 1px 1px rgba(29,29,31,0.06), 0 3px 8px -2px rgba(29,29,31,0.07), 0 22px 44px -22px rgba(29,29,31,0.26);
+  --shadow-lift:  0 1px 1px rgba(29,29,31,0.07), 0 8px 18px -4px rgba(29,29,31,0.12), 0 38px 66px -26px rgba(29,29,31,0.34);
   --shadow-hard:   var(--shadow-card);
   --shadow-harder: var(--shadow-lift);
 }
 [data-theme="dark"] {
-  --shadow-card: 0 1px 2px rgba(0,0,0,0.5), 0 18px 40px -22px rgba(0,0,0,0.7);
-  --shadow-lift: 0 1px 2px rgba(0,0,0,0.55), 0 30px 60px -26px rgba(0,0,0,0.8);
+  --shadow-card: 0 1px 1px rgba(0,0,0,0.6), 0 3px 8px -2px rgba(0,0,0,0.5), 0 22px 44px -20px rgba(0,0,0,0.75);
+  --shadow-lift: 0 1px 1px rgba(0,0,0,0.65), 0 8px 18px -4px rgba(0,0,0,0.55), 0 38px 66px -24px rgba(0,0,0,0.85);
 }
+
+/* Hairlines are engraved, not printed: --rule draws the cut and --edge-hi
+   catches light on the lip just below it. Applied wherever a rule separates
+   two blocks of content (card link row, contact meta blocks). */
 
 /* ---------------- BASE RESET ---------------- */
 * { box-sizing: border-box; }
@@ -93,7 +125,9 @@ body {
   overflow-x: hidden;
 }
 
-/* soft grain — subtle film over the whole page */
+/* brushed film over the whole page — the turbulence is stretched along x
+   (low horizontal frequency, high vertical) so the noise resolves into fine
+   horizontal streaks: a milled surface, not paper grain */
 body::after {
   content: "";
   position: fixed;
@@ -102,7 +136,7 @@ body::after {
   pointer-events: none;
   opacity: var(--grain-opacity);
   mix-blend-mode: var(--grain-blend);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.012 1.4' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   background-size: 180px 180px;
 }
 @media (prefers-reduced-motion: reduce) {
@@ -256,10 +290,11 @@ img { max-width: 100%; height: auto; }
   padding: 0 var(--gutter);
 }
 
+/* No rule between sections — the eyebrow number and the headline mark the
+   boundary, and the 144–232px of stacked padding carries the separation. */
 section {
   position: relative;
   padding: clamp(72px, 8vw, 116px) 0;
-  border-top: 1px solid var(--rule-soft);
 }
 
 .mono {
@@ -295,7 +330,7 @@ section {
   font-family: var(--font-mono);
   font-size: 11px;
   letter-spacing: 0.1em;
-  color: var(--accent);
+  color: var(--accent-text);
 }
 .sec-eyebrow .lbl {
   font-family: var(--font-mono);
@@ -406,7 +441,7 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
   color: var(--ink-2);
   transition: color 0.2s;
 }
-.nav a:hover { color: var(--accent); }
+.nav a:hover { color: var(--accent-text); }
 .nav a.nav-active { color: var(--ink); }
 .nav a.nav-active::after {
   content: "";
@@ -518,7 +553,8 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
 .btn-ghost {
   border: 1px solid var(--rule);
   color: var(--ink);
-  background: var(--panel-1);
+  background: var(--plate);
+  box-shadow: inset 0 1px 0 var(--edge-hi);
 }
 .btn-ghost:hover { border-color: color-mix(in srgb, var(--ink) 28%, transparent); transform: translateY(-2px); box-shadow: var(--shadow-card); }
 .btn-primary svg, .btn-ghost svg { width: 14px; height: 14px; transition: transform 0.25s var(--ease); }
@@ -529,7 +565,6 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
    ============================================================ */
 .hero {
   position: relative;
-  border-top: none;
   /* tight vertical chrome — the whole stack must fit the first fold.
      +env keeps the same gap below the header now that the header is offset
      down by the iOS safe-area inset */
@@ -644,10 +679,10 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
   color: var(--ink-2);
   margin: 0 0 36px;
 }
-.hero-copy .hl-w { 
-  font-weight: 700; 
-  white-space: nowrap; 
-  color: var(--accent); 
+.hero-copy .hl-w {
+  font-weight: 700;
+  white-space: nowrap;
+  color: var(--accent);
 }
 
 .br-mobile { display: none; }
@@ -685,7 +720,6 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
 .marquee {
   padding: clamp(30px, 4vw, 52px) 0;
   overflow: hidden;
-  border-top: 1px solid var(--rule-soft);
   user-select: none;
   cursor: grab;
   touch-action: pan-y; /* keep vertical page scroll working over the band */
@@ -697,7 +731,6 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
   animation: mq-scroll 32s linear infinite;
 }
 /* press-and-hold (pointer/touch) pauses the scroll and lights the whole band */
-.mq-track:has(.mq-item:hover) { animation-play-state: paused; }
 .marquee.is-held .mq-track { animation-play-state: paused; }
 .marquee.is-held .mq-item { color: var(--accent); }
 .mq-copy {
@@ -718,7 +751,14 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
   color: color-mix(in srgb, var(--ink) 16%, transparent);
   transition: color 0.4s var(--ease);
 }
-.mq-item:hover { color: var(--accent); }
+/* Hover pause and hover color are gated to real pointers. A tap on a touch
+   screen latches :hover on the word and never clears it until you tap
+   somewhere else, which left the band paused for good. Touch reaches the same
+   behaviour through .is-held, which releases on pointerup/cancel. */
+@media (hover: hover) and (pointer: fine) {
+  .mq-track:has(.mq-item:hover) { animation-play-state: paused; }
+  .mq-item:hover { color: var(--accent); }
+}
 .mq-dot {
   width: clamp(8px, 1vw, 12px);
   aspect-ratio: 1;
@@ -773,7 +813,7 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
   font-family: var(--font-mono);
   font-size: 13px;
   letter-spacing: 0.14em;
-  fill: var(--accent);
+  fill: var(--accent-text);
 }
 .flow-sub {
   font-family: var(--font-sans);
@@ -868,7 +908,8 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
   padding: 4px 9px;
   border: 1px solid var(--rule);
   border-radius: 6px;
-  background: var(--bg);
+  background: var(--plate);
+  box-shadow: inset 0 1px 0 var(--edge-hi);
 }
 /* stack chips close the copy column — the proof links row supplies the gap below */
 .article-card .proj-stack { margin-bottom: 0; }
@@ -896,13 +937,13 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
   stroke: var(--accent);
   stroke-width: 1.5;
   stroke-opacity: 0.9;
-  filter: drop-shadow(0 0 9px color-mix(in srgb, var(--accent) 45%, transparent));
+  filter: drop-shadow(0 0 9px var(--glow));
 }
 
 /* labels — font-size is set per-ring inline so it grows toward the outcome */
 .po-lbl { text-anchor: middle; }
 .po-num {
-  fill: var(--accent);
+  fill: var(--accent-text);
   font-family: var(--font-mono);
   letter-spacing: 0.1em;
 }
@@ -912,8 +953,8 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
   letter-spacing: -0.015em;
 }
 .po-lbl.acc .po-nm {
-  fill: var(--accent);
-  filter: drop-shadow(0 0 12px color-mix(in srgb, var(--accent) 45%, transparent));
+  fill: var(--accent-text);
+  filter: drop-shadow(0 0 12px var(--glow));
 }
 
 .po-foot {
@@ -923,7 +964,7 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
   font-size: clamp(14px, 1.4vw, 15.5px);
   color: var(--ink-2);
 }
-.po-foot em { font-style: normal; color: var(--accent); }
+.po-foot em { color: var(--accent-text); font-style: normal; }
 
 /* ── reveal: rings trace in from the core, labels rise ── */
 .po-ring { stroke-dashoffset: 1; stroke-dasharray: 1; }
@@ -1085,18 +1126,20 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
   flex-direction: column;
   gap: 16px;
 }
+/* a milled plate, not a printed rectangle: the lit top edge and the shaded
+   base are what give the surface thickness */
 .article-card {
   border: 1px solid var(--rule);
   border-radius: 14px;
-  background: var(--panel-1);
-  background-image: var(--panel-sheen);
+  background: var(--plate);
   overflow: hidden;
+  box-shadow: inset 0 1px 0 var(--edge-hi), inset 0 -1px 0 var(--edge-lo);
   transition: transform 0.2s var(--ease), border-color 0.2s var(--ease), box-shadow 0.2s var(--ease);
 }
 .article-card:hover {
   transform: translateY(-3px);
   border-color: color-mix(in srgb, var(--ink) 22%, transparent);
-  box-shadow: var(--shadow-card);
+  box-shadow: inset 0 1px 0 var(--edge-hi), inset 0 -1px 0 var(--edge-lo), var(--shadow-card);
 }
 .ac-link {
   display: block;
@@ -1145,7 +1188,7 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
 }
 /* chips wrap as whole units — a slot must never split mid-label */
 .ac-meta span { white-space: nowrap; }
-.ac-meta .ac-pulse { color: var(--accent); }
+.ac-meta .ac-pulse { color: var(--accent-text); }
 .article-card h3 {
   font-family: var(--font-display);
   font-weight: 400;
@@ -1178,7 +1221,7 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
   font-size: 11px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--accent);
+  color: var(--accent-text);
 }
 .ac-read {
   display: inline-flex;
@@ -1209,6 +1252,7 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
   margin-top: 0;
   padding-top: clamp(14px, 1.6vw, 20px);
   border-top: 1px solid var(--rule);
+  box-shadow: inset 0 1px 0 var(--edge-hi);
 }
 a.ac-read:hover { color: var(--accent); }
 a.ac-read:hover svg { transform: translate(2px, -2px); }
@@ -1235,7 +1279,7 @@ a.ac-read:hover svg { transform: translate(2px, -2px); }
   color: var(--ink-3);
   transition: color 0.2s var(--ease);
 }
-.article-back:hover { color: var(--accent); }
+.article-back:hover { color: var(--accent-text); }
 .article-head {
   margin: clamp(28px, 4vw, 48px) 0 clamp(32px, 4vw, 48px);
   padding-bottom: clamp(24px, 3vw, 36px);
@@ -1247,7 +1291,7 @@ a.ac-read:hover svg { transform: translate(2px, -2px); }
   font-size: 11px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--accent);
+  color: var(--accent-text);
   margin-bottom: 18px;
 }
 .article-head h1 {
@@ -1304,8 +1348,8 @@ a.ac-read:hover svg { transform: translate(2px, -2px); }
   transition: color 0.2s var(--ease), text-decoration-color 0.2s var(--ease);
 }
 .article-body a:hover {
-  color: var(--accent);
-  text-decoration-color: var(--accent);
+  color: var(--accent-text);
+  text-decoration-color: var(--accent-text);
 }
 /* code keeps a real monospace stack — system fonts only, no web font added.
    the metric/ascii blocks depend on column alignment. */
@@ -1430,7 +1474,7 @@ a.ac-read:hover svg { transform: translate(2px, -2px); }
 .contact-link-primary {
   font-size: 19px;
   font-weight: 600;
-  color: var(--accent);
+  color: var(--accent-text);
   border-bottom-color: color-mix(in srgb, var(--accent) 35%, transparent);
 }
 .contact-link-primary svg { width: 16px; height: 16px; }
@@ -1457,8 +1501,8 @@ a.ac-read:hover svg { transform: translate(2px, -2px); }
   flex-direction: column;
   gap: 0;
 }
-.contact-meta .cm-block { padding: 20px 0; border-top: 1px solid var(--rule); }
-.contact-meta .cm-block:first-child { border-top: none; padding-top: 0; }
+.contact-meta .cm-block { padding: 20px 0; border-top: 1px solid var(--rule); box-shadow: inset 0 1px 0 var(--edge-hi); }
+.contact-meta .cm-block:first-child { border-top: none; box-shadow: none; padding-top: 0; }
 .contact-meta .cmk {
   font-family: var(--font-mono);
   font-size: 14px;
@@ -1476,7 +1520,7 @@ a.ac-read:hover svg { transform: translate(2px, -2px); }
 .contact-meta .cmv a.dl-pdf:hover svg { transform: translate(2px, -2px); }
 .contact-meta .opp { display: flex; flex-direction: column; gap: 8px; }
 .contact-meta .opp span { font-size: 16px; color: var(--ink-2); display: flex; gap: 9px; align-items: baseline; }
-.contact-meta .opp span::before { content: "→"; color: var(--accent); font-size: 16px; }
+.contact-meta .opp span::before { content: "→"; color: var(--accent-text); font-size: 16px; }
 
 /* ============================================================
    FOOTER
@@ -1580,7 +1624,7 @@ a.ac-read:hover svg { transform: translate(2px, -2px); }
   white-space: nowrap;
 }
 .ai-flow-stages span { display: inline-flex; align-items: center; white-space: nowrap; }
-.ai-flow-stages i { font-style: normal; color: var(--accent); margin-left: 6px; }
+.ai-flow-stages i { font-style: normal; color: var(--accent-text); margin-left: 6px; }
 
 /* ============================================================
    RESPONSIVE
