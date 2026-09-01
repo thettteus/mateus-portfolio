@@ -6,17 +6,17 @@ export const metadata: Metadata = {
   description:
     'An AI workflow is not only the model. It also has validation, retries, budgets, permissions, tools, and real consequences when something goes wrong. On designing an AI stack around cost, risk, and complexity.',
   alternates: {
-    canonical: 'https://mateusps.vercel.app/writing/stop-using-the-best-model-for-everything',
+    canonical: 'https://mattbuilds.io/writing/stop-using-the-best-model-for-everything',
   },
   openGraph: {
     title:
       'Stop using the best model for everything: designing an AI stack around cost, risk, and complexity',
     description:
       'The strongest model has plenty of work to do. It just should not be responsible for everything.',
-    url: 'https://mateusps.vercel.app/writing/stop-using-the-best-model-for-everything',
+    url: 'https://mattbuilds.io/writing/stop-using-the-best-model-for-everything',
     type: 'article',
     authors: ['Mateus Pereira da Silva'],
-    images: [{ url: 'https://mateusps.vercel.app/og.png', width: 1200, height: 630, type: 'image/png', alt: 'Mateus P. S. — Product Engineer' }],
+    images: [{ url: 'https://mattbuilds.io/og.png', width: 1200, height: 630, type: 'image/png', alt: 'Mateus P. S. — Product Engineer' }],
   },
 };
 
