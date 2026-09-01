@@ -13,19 +13,19 @@ export default function Depth() {
     {
       ix: '01',
       title: 'Shaping the product',
-      items: ['Stakeholder alignment', 'Requirements', 'MVP definition', 'UX thinking', 'Prototyping', 'Prioritization'],
+      items: ['Ambiguous problems', 'Stakeholder alignment', 'Product scoping', 'MVP definition', 'Prototyping', 'UX thinking'],
       art: 'discovery',
     },
     {
       ix: '02',
       title: 'Designing the architecture',
-      items: ['System design', 'Data modeling', 'APIs & services', 'Integrations', 'Scalability', 'Technical trade-offs'],
+      items: ['System design', 'Data modeling', 'APIs & SDKs', 'Event-driven systems', 'Multi-tenant scale', 'Technical trade-offs'],
       art: 'architecture',
     },
     {
       ix: '03',
       title: 'Building & shipping',
-      items: ['Backend & frontend', 'Full-stack delivery', 'Cloud', 'Data workflows', 'RAG & LLM features', 'Observability'],
+      items: ['Full-stack delivery', 'Cloud', 'Data workflows', 'RAG & agent workflows', 'Model selection', 'Production ownership'],
       art: 'engineering',
     },
     {
@@ -37,13 +37,13 @@ export default function Depth() {
     {
       ix: '05',
       title: 'Running lean at scale',
-      items: ['Cloud cost architecture', 'Low-cost infrastructure', 'SQL optimization', 'Performance', 'Monitoring', 'Reliability'],
+      items: ['Cloud cost', 'SQL optimization', 'Latency', 'Performance', 'Observability', 'Reliability'],
       art: 'scale',
     },
     {
       ix: '06',
       title: 'Securing the system',
-      items: ['Threat modeling', 'Pentest suite (authored)', 'Hardening', 'Audits & compliance', 'Access & secrets', 'On-spec delivery'],
+      items: ['Threat modeling', 'Pentest', 'Hardening', 'Audits & compliance', 'Access & secrets', 'Secure defaults'],
       art: 'security',
     },
   ];
