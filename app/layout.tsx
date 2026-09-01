@@ -13,7 +13,7 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://mattbuilds.io'),
-  title: 'Mateus P. S. — Product Engineer',
+  title: 'Matt P. S. — Product Engineer',
   description:
     'Product engineer building the systems that let products ship faster: from ambiguous problems to production, across backend, AI, data, and product. The proof is real repos, architecture decisions, and trade-offs, not claims.',
   keywords: [
@@ -36,17 +36,17 @@ export const metadata: Metadata = {
   },
   manifest: '/site.webmanifest',
   openGraph: {
-    title: 'Mateus P. S. — Product Engineer',
+    title: 'Matt P. S. — Product Engineer',
     description: 'From ambiguous problems to production systems: backend, AI, data, and product engineering, proven with real repos and architecture decisions.',
     url: 'https://mattbuilds.io/',
-    siteName: 'Mateus P. S.',
-    images: [{ url: 'https://mattbuilds.io/og.png', width: 1200, height: 630, type: 'image/png', alt: 'Mateus P. S. — Product Engineer. From ambiguity to production.' }],
+    siteName: 'Matt P. S.',
+    images: [{ url: 'https://mattbuilds.io/og.png', width: 1200, height: 630, type: 'image/png', alt: 'Matt P. S. — Product Engineer. From ambiguity to production.' }],
     locale: 'en_US',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Mateus P. S. — Product Engineer',
+    title: 'Matt P. S. — Product Engineer',
     description: 'Product Engineer taking ambiguous problems to production. The proof is real repos, not claims.',
     images: ['https://mattbuilds.io/og.png'],
   },
@@ -73,7 +73,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               '@context': 'https://schema.org',
               '@type': 'Person',
               name: 'Mateus Pereira da Silva',
-              alternateName: 'Mateus P. S.',
+              alternateName: 'Matt P. S.',
               jobTitle: 'Product Engineer',
               url: 'https://mattbuilds.io/',
               email: 'mailto:mateuspdasilva369@gmail.com',

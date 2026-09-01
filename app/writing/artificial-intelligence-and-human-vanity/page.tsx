@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'AI Didn’t Replace Our Intelligence — Mateus P. S.',
+  title: 'AI Didn’t Replace Our Intelligence — Matt P. S.',
   description:
     'Answers have become abundant. Abundance is not the same as meaning. An essay on AI, self-importance, and where human value really lives.',
   alternates: { canonical: 'https://mattbuilds.io/writing/artificial-intelligence-and-human-vanity' },
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     url: 'https://mattbuilds.io/writing/artificial-intelligence-and-human-vanity',
     type: 'article',
     authors: ['Mateus Pereira da Silva'],
-    images: [{ url: 'https://mattbuilds.io/og.png', width: 1200, height: 630, type: 'image/png', alt: 'Mateus P. S. — Product Engineer' }],
+    images: [{ url: 'https://mattbuilds.io/og.png', width: 1200, height: 630, type: 'image/png', alt: 'Matt P. S. — Product Engineer' }],
   },
 };
 
@@ -21,7 +21,7 @@ export default function Article() {
     <main className="article-page">
       <article className="article">
         <Link className="article-back" href="/#writing">
-          <span aria-hidden="true">←</span> Mateus P. S.
+          <span aria-hidden="true">←</span> Matt P. S.
         </Link>
 
         <header className="article-head">
@@ -30,7 +30,7 @@ export default function Article() {
           <p className="article-dek">
             Answers have become abundant. Abundance is not the same as meaning.
           </p>
-          <span className="article-by">Mateus P. S.</span>
+          <span className="article-by">Matt P. S.</span>
         </header>
 
         <div className="article-body">
