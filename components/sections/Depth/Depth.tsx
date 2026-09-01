@@ -53,15 +53,24 @@ export default function Depth() {
   const technologies = [
     // Languages & frameworks
     { name: 'TypeScript' }, { name: 'Node.js' }, { name: 'React' }, { name: 'Next.js' },
-    { name: 'Python' }, { name: 'Go' }, { name: 'PHP' },
+    { name: 'Python' }, { name: 'FastAPI' }, { name: 'Go' }, { name: 'PHP' },
     // Data
-    { name: 'PostgreSQL' }, { name: 'Prisma' }, { name: 'Redis' }, { name: 'Kafka' },
-    { name: 'Polars' }, { name: 'Data pipelines' },
+    { name: 'PostgreSQL' }, { name: 'MySQL' }, { name: 'Prisma' }, { name: 'Redis' },
+    { name: 'Kafka' }, { name: 'Polars' }, { name: 'Data pipelines' }, { name: 'Query optimization' },
+    // Systems
+    { name: 'Microservices' }, { name: 'Event-driven' }, { name: 'Distributed systems' },
+    { name: 'Background workers' }, { name: 'SDKs' },
+    // Quality
+    { name: 'pytest' }, { name: 'Jest' }, { name: 'go test' }, { name: 'Playwright' },
+    { name: 'Selenium' },
     // Cloud & ops
-    { name: 'AWS' }, { name: 'Docker' }, { name: 'Kubernetes' }, { name: 'Cloudflare' },
-    { name: 'Grafana' }, { name: 'Observability' },
+    { name: 'Linux' }, { name: 'Bash' }, { name: 'AWS' }, { name: 'Docker' },
+    { name: 'Kubernetes' }, { name: 'Terraform' }, { name: 'Cloudflare' }, { name: 'CI/CD' },
+    { name: 'Prometheus' }, { name: 'Grafana' }, { name: 'CloudWatch' }, { name: 'Observability' },
     // AI
-    { name: 'LLM APIs' }, { name: 'RAG' }, { name: 'Code agents' }, { name: 'MCP' },
+    { name: 'LLM APIs' }, { name: 'RAG' }, { name: 'LangGraph' }, { name: 'LangSmith' },
+    { name: 'Prompt engineering' }, { name: 'Tool calling' }, { name: 'Structured outputs' },
+    { name: 'Embeddings' }, { name: 'Code agents' }, { name: 'MCP' },
   ];
 
   return (
