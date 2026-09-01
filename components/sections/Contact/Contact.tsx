@@ -105,7 +105,7 @@ export default function Contact() {
                 <a
                   className="contact-link"
                   href="mailto:mateuspdasilva369@gmail.com"
-                  aria-label="Email Mateus"
+                  aria-label="Email Matt"
                 >
                   Email
                   <svg

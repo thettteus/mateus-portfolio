@@ -1,4 +1,4 @@
-# Mateus P. S. — Product Engineer portfolio
+# Matt P. S. — Product Engineer portfolio
 
 I build the systems that let products ship faster — not a list of skills, but the leverage
 behind them. Every project card is a proof point: a real repo, a real trade-off, a real decision.

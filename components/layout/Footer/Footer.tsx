@@ -5,7 +5,7 @@ export default function Footer() {
     <footer className="footer" role="contentinfo">
       <div className="topo-bg" aria-hidden="true" />
       <div className="container footer-inner">
-        <span className="footer-id">Mateus P. S.</span>
+        <span className="footer-id">Matt P. S.</span>
 <span className="footer-copy">
           <span aria-hidden="true">©</span>
           <span className="sr-only">Copyright</span> {year}. All rights reserved

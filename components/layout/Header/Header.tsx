@@ -98,7 +98,7 @@ export default function Header() {
         <motion.span className="scroll-progress" style={{ scaleX: progress }} aria-hidden="true" />
         <div className="container topbar-inner">
         <a className="brand" href="#top" aria-label="Back to top" onClick={() => setOpen(false)}>
-          <strong>Mateus P. S.</strong>
+          <strong>Matt P. S.</strong>
         </a>
 
         <nav className="nav" aria-label="Page sections">

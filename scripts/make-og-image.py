@@ -72,7 +72,7 @@ CONTENT = W - 2 * M
 # --- eyebrow: name, hairline divider, role ---------------------------------
 f_name = font(30, BOLD)
 f_role = font(15, MED)
-name = "Mateus P. S."
+name = "Matt P. S."
 y_eyebrow = 58 * S
 d.text((M, y_eyebrow), name, font=f_name, fill=INK)
 
