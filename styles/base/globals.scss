@@ -122,7 +122,8 @@ body {
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
   max-width: 100vw;
-  overflow-x: hidden;
+  /* clip, not hidden: hidden makes body a scroll container and breaks sticky */
+  overflow-x: clip;
 }
 
 /* brushed film over the whole page — the turbulence is stretched along x
@@ -163,24 +164,24 @@ main, footer, header { position: relative; z-index: 1; }
 @keyframes la-fade { from { opacity: 0; } }
 
 /* security — shield draws, then the check snaps in: locked / verified */
-.iso-layer.is-drawn .iso-motif.la-security path { animation: la-draw 0.6s var(--ease) both; }
-.iso-layer.is-drawn .iso-motif.la-security path:last-of-type { animation: la-draw 0.42s var(--ease) 0.36s both; }
+.iso-plate.is-drawn .iso-motif.la-security path { animation: la-draw 0.6s var(--ease) both; }
+.iso-plate.is-drawn .iso-motif.la-security path:last-of-type { animation: la-draw 0.42s var(--ease) 0.36s both; }
 
 /* discovery — dotted probes stream out from the origin (each dot delayed by its
    distance) and form the end nodes where they land: exploring the space */
-.iso-layer.is-drawn .iso-motif.la-discovery .disc-trail { animation: la-fade 0.3s var(--ease) both; animation-delay: var(--dd, 0s); }
-.iso-layer.is-drawn .iso-motif.la-discovery circle[pathLength] { animation: la-fade 0.34s var(--ease) both; animation-delay: var(--dd, 0s); }
+.iso-plate.is-drawn .iso-motif.la-discovery .disc-trail { animation: la-fade 0.3s var(--ease) both; animation-delay: var(--dd, 0s); }
+.iso-plate.is-drawn .iso-motif.la-discovery circle[pathLength] { animation: la-fade 0.34s var(--ease) both; animation-delay: var(--dd, 0s); }
 
 /* architecture — signals draw out from the core, then the nodes light: connecting */
-.iso-layer.is-drawn .iso-motif.la-architecture line { animation: la-draw 0.5s var(--ease) both; }
-.iso-layer.is-drawn .iso-motif.la-architecture line:nth-of-type(2) { animation-delay: 0.05s; }
-.iso-layer.is-drawn .iso-motif.la-architecture line:nth-of-type(3) { animation-delay: 0.10s; }
-.iso-layer.is-drawn .iso-motif.la-architecture line:nth-of-type(4) { animation-delay: 0.15s; }
-.iso-layer.is-drawn .iso-motif.la-architecture line:nth-of-type(5) { animation-delay: 0.20s; }
-.iso-layer.is-drawn .iso-motif.la-architecture line:nth-of-type(6) { animation-delay: 0.25s; }
-.iso-layer.is-drawn .iso-motif.la-architecture line:nth-of-type(7) { animation-delay: 0.30s; }
-.iso-layer.is-drawn .iso-motif.la-architecture line:nth-of-type(8) { animation-delay: 0.35s; }
-.iso-layer.is-drawn .iso-motif.la-architecture circle { animation: la-fade 0.4s var(--ease) 0.36s both; }
+.iso-plate.is-drawn .iso-motif.la-architecture line { animation: la-draw 0.5s var(--ease) both; }
+.iso-plate.is-drawn .iso-motif.la-architecture line:nth-of-type(2) { animation-delay: 0.05s; }
+.iso-plate.is-drawn .iso-motif.la-architecture line:nth-of-type(3) { animation-delay: 0.10s; }
+.iso-plate.is-drawn .iso-motif.la-architecture line:nth-of-type(4) { animation-delay: 0.15s; }
+.iso-plate.is-drawn .iso-motif.la-architecture line:nth-of-type(5) { animation-delay: 0.20s; }
+.iso-plate.is-drawn .iso-motif.la-architecture line:nth-of-type(6) { animation-delay: 0.25s; }
+.iso-plate.is-drawn .iso-motif.la-architecture line:nth-of-type(7) { animation-delay: 0.30s; }
+.iso-plate.is-drawn .iso-motif.la-architecture line:nth-of-type(8) { animation-delay: 0.35s; }
+.iso-plate.is-drawn .iso-motif.la-architecture circle { animation: la-fade 0.4s var(--ease) 0.36s both; }
 
 /* engineering — gears slide in from apart and give a counter-rotating turn as
    they mesh; each spins about its own centre (projects as an in-plane turn) */
@@ -190,60 +191,34 @@ main, footer, header { position: relative; z-index: 1; }
   55%  { opacity: 1; }
   to   { transform: translate(0, 0) rotate(0deg); opacity: 1; }
 }
-.iso-layer.is-drawn .iso-motif.la-engineering .eng-gear { animation: la-gear 0.75s var(--ease) both; }
-.iso-layer.is-drawn .iso-motif.la-engineering .eng-gear:nth-of-type(2) { animation-delay: 0.06s; }
-.iso-layer.is-drawn .iso-motif.la-engineering .eng-gear:nth-of-type(3) { animation-delay: 0.12s; }
+.iso-plate.is-drawn .iso-motif.la-engineering .eng-gear { animation: la-gear 0.75s var(--ease) both; }
+.iso-plate.is-drawn .iso-motif.la-engineering .eng-gear:nth-of-type(2) { animation-delay: 0.06s; }
+.iso-plate.is-drawn .iso-motif.la-engineering .eng-gear:nth-of-type(3) { animation-delay: 0.12s; }
 
 /* harness — the machine draws first (with the seed of its product inside),
    connectors extend outward, then the blocks it builds snap in one by one:
    build the thing that builds the thing */
-.iso-layer.is-drawn .iso-motif.la-harness rect { animation: la-draw 0.5s var(--ease) both; }
-.iso-layer.is-drawn .iso-motif.la-harness rect:nth-of-type(2) { animation-delay: 0.12s; }
-.iso-layer.is-drawn .iso-motif.la-harness line { animation: la-draw 0.4s var(--ease) 0.3s both; }
-.iso-layer.is-drawn .iso-motif.la-harness line:nth-of-type(2) { animation-delay: 0.38s; }
-.iso-layer.is-drawn .iso-motif.la-harness line:nth-of-type(3) { animation-delay: 0.46s; }
-.iso-layer.is-drawn .iso-motif.la-harness rect:nth-of-type(3) { animation-delay: 0.55s; }
-.iso-layer.is-drawn .iso-motif.la-harness rect:nth-of-type(4) { animation-delay: 0.63s; }
-.iso-layer.is-drawn .iso-motif.la-harness rect:nth-of-type(5) { animation-delay: 0.71s; }
+.iso-plate.is-drawn .iso-motif.la-harness rect { animation: la-draw 0.5s var(--ease) both; }
+.iso-plate.is-drawn .iso-motif.la-harness rect:nth-of-type(2) { animation-delay: 0.12s; }
+.iso-plate.is-drawn .iso-motif.la-harness line { animation: la-draw 0.4s var(--ease) 0.3s both; }
+.iso-plate.is-drawn .iso-motif.la-harness line:nth-of-type(2) { animation-delay: 0.38s; }
+.iso-plate.is-drawn .iso-motif.la-harness line:nth-of-type(3) { animation-delay: 0.46s; }
+.iso-plate.is-drawn .iso-motif.la-harness rect:nth-of-type(3) { animation-delay: 0.55s; }
+.iso-plate.is-drawn .iso-motif.la-harness rect:nth-of-type(4) { animation-delay: 0.63s; }
+.iso-plate.is-drawn .iso-motif.la-harness rect:nth-of-type(5) { animation-delay: 0.71s; }
 
 /* scale — baseline draws, bars draw left to right, then the trend line: climbing */
-.iso-layer.is-drawn .iso-motif.la-scale line { animation: la-draw 0.4s var(--ease) both; }
-.iso-layer.is-drawn .iso-motif.la-scale rect { animation: la-draw 0.5s var(--ease) both; }
-.iso-layer.is-drawn .iso-motif.la-scale rect:nth-of-type(2) { animation-delay: 0.06s; }
-.iso-layer.is-drawn .iso-motif.la-scale rect:nth-of-type(3) { animation-delay: 0.12s; }
-.iso-layer.is-drawn .iso-motif.la-scale rect:nth-of-type(4) { animation-delay: 0.18s; }
-.iso-layer.is-drawn .iso-motif.la-scale rect:nth-of-type(5) { animation-delay: 0.24s; }
-.iso-layer.is-drawn .iso-motif.la-scale rect:nth-of-type(6) { animation-delay: 0.30s; }
-.iso-layer.is-drawn .iso-motif.la-scale polyline { animation: la-fade 0.5s var(--ease) 0.42s both; }
+.iso-plate.is-drawn .iso-motif.la-scale line { animation: la-draw 0.4s var(--ease) both; }
+.iso-plate.is-drawn .iso-motif.la-scale rect { animation: la-draw 0.5s var(--ease) both; }
+.iso-plate.is-drawn .iso-motif.la-scale rect:nth-of-type(2) { animation-delay: 0.06s; }
+.iso-plate.is-drawn .iso-motif.la-scale rect:nth-of-type(3) { animation-delay: 0.12s; }
+.iso-plate.is-drawn .iso-motif.la-scale rect:nth-of-type(4) { animation-delay: 0.18s; }
+.iso-plate.is-drawn .iso-motif.la-scale rect:nth-of-type(5) { animation-delay: 0.24s; }
+.iso-plate.is-drawn .iso-motif.la-scale rect:nth-of-type(6) { animation-delay: 0.30s; }
+.iso-plate.is-drawn .iso-motif.la-scale polyline { animation: la-fade 0.5s var(--ease) 0.42s both; }
 
 @media (prefers-reduced-motion: reduce) {
-  .iso-layer.is-drawn .iso-motif * { animation: none; }
-}
-
-/* ignite — as each tile scrolls into view it lights up into the same look as
-   :hover — accent glow + accent strokes — and STAYS lit (.is-in is added once
-   and never removed), staggered per layer so the stack reads as lighting up
-   one at a time. Clicking a card only replays the motif draw-in above (toggles
-   .is-drawn, a separate class) — the lighting itself is left untouched. */
-.iso-layer:nth-child(2) { --ignite-delay: 0.07s; }
-.iso-layer:nth-child(3) { --ignite-delay: 0.14s; }
-.iso-layer:nth-child(4) { --ignite-delay: 0.21s; }
-.iso-layer:nth-child(5) { --ignite-delay: 0.28s; }
-.iso-layer:nth-child(6) { --ignite-delay: 0.35s; }
-.iso-layer { cursor: pointer; }
-@media (prefers-reduced-motion: no-preference) {
-  @keyframes iso-ignite-top { from { stroke: var(--ink-4); } to { stroke: var(--accent); } }
-  @keyframes iso-ignite-motif { from { stroke: var(--ink-3); } to { stroke: var(--accent); } }
-  .iso-layer.is-in .iso-top { animation: iso-ignite-top 0.48s var(--ease) var(--ignite-delay, 0s) forwards; }
-  .iso-layer.is-in .iso-motif { animation: iso-ignite-motif 0.48s var(--ease) var(--ignite-delay, 0s) forwards; }
-}
-/* the accent halo ignites with the same per-layer stagger (opacity only, so it
-   behaves under reduced motion too) */
-.iso-layer.is-in .iso-cell-c::before { opacity: 1; transition-delay: var(--ignite-delay, 0s); }
-@media (prefers-reduced-motion: reduce) {
-  .iso-layer.is-in .iso-top { stroke: var(--accent); }
-  .iso-layer.is-in .iso-motif { stroke: var(--accent); }
-  .iso-cell-c::before { transition: none; }
+  .iso-plate.is-drawn .iso-motif * { animation: none; }
 }
 
 a { color: inherit; text-decoration: none; }
@@ -992,56 +967,57 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
 /* ============================================================
    TECHNICAL DEPTH
    ============================================================ */
-/* "Every layer" — technical module: framed grid + exploded isometric tiles */
-.iso-module {
+/* "Every layer" — pinned isometric stack: scrolling through the track walks
+   down the stack, opening and lighting one plate at a time */
+.range-track {
   position: relative;
-  background: transparent;
-  border: 1px solid var(--rule);
-  border-radius: 18px;
-  padding: 4px clamp(8px, 1.6vw, 18px);
+  /* the pinned screen centres its content, which leaves a tall empty band
+     above it — pull the track up under the heading to close that gap */
+  margin-top: calc((100svh - 64px - min(76svh, 640px)) / -2 - 64px - 100px);
 }
-.iso-layer {
+.range-pin {
+  pointer-events: none; /* the empty band overlaps the heading before pinning */
+  position: sticky;
+  top: 0;
+  height: 100svh;
   display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  column-gap: clamp(24px, 4vw, 72px);
   align-items: center;
+  padding-top: 64px; /* clear the fixed header */
 }
-.iso-cell {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  min-height: clamp(112px, 13vw, 144px);
-  padding: clamp(14px, 2vw, 22px) clamp(16px, 2.2vw, 26px);
-  border-top: 1px solid var(--rule-soft);
+.range-stage { position: relative; height: min(76svh, 640px); }
+.iso-plate {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  opacity: 0;
+  cursor: pointer;
+  transition: transform 0.9s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.6s ease;
 }
-.iso-layer:first-child .iso-cell { border-top: none; }
-.iso-cell-c {
-  position: relative;
-  z-index: 1;
-  padding: 0;
-  align-items: center;
-  border-left: 1px solid var(--rule-soft);
-  border-right: 1px solid var(--rule-soft);
-  min-width: clamp(214px, 30vw, 300px);
-}
-.iso-tile { width: clamp(214px, 30vw, 296px); display: block; margin: clamp(-14px, -1.2vw, -8px) 0; }
-.iso-side { stroke: var(--rule); stroke-width: 1; }
-/* two-tone side faces — left catches light, right falls into shadow */
-.iso-side-l { fill: color-mix(in srgb, var(--ink) 6%, var(--bg)); }
-.iso-side-r { fill: color-mix(in srgb, var(--ink) 13%, var(--bg)); }
-.iso-top { fill: var(--panel-1); stroke: var(--ink-4); stroke-width: 1; transition: stroke 0.3s var(--ease); }
+.range-stage:not(.is-settled) .iso-plate { transition-delay: var(--drop-delay, 0s); }
+/* once assembled, the scroll drives the plates frame by frame */
+.range-stage.is-settled .iso-plate { transition: opacity 0.6s ease; will-change: transform; }
+.iso-plate.is-in { opacity: 1; }
+/* the plate boxes overlap — only the drawn tile takes the click, so whichever
+   plate is visibly under the pointer is the one picked */
+.iso-plate { pointer-events: none; }
+.iso-plate.is-in .iso-side, .iso-plate.is-in .iso-top { pointer-events: visiblePainted; }
+.iso-tile { width: 100%; display: block; overflow: visible; }
+.iso-side { stroke: var(--rule); stroke-width: 1; transition: stroke 0.4s var(--ease); }
+/* both side faces share the same light tone */
+.iso-side { fill: color-mix(in srgb, var(--ink) 6%, var(--bg)); }
+.iso-top { fill: var(--panel-1); stroke: var(--ink-4); stroke-width: 1; transition: stroke 0.4s var(--ease), fill 0.4s var(--ease); }
 .iso-dot { fill: var(--ink-4); }
-.iso-motif { fill: none; stroke: var(--ink-3); stroke-width: 1.5; transition: stroke 0.3s var(--ease); }
+.iso-motif { fill: none; stroke: var(--ink-3); stroke-width: 1.5; transition: stroke 0.4s var(--ease); }
 .iso-motif * { vector-effect: non-scaling-stroke; }
-.iso-layer { transition: transform 0.22s var(--ease); }
-.iso-layer:hover { transform: translateY(-3px); }
-/* soft accent halo behind the tile — a radial pool, never a hard box, so it
-   fades identically on mobile and desktop. Replaces the SVG drop-shadow that
-   some mobile browsers rasterized to a square with no fade. */
-.iso-cell-c::before {
+/* soft accent halo behind the active tile — a radial pool, never a hard box, so
+   it fades identically on mobile and desktop */
+.iso-plate::before {
   content: '';
   position: absolute;
   left: 50%;
-  top: 50%;
+  top: 40%;
   width: 90%;
   height: 82%;
   transform: translate(-50%, -50%);
@@ -1051,23 +1027,44 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
   z-index: -1;
   transition: opacity 0.38s var(--ease);
 }
-.iso-layer:hover .iso-cell-c::before { opacity: 1; transition-delay: 0s; }
-.iso-layer:hover .iso-top { stroke: var(--accent); }
-.iso-layer:hover .iso-motif { stroke: var(--accent); }
-/* labels */
-.iso-label { display: flex; flex-direction: column; gap: 8px; max-width: 320px; }
-.side-left .iso-cell-l .iso-label { margin-left: auto; align-items: flex-end; text-align: right; }
-.iso-label .db-ix { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.14em; color: var(--ink-4); }
-.iso-label .db-title {
-  font-size: clamp(16px, 1.7vw, 20px);
+.iso-plate.is-active::before { opacity: 1; }
+.iso-plate.is-active .iso-top { stroke: var(--accent); fill: color-mix(in srgb, var(--accent) 6%, var(--panel-1)); }
+.iso-plate.is-active .iso-side { stroke: color-mix(in srgb, var(--accent) 55%, transparent); }
+.iso-plate.is-active .iso-motif { stroke: var(--accent); }
+.iso-plate.is-active .iso-dot { fill: var(--accent); }
+
+/* layer list — titles always visible, the active one expands its pills */
+.range-list { list-style: none; margin: 0; padding: 0; pointer-events: auto; }
+.range-item { border-top: 1px solid var(--rule); }
+.range-item:last-child { border-bottom: 1px solid var(--rule); }
+.range-item h3 { margin: 0; font: inherit; }
+.range-item button {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  width: 100%;
+  padding: clamp(12px, 1.4vw, 18px) 0;
+  text-align: left;
+}
+.range-item .db-ix {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  /* --open (0–1) is tweened in JS when a plate lands */
+  color: color-mix(in srgb, var(--accent-text) calc(var(--open, 0) * 100%), var(--ink-4));
+}
+.range-item .db-title {
+  font-size: clamp(18px, 1.9vw, 24px);
   font-weight: 600;
   letter-spacing: -0.015em;
   line-height: 1.15;
-  color: var(--ink);
+  color: color-mix(in srgb, var(--ink) calc(var(--open, 0) * 100%), var(--ink-3));
 }
-.iso-label .db-items { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
-.side-left .iso-label .db-items { justify-content: flex-end; }
-.iso-label .db-items li {
+.range-item button:hover .db-title { color: var(--ink); }
+/* height is tweened in JS, in step with the label it hands over to */
+.range-desc { height: 0; overflow: hidden; }
+.range-item .db-items { list-style: none; margin: 0; padding: 0 0 clamp(14px, 1.6vw, 20px) 30px; display: flex; flex-wrap: wrap; gap: 6px; opacity: clamp(0, calc(var(--open, 0) * 2 - 1), 1); /* pills fade in the second half of the unfold */ }
+.range-item .db-items li {
   font-family: var(--font-mono);
   font-size: 10.5px;
   letter-spacing: 0.02em;
@@ -1076,6 +1073,9 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
   border: 1px solid var(--rule);
   border-radius: 6px;
   background: var(--bg);
+}
+@media (prefers-reduced-motion: reduce) {
+  .iso-plate, .iso-plate::before { transition: none; }
 }
 
 /* technology feed */
@@ -1655,14 +1655,19 @@ a.ac-read:hover svg { transform: translate(2px, -2px); }
   .topbar-inner {
     gap: 14px;
   }
-  /* iso module → single column: tile on top, label centered below */
-  .iso-layer { grid-template-columns: 1fr; justify-items: center; }
-  .iso-cell-l:empty, .iso-cell-r:empty { display: none; }
-  .iso-cell-l, .iso-cell-r { grid-column: 1; grid-row: 2; border: none; padding-top: 0; }
-  .iso-cell-c { grid-column: 1; grid-row: 1; border: none; min-width: 0; }
-  .side-left .iso-cell-l .iso-label { margin: 0; }
-  .iso-label, .side-left .iso-cell-l .iso-label { align-items: center; text-align: center; }
-  .iso-label .db-items, .side-left .iso-label .db-items { justify-content: center; }
+  /* range stack → stage on top, list below, both inside the pinned screen */
+  .range-pin {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: 36svh auto;
+    align-content: start;
+    align-items: start;
+    row-gap: 8px;
+  }
+  .range-stage { height: 36svh; }
+  .range-track { margin-top: -110px; }
+  .range-item button { padding: 9px 0; }
+  .range-item .db-title { font-size: 17px; }
+  .range-item .db-items { padding-bottom: 12px; }
   /* Stack pills at the bottom of Depth: default flex is left-aligned, center to
      match the db-items pills above */
   .depth-feed { justify-content: center; }

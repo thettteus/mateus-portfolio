@@ -1,15 +1,8 @@
 import { FadeIn } from '@/components/ui/FadeIn';
-import { StaggerGrid, StaggerItem } from '@/components/ui/StaggerGrid';
-import { IsoLayer } from '@/components/ui/generative/IsoLayer';
-import { type LineArtVariant } from '@/components/ui/generative/LineArt';
+import RangeStack, { type RangeLayer } from './RangeStack';
 
 export default function Depth() {
-  const layers: {
-    ix: string;
-    title: string;
-    items: string[];
-    art: LineArtVariant;
-  }[] = [
+  const layers: RangeLayer[] = [
     {
       ix: '01',
       title: 'Shaping the product',
@@ -84,31 +77,7 @@ export default function Depth() {
           <h2>Problems cut across layers. <em>So do I.</em></h2>
         </FadeIn>
 
-        <div className="iso-module">
-          <StaggerGrid className="iso-stack">
-            {layers.map(({ ix, title, items, art }, i) => {
-              const side = i % 2 === 0 ? 'left' : 'right';
-              const label = (
-                <div className="iso-label">
-                  <span className="db-ix">{ix}</span>
-                  <h3 className="db-title">{title}</h3>
-                  <ul className="db-items">
-                    {items.map(item => <li key={item}>{item}</li>)}
-                  </ul>
-                </div>
-              );
-              return (
-                <StaggerItem className={`iso-layer side-${side}`} key={ix}>
-                  <div className="iso-cell iso-cell-l">{side === 'left' && label}</div>
-                  <div className="iso-cell iso-cell-c">
-                    <IsoLayer variant={art} />
-                  </div>
-                  <div className="iso-cell iso-cell-r">{side === 'right' && label}</div>
-                </StaggerItem>
-              );
-            })}
-          </StaggerGrid>
-        </div>
+        <RangeStack layers={layers} />
 
         <FadeIn className="depth-feed">
           <span className="df-label">Stack</span>
