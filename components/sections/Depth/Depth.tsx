@@ -1,5 +1,6 @@
 import { FadeIn } from '@/components/ui/FadeIn';
 import RangeStack, { type RangeLayer } from './RangeStack';
+import TechStack from './TechStack';
 
 export default function Depth() {
   const layers: RangeLayer[] = [
@@ -41,31 +42,6 @@ export default function Depth() {
     },
   ];
 
-  // Full working range across my projects (Vorax, colplan, Plan Patagonia,
-  // Multi Agent Loop, go-kafka-sdk) and mateus_resume.pdf.
-  const technologies = [
-    // Languages & frameworks
-    { name: 'TypeScript' }, { name: 'Node.js' }, { name: 'React' }, { name: 'Next.js' },
-    { name: 'Python' }, { name: 'FastAPI' }, { name: 'Go' }, { name: 'PHP' },
-    // Data
-    { name: 'PostgreSQL' }, { name: 'MySQL' }, { name: 'Prisma' }, { name: 'Redis' },
-    { name: 'Kafka' }, { name: 'Polars' }, { name: 'Data pipelines' }, { name: 'Query optimization' },
-    // Systems
-    { name: 'Microservices' }, { name: 'Event-driven' }, { name: 'Distributed systems' },
-    { name: 'Background workers' }, { name: 'SDKs' },
-    // Quality
-    { name: 'pytest' }, { name: 'Jest' }, { name: 'go test' }, { name: 'Playwright' },
-    { name: 'Selenium' },
-    // Cloud & ops
-    { name: 'Linux' }, { name: 'Bash' }, { name: 'AWS' }, { name: 'Docker' },
-    { name: 'Kubernetes' }, { name: 'Terraform' }, { name: 'Cloudflare' }, { name: 'CI/CD' },
-    { name: 'Prometheus' }, { name: 'Grafana' }, { name: 'CloudWatch' }, { name: 'Observability' },
-    // AI
-    { name: 'LLM APIs' }, { name: 'RAG' }, { name: 'LangGraph' }, { name: 'LangSmith' },
-    { name: 'Prompt engineering' }, { name: 'Tool calling' }, { name: 'Structured outputs' },
-    { name: 'Embeddings' }, { name: 'Code agents' }, { name: 'MCP' },
-  ];
-
   return (
     <section className="depth" id="depth">
       <div className="container">
@@ -79,14 +55,7 @@ export default function Depth() {
 
         <RangeStack layers={layers} />
 
-        <FadeIn className="depth-feed">
-          <span className="df-label">Stack</span>
-          <ul className="df-list">
-            {technologies.map(({ name }) => (
-              <li key={name}>{name}</li>
-            ))}
-          </ul>
-        </FadeIn>
+        <TechStack />
       </div>
     </section>
   );
