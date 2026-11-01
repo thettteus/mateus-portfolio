@@ -164,24 +164,24 @@ main, footer, header { position: relative; z-index: 1; }
 @keyframes la-fade { from { opacity: 0; } }
 
 /* security — shield draws, then the check snaps in: locked / verified */
-.iso-plate.is-drawn .iso-motif.la-security path { animation: la-draw 0.6s var(--ease) both; }
-.iso-plate.is-drawn .iso-motif.la-security path:last-of-type { animation: la-draw 0.42s var(--ease) 0.36s both; }
+.iso-plate.is-drawn .iso-motif.la-security path { animation: la-draw 0.36s var(--ease) both; }
+.iso-plate.is-drawn .iso-motif.la-security path:last-of-type { animation: la-draw 0.252s var(--ease) 0.216s both; }
 
 /* discovery — dotted probes stream out from the origin (each dot delayed by its
    distance) and form the end nodes where they land: exploring the space */
-.iso-plate.is-drawn .iso-motif.la-discovery .disc-trail { animation: la-fade 0.3s var(--ease) both; animation-delay: var(--dd, 0s); }
-.iso-plate.is-drawn .iso-motif.la-discovery circle[pathLength] { animation: la-fade 0.34s var(--ease) both; animation-delay: var(--dd, 0s); }
+.iso-plate.is-drawn .iso-motif.la-discovery .disc-trail { animation: la-fade 0.18s var(--ease) both; animation-delay: calc(var(--dd, 0s) * 0.6); }
+.iso-plate.is-drawn .iso-motif.la-discovery circle[pathLength] { animation: la-fade 0.204s var(--ease) both; animation-delay: calc(var(--dd, 0s) * 0.6); }
 
 /* architecture — signals draw out from the core, then the nodes light: connecting */
-.iso-plate.is-drawn .iso-motif.la-architecture line { animation: la-draw 0.5s var(--ease) both; }
-.iso-plate.is-drawn .iso-motif.la-architecture line:nth-of-type(2) { animation-delay: 0.05s; }
-.iso-plate.is-drawn .iso-motif.la-architecture line:nth-of-type(3) { animation-delay: 0.10s; }
-.iso-plate.is-drawn .iso-motif.la-architecture line:nth-of-type(4) { animation-delay: 0.15s; }
-.iso-plate.is-drawn .iso-motif.la-architecture line:nth-of-type(5) { animation-delay: 0.20s; }
-.iso-plate.is-drawn .iso-motif.la-architecture line:nth-of-type(6) { animation-delay: 0.25s; }
-.iso-plate.is-drawn .iso-motif.la-architecture line:nth-of-type(7) { animation-delay: 0.30s; }
-.iso-plate.is-drawn .iso-motif.la-architecture line:nth-of-type(8) { animation-delay: 0.35s; }
-.iso-plate.is-drawn .iso-motif.la-architecture circle { animation: la-fade 0.4s var(--ease) 0.36s both; }
+.iso-plate.is-drawn .iso-motif.la-architecture line { animation: la-draw 0.3s var(--ease) both; }
+.iso-plate.is-drawn .iso-motif.la-architecture line:nth-of-type(2) { animation-delay: 0.03s; }
+.iso-plate.is-drawn .iso-motif.la-architecture line:nth-of-type(3) { animation-delay: 0.06s; }
+.iso-plate.is-drawn .iso-motif.la-architecture line:nth-of-type(4) { animation-delay: 0.09s; }
+.iso-plate.is-drawn .iso-motif.la-architecture line:nth-of-type(5) { animation-delay: 0.12s; }
+.iso-plate.is-drawn .iso-motif.la-architecture line:nth-of-type(6) { animation-delay: 0.15s; }
+.iso-plate.is-drawn .iso-motif.la-architecture line:nth-of-type(7) { animation-delay: 0.18s; }
+.iso-plate.is-drawn .iso-motif.la-architecture line:nth-of-type(8) { animation-delay: 0.21s; }
+.iso-plate.is-drawn .iso-motif.la-architecture circle { animation: la-fade 0.24s var(--ease) 0.216s both; }
 
 /* engineering — gears slide in from apart and give a counter-rotating turn as
    they mesh; each spins about its own centre (projects as an in-plane turn) */
@@ -191,31 +191,31 @@ main, footer, header { position: relative; z-index: 1; }
   55%  { opacity: 1; }
   to   { transform: translate(0, 0) rotate(0deg); opacity: 1; }
 }
-.iso-plate.is-drawn .iso-motif.la-engineering .eng-gear { animation: la-gear 0.75s var(--ease) both; }
-.iso-plate.is-drawn .iso-motif.la-engineering .eng-gear:nth-of-type(2) { animation-delay: 0.06s; }
-.iso-plate.is-drawn .iso-motif.la-engineering .eng-gear:nth-of-type(3) { animation-delay: 0.12s; }
+.iso-plate.is-drawn .iso-motif.la-engineering .eng-gear { animation: la-gear 0.45s var(--ease) both; }
+.iso-plate.is-drawn .iso-motif.la-engineering .eng-gear:nth-of-type(2) { animation-delay: 0.036s; }
+.iso-plate.is-drawn .iso-motif.la-engineering .eng-gear:nth-of-type(3) { animation-delay: 0.072s; }
 
 /* harness — the machine draws first (with the seed of its product inside),
    connectors extend outward, then the blocks it builds snap in one by one:
    build the thing that builds the thing */
-.iso-plate.is-drawn .iso-motif.la-harness rect { animation: la-draw 0.5s var(--ease) both; }
-.iso-plate.is-drawn .iso-motif.la-harness rect:nth-of-type(2) { animation-delay: 0.12s; }
-.iso-plate.is-drawn .iso-motif.la-harness line { animation: la-draw 0.4s var(--ease) 0.3s both; }
-.iso-plate.is-drawn .iso-motif.la-harness line:nth-of-type(2) { animation-delay: 0.38s; }
-.iso-plate.is-drawn .iso-motif.la-harness line:nth-of-type(3) { animation-delay: 0.46s; }
-.iso-plate.is-drawn .iso-motif.la-harness rect:nth-of-type(3) { animation-delay: 0.55s; }
-.iso-plate.is-drawn .iso-motif.la-harness rect:nth-of-type(4) { animation-delay: 0.63s; }
-.iso-plate.is-drawn .iso-motif.la-harness rect:nth-of-type(5) { animation-delay: 0.71s; }
+.iso-plate.is-drawn .iso-motif.la-harness rect { animation: la-draw 0.3s var(--ease) both; }
+.iso-plate.is-drawn .iso-motif.la-harness rect:nth-of-type(2) { animation-delay: 0.072s; }
+.iso-plate.is-drawn .iso-motif.la-harness line { animation: la-draw 0.24s var(--ease) 0.18s both; }
+.iso-plate.is-drawn .iso-motif.la-harness line:nth-of-type(2) { animation-delay: 0.228s; }
+.iso-plate.is-drawn .iso-motif.la-harness line:nth-of-type(3) { animation-delay: 0.276s; }
+.iso-plate.is-drawn .iso-motif.la-harness rect:nth-of-type(3) { animation-delay: 0.33s; }
+.iso-plate.is-drawn .iso-motif.la-harness rect:nth-of-type(4) { animation-delay: 0.378s; }
+.iso-plate.is-drawn .iso-motif.la-harness rect:nth-of-type(5) { animation-delay: 0.426s; }
 
 /* scale — baseline draws, bars draw left to right, then the trend line: climbing */
-.iso-plate.is-drawn .iso-motif.la-scale line { animation: la-draw 0.4s var(--ease) both; }
-.iso-plate.is-drawn .iso-motif.la-scale rect { animation: la-draw 0.5s var(--ease) both; }
-.iso-plate.is-drawn .iso-motif.la-scale rect:nth-of-type(2) { animation-delay: 0.06s; }
-.iso-plate.is-drawn .iso-motif.la-scale rect:nth-of-type(3) { animation-delay: 0.12s; }
-.iso-plate.is-drawn .iso-motif.la-scale rect:nth-of-type(4) { animation-delay: 0.18s; }
-.iso-plate.is-drawn .iso-motif.la-scale rect:nth-of-type(5) { animation-delay: 0.24s; }
-.iso-plate.is-drawn .iso-motif.la-scale rect:nth-of-type(6) { animation-delay: 0.30s; }
-.iso-plate.is-drawn .iso-motif.la-scale polyline { animation: la-fade 0.5s var(--ease) 0.42s both; }
+.iso-plate.is-drawn .iso-motif.la-scale line { animation: la-draw 0.24s var(--ease) both; }
+.iso-plate.is-drawn .iso-motif.la-scale rect { animation: la-draw 0.3s var(--ease) both; }
+.iso-plate.is-drawn .iso-motif.la-scale rect:nth-of-type(2) { animation-delay: 0.036s; }
+.iso-plate.is-drawn .iso-motif.la-scale rect:nth-of-type(3) { animation-delay: 0.072s; }
+.iso-plate.is-drawn .iso-motif.la-scale rect:nth-of-type(4) { animation-delay: 0.108s; }
+.iso-plate.is-drawn .iso-motif.la-scale rect:nth-of-type(5) { animation-delay: 0.144s; }
+.iso-plate.is-drawn .iso-motif.la-scale rect:nth-of-type(6) { animation-delay: 0.18s; }
+.iso-plate.is-drawn .iso-motif.la-scale polyline { animation: la-fade 0.3s var(--ease) 0.252s both; }
 
 @media (prefers-reduced-motion: reduce) {
   .iso-plate.is-drawn .iso-motif * { animation: none; }
@@ -932,12 +932,12 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
   grid-column: 1 / 6;
   font: 300 clamp(1.5rem, 1rem + 1.45vw, 2.625rem)/1.1 var(--font-sans);
   letter-spacing: -0.025em;
-  transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 .wk-role { grid-column: 6 / 8; }
 .wk-type { grid-column: 8 / 10; }
 .wk-status { grid-column: 10 / 12; font-variant-numeric: tabular-nums; }
-.wk-role, .wk-type, .wk-status { color: var(--ink-2); font-size: 0.875rem; letter-spacing: normal; transition: color 0.3s; }
+.wk-role, .wk-type, .wk-status { color: var(--ink-2); font-size: 0.875rem; letter-spacing: normal; transition: color 0.18s; }
 .wk-row:hover .wk-title { transform: translateX(0.25em); }
 .wk-row:hover .wk-role, .wk-row:hover .wk-type, .wk-row:hover .wk-status,
 .wk-case.is-open .wk-role, .wk-case.is-open .wk-type, .wk-case.is-open .wk-status { color: var(--ink); }
@@ -966,7 +966,7 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
   width: 12px;
   height: 1px;
   background: var(--ink);
-  transition: transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition: transform 0.27s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 .wk-icon::after { transform: rotate(90deg); }
 .wk-case.is-open .wk-icon::after { transform: rotate(0deg); }
@@ -975,7 +975,7 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
 .wk-panel {
   display: grid;
   grid-template-rows: 0fr;
-  transition: grid-template-rows 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition: grid-template-rows 0.42s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 .wk-case.is-open .wk-panel { grid-template-rows: 1fr; }
 .wk-clip { min-height: 0; overflow: hidden; }
@@ -1003,7 +1003,7 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
   text-decoration-thickness: 1px;
   text-underline-offset: 0.3em;
   text-decoration-color: var(--rule);
-  transition: text-decoration-color 0.2s;
+  transition: text-decoration-color 0.12s;
 }
 .wk-links a:hover { text-decoration-color: var(--ink); }
 
@@ -1035,23 +1035,23 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
 
 /* opening: text resolves, the picture rises in */
 @media (prefers-reduced-motion: no-preference) {
-  .wk-case.is-open .wk-text > * { animation: wk-resolve 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) backwards; }
-  .wk-case.is-open .wk-text > :nth-child(2) { animation-delay: 0.08s; }
-  .wk-case.is-open .wk-text > :nth-child(3) { animation-delay: 0.16s; }
-  .wk-case.is-open .wk-text > :nth-child(4) { animation-delay: 0.24s; }
-  .wk-case.is-open .wk-media { animation: wk-curtain 0.9s cubic-bezier(0.6, 0, 0.2, 1) 0.05s backwards; }
-  .wk-case.is-open .wk-media > * { animation: wk-settle 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) 0.05s backwards; }
+  .wk-case.is-open .wk-text > * { animation: wk-resolve 0.42s cubic-bezier(0.2, 0.8, 0.2, 1) backwards; }
+  .wk-case.is-open .wk-text > :nth-child(2) { animation-delay: 0.048s; }
+  .wk-case.is-open .wk-text > :nth-child(3) { animation-delay: 0.096s; }
+  .wk-case.is-open .wk-text > :nth-child(4) { animation-delay: 0.144s; }
+  .wk-case.is-open .wk-media { animation: wk-curtain 0.54s cubic-bezier(0.6, 0, 0.2, 1) 0.03s backwards; }
+  .wk-case.is-open .wk-media > * { animation: wk-settle 0.72s cubic-bezier(0.2, 0.8, 0.2, 1) 0.03s backwards; }
 
   .wk-cases.js-anim:not(.is-in) .wk-case::before,
   .wk-cases.js-anim:not(.is-in) .wk-case:last-child::after { transform: scaleX(0); }
   .wk-cases.js-anim:not(.is-in) .wk-row > * { opacity: 0; }
   .wk-cases.is-in .wk-case::before, .wk-cases.is-in .wk-case:last-child::after {
-    animation: wk-rule 0.9s cubic-bezier(0.6, 0, 0.2, 1) backwards;
-    animation-delay: calc(var(--r) * 90ms);
+    animation: wk-rule 0.54s cubic-bezier(0.6, 0, 0.2, 1) backwards;
+    animation-delay: calc(var(--r) * 54ms);
   }
   .wk-cases.is-in .wk-row > * {
-    animation: wk-resolve 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
-    animation-delay: calc(var(--r) * 90ms + 200ms);
+    animation: wk-resolve 0.42s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+    animation-delay: calc(var(--r) * 54ms + 120ms);
   }
 }
 @keyframes wk-rule { from { transform: scaleX(0); } }
@@ -1183,11 +1183,11 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
   left: 50%;
   opacity: 0;
   cursor: pointer;
-  transition: transform 0.9s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.6s ease;
+  transition: transform 0.54s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.36s ease;
 }
 .range-stage:not(.is-settled) .iso-plate { transition-delay: var(--drop-delay, 0s); }
 /* once assembled, the scroll drives the plates frame by frame */
-.range-stage.is-settled .iso-plate { transition: opacity 0.6s ease; will-change: transform; }
+.range-stage.is-settled .iso-plate { transition: opacity 0.36s ease; will-change: transform; }
 .iso-plate.is-in { opacity: 1; }
 /* the plate boxes overlap — only the drawn tile takes the click, so whichever
    plate is visibly under the pointer is the one picked */
@@ -1414,10 +1414,10 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
   letter-spacing: -0.018em;
   color: var(--ink);
 }
-.stk-item { white-space: nowrap; transition: opacity 0.45s ease; transition-delay: calc(var(--i, 0) * 5ms); }
+.stk-item { white-space: nowrap; transition: opacity 0.27s ease; transition-delay: calc(var(--i, 0) * 3ms); }
 .stk-t {
   background: linear-gradient(var(--accent), var(--accent)) 0 90% / 0% 1.5px no-repeat;
-  transition: background-size 0.55s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition: background-size 0.33s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 .stk-index.is-filtering .stk-item { opacity: 0.2; }
 .stk-index.is-filtering .stk-item.is-match { opacity: 1; }
@@ -1432,12 +1432,12 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
   .stk-index.js-anim:not(.is-in) .stk-row-head,
   .stk-index.js-anim:not(.is-in) .stk-item { opacity: 0; }
   .stk-index.is-in .stk-row::before, .stk-index.is-in .stk-row:last-child::after {
-    animation: stk-rule 0.9s cubic-bezier(0.6, 0, 0.2, 1) backwards;
-    animation-delay: calc(var(--r) * 70ms);
+    animation: stk-rule 0.54s cubic-bezier(0.6, 0, 0.2, 1) backwards;
+    animation-delay: calc(var(--r) * 42ms);
   }
   .stk-index.is-in .stk-row-head, .stk-index.is-in .stk-item {
-    animation: stk-resolve 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
-    animation-delay: calc(var(--r) * 70ms + 180ms + var(--k, 0) * 18ms);
+    animation: stk-resolve 0.42s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+    animation-delay: calc(var(--r) * 42ms + 108ms + var(--k, 0) * 10.8ms);
   }
 }
 @keyframes stk-rule { from { transform: scaleX(0); } }

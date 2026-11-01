@@ -19,13 +19,13 @@ const DROP = 140; // how far plates fall from on first assemble
 const TILE_RATIO = 150 / 280; // IsoLayer viewBox height / width
 
 const STEP_SVH = 30; // page length per step, so the pinned screen has room to scroll through
-const STEP_MS = 850; // how long one plate takes to travel to the next layer
+const STEP_MS = 510; // how long one plate takes to travel to the next layer
 const GESTURE_GAP_MS = 180; // a pause this long between wheel events starts a new gesture
 const SUSTAIN_MS = 300; // a wheel still spinning this long after a landing moves on again
 const SWIPE_PX = 40; // touch travel that counts as a swipe
 const BYPASS_MS = 2000; // in-page link scrolls pass straight through for this long
 
-const TEXT_MS = 600; // how long a label takes to hand over once its plate lands
+const TEXT_MS = 360; // how long a label takes to hand over once its plate lands
 
 const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
 const easeInOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2);
@@ -218,7 +218,7 @@ export default function RangeStack({ layers }: { layers: RangeLayer[] }) {
   // after that the frame loop moves the plates
   useEffect(() => {
     if (!assembled) return;
-    const t = setTimeout(() => setSettled(true), (n - 1) * 110 + 950);
+    const t = setTimeout(() => setSettled(true), (n - 1) * 66 + 590);
     return () => clearTimeout(t);
   }, [assembled, n]);
 
@@ -377,7 +377,7 @@ export default function RangeStack({ layers }: { layers: RangeLayer[] }) {
               key={ix}
               ref={(el) => { plates.current[i] = el; }}
               className={['iso-plate', assembled && 'is-in', i === active && 'is-active'].filter(Boolean).join(' ')}
-              style={{ width: tileW, zIndex: n - i, '--drop-delay': `${(n - 1 - i) * 110}ms` } as CSSProperties}
+              style={{ width: tileW, zIndex: n - i, '--drop-delay': `${(n - 1 - i) * 66}ms` } as CSSProperties}
               onClick={() => pick(i)}
             >
               <IsoLayer variant={art} />
