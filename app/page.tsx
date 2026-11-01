@@ -5,8 +5,7 @@ import { Hero } from '@/components/sections/Hero';
 import { getContributions } from '@/components/sections/Hero/contributions';
 import { Marquee } from '@/components/sections/Marquee';
 import { Projects } from '@/components/sections/Projects';
-import { AILeverage } from '@/components/sections/AILeverage';
-import { Process } from '@/components/sections/Process';
+import { Leverage } from '@/components/sections/Leverage';
 import { Depth } from '@/components/sections/Depth';
 import { Writing } from '@/components/sections/Writing';
 import { Contact } from '@/components/sections/Contact';
@@ -24,8 +23,7 @@ export default async function Home() {
         <Marquee />
         <Depth />
         <Projects />
-        <Process />
-        <AILeverage />
+        <Leverage />
         <Writing />
         <Contact />
       </main>

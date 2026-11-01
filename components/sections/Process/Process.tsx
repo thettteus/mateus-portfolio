@@ -7,7 +7,6 @@ export default function Process() {
       <div className="container">
         <FadeIn as="header" className="sec-head">
           <div className="sec-eyebrow">
-            <span className="num">03</span>
             <span className="lbl">Process</span>
           </div>
           <h2>Not just the code, <em>the whole system.</em></h2>

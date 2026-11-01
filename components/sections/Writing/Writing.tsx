@@ -32,7 +32,6 @@ export default function Writing() {
       <div className="container">
         <FadeIn as="header" className="sec-head">
           <div className="sec-eyebrow">
-            <span className="num">05</span>
             <span className="lbl">Writing</span>
           </div>
           <h2>I write to work things out.</h2>

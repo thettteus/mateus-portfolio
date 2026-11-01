@@ -47,7 +47,6 @@ export default function Depth() {
       <div className="container">
         <FadeIn as="header" className="sec-head">
           <div className="sec-eyebrow">
-            <span className="num">01</span>
             <span className="lbl">The range</span>
           </div>
           <h2>Problems cut across layers. <em>So do I.</em></h2>

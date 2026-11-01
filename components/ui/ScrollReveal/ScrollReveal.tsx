@@ -12,7 +12,7 @@ export default function ScrollReveal() {
       });
     });
 
-    const NAV_SECTIONS = ['depth', 'projects', 'process', 'ai', 'writing', 'contact'];
+    const NAV_SECTIONS = ['depth', 'projects', 'leverage', 'writing', 'contact'];
 
     const updateActive = () => {
       const y = window.scrollY + 120;

@@ -301,12 +301,6 @@ section {
   background: var(--rule);
   margin-left: 10px;
 }
-.sec-eyebrow .num {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.1em;
-  color: var(--accent-text);
-}
 .sec-eyebrow .lbl {
   font-family: var(--font-mono);
   font-size: 11px;
@@ -1471,6 +1465,137 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
 }
 @media (prefers-reduced-motion: reduce) {
   .stk *, .stk *::before, .stk *::after { transition: none !important; }
+}
+
+/* ============================================================
+   LEVERAGE — "choosing is the job": one pinned frame, the drawing behind,
+   the words in front
+   ============================================================ */
+.lev {
+  --lev-dot: #4a4a4f;
+  /* captions and progress line up with the page column */
+  --lev-edge: max(var(--gutter), calc((100% - var(--maxw)) / 2 + var(--gutter)));
+  padding-bottom: 0;
+  font-size: 1rem;
+  line-height: 1.5;
+  letter-spacing: normal;
+}
+[data-theme="dark"] .lev { --lev-dot: #c9c9cc; }
+.lev-head { padding-bottom: clamp(24px, 4vh, 48px); }
+.lev-head h2 {
+  grid-column: 1 / 10;
+  margin: 0 0 0 -0.03em;
+  font: 300 clamp(2.2rem, 5.2vw, 6.5rem)/1 var(--font-sans);
+  letter-spacing: -0.035em;
+  color: var(--ink);
+  text-wrap: balance;
+}
+.lev-head h2 b { font-weight: 500; }
+.lev-intro {
+  grid-column: 1 / 7;
+  margin: 28px 0 0;
+  max-width: 34em;
+  color: var(--ink-2);
+  font-size: clamp(1.0625rem, 0.95rem + 0.3vw, 1.25rem);
+  line-height: 1.45;
+  text-wrap: pretty;
+}
+
+.lev-track { position: relative; height: calc(100svh + 4 * 65svh); }
+.lev-pin { position: sticky; top: 0; height: 100svh; overflow: hidden; }
+.lev-pin canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+
+.lev-captions {
+  position: absolute;
+  left: var(--lev-edge);
+  bottom: clamp(40px, 9vh, 96px);
+  width: min(58vw, 56rem);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.lev-cap {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  opacity: 0;
+  filter: blur(10px);
+  transform: translateY(14px);
+  transition: opacity 0.6s ease, filter 0.7s ease, transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+  pointer-events: none;
+}
+.lev-cap.is-on { opacity: 1; filter: none; transform: none; }
+.lev-cap.is-past { transform: translateY(-14px); }
+.lev-cap-n { margin: 0 0 10px; color: var(--ink-2); font-size: 0.8125rem; font-variant-numeric: tabular-nums; }
+.lev-cap h3 {
+  margin: 0 0 0 -0.04em;
+  font: 300 clamp(3rem, 6.6vw, 8rem)/0.95 var(--font-sans);
+  letter-spacing: -0.04em;
+  color: var(--ink);
+}
+.lev-cap:last-child h3 { color: var(--accent); }
+.lev-say {
+  max-width: 26em;
+  margin: 18px 0 0;
+  color: var(--ink-2);
+  font-size: clamp(1rem, 0.9rem + 0.3vw, 1.1875rem);
+  line-height: 1.45;
+}
+
+/* progress: four steps you can jump to */
+.lev-progress {
+  position: absolute;
+  right: var(--lev-edge);
+  bottom: clamp(40px, 9vh, 96px);
+  display: flex;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.lev-progress button {
+  display: block;
+  width: clamp(40px, 4.2vw, 64px);
+  padding: 14px 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+.lev-bar { display: block; height: 2px; background: var(--rule); position: relative; overflow: hidden; }
+.lev-bar::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--ink);
+  transform-origin: left;
+  transform: scaleX(var(--f, 0));
+}
+.lev-progress li:last-child .lev-bar::after { background: var(--accent); }
+
+.lev-after { height: 25svh; }
+
+/* reduced motion: no pinning, the finished picture and all four steps */
+.lev-track.is-static { height: auto; }
+.is-static .lev-pin { position: relative; height: 100svh; }
+.is-static .lev-captions { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(16px, 1.9vw, 28px); width: auto; right: var(--lev-edge); }
+.is-static .lev-cap { position: static; opacity: 1; filter: none; transform: none; }
+.is-static .lev-cap h3 { font-size: clamp(1.5rem, 2.4vw, 2.5rem); }
+.is-static .lev-progress { display: none; }
+
+@media (max-width: 759px), (orientation: portrait) and (max-width: 1023px) {
+  .lev-head h2, .lev-intro { grid-column: 1 / -1; }
+  .lev-captions { right: var(--lev-edge); width: auto; bottom: 28px; }
+  .lev-cap h3 { font-size: clamp(2.5rem, 11.5vw, 4rem); }
+  .lev-say { margin-top: 12px; }
+  /* below the fixed header */
+  .lev-progress { left: var(--lev-edge); right: var(--lev-edge); bottom: auto; top: calc(env(safe-area-inset-top, 0px) + 72px); }
+  .lev-progress li { flex: 1; }
+  .lev-progress button { width: 100%; }
+  .is-static .lev-captions { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lev *, .lev *::before, .lev *::after { transition: none !important; }
 }
 
 /* ============================================================

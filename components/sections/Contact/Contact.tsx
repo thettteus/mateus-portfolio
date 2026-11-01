@@ -11,7 +11,6 @@ export default function Contact() {
           style={{ marginBottom: "48px" }}
         >
           <div className="sec-eyebrow">
-            <span className="num">06</span>
             <span className="lbl">Work with me</span>
           </div>
         </FadeIn>

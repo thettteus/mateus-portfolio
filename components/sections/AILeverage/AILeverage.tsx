@@ -77,7 +77,6 @@ export default function AILeverage() {
       <div className="container">
         <FadeIn as="header" className="sec-head">
           <div className="sec-eyebrow">
-            <span className="num">04</span>
             <span className="lbl">Working with leverage</span>
           </div>
           <h2>

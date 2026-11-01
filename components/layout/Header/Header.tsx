@@ -14,8 +14,7 @@ function syncThemeColorMeta(theme: 'light' | 'dark') {
 const LINKS = [
   { href: '#depth', label: 'Stack' },
   { href: '#projects', label: 'Work' },
-  { href: '#process', label: 'Process' },
-  { href: '#ai', label: 'Leverage' },
+  { href: '#leverage', label: 'Leverage' },
   { href: '#writing', label: 'Writing' },
   { href: '#contact', label: 'Contact' },
 ];
