@@ -1,5 +1,4 @@
 import { Header } from '@/components/layout/Header';
-import { Footer } from '@/components/layout/Footer';
 import { ScrollReveal } from '@/components/ui/ScrollReveal';
 import { Hero } from '@/components/sections/Hero';
 import { getContributions } from '@/components/sections/Hero/contributions';
@@ -27,7 +26,6 @@ export default async function Home() {
         <Writing />
         <Contact />
       </main>
-      <Footer />
     </>
   );
 }

@@ -8,13 +8,29 @@ const STEPS_TEXT = [
   { title: 'Business outcomes', say: 'Done means a number moved.' },
 ];
 
-// where each step lives on the scroll (0–1 through the pinned track)
-const STEPS: [number, number][] = [[0, 0.2], [0.2, 0.46], [0.46, 0.7], [0.7, 1]];
+// where the scene rests on each step (0–1 through the animation)
+const LAND = [0, 0.44, 0.68, 1];
+
+const STEP_MS = 850; // how long the scene takes to travel to the next step
+const GESTURE_GAP_MS = 180; // a pause this long between wheel events starts a new gesture
+const SUSTAIN_MS = 300; // a wheel still spinning this long after a landing moves on again
+const SWIPE_PX = 40; // touch travel that counts as a swipe
+const BYPASS_MS = 2000; // in-page link scrolls pass straight through for this long
+const SPIN_MS = 420; // how long the first letter's reel rolls
+const SPIN_STAGGER_MS = 24; // each later letter rolls a little longer, so they stop left to right
+const REEL = 9; // letters on each reel, the last one being the real letter
 
 const clamp01 = (x: number) => (x < 0 ? 0 : x > 1 ? 1 : x);
 const smooth = (a: number, b: number, x: number) => { const t = clamp01((x - a) / (b - a)); return t * t * (3 - 2 * t); };
 const easeOut = (t: number) => 1 - (1 - t) ** 3;
+const easeInOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2);
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+const LOWER = 'abcdefghijklmnopqrstuvwxyz';
+const UPPER = LOWER.toUpperCase();
+const spinChar = (c: string) => {
+  const set = c === c.toLowerCase() ? (c === c.toUpperCase() ? '' : LOWER) : UPPER;
+  return set ? set[Math.floor(Math.random() * set.length)] : c;
+};
 
 type RGB = [number, number, number];
 type Part = { phi: number; d: number; sp: number; sp2: number; p1: number; p2: number; p3: number; p4: number; r: number; a: number };
@@ -39,8 +55,10 @@ const EDGES = [[0, 2], [0, 3], [0, 4], [0, 5], [1, 2], [1, 3], [1, 4], [1, 5], [
 /**
  * Leverage — "choosing is the job": a pinned scene where scattered options
  * (particles) funnel into one point of judgment (a crystal), leave as a single
- * path to production, and land on an outcome (a target). Four captions follow
- * the scroll; the progress bars jump between them.
+ * path to production, and land on an outcome (a target). While it's pinned,
+ * each scroll gesture (wheel, swipe or key) moves exactly one step, like the
+ * range stack; the scene travels on its own clock and the new title spins its
+ * letters into place. The progress bars jump between steps.
  */
 export default function Leverage() {
   const trackRef = useRef<HTMLDivElement>(null);
@@ -126,7 +144,16 @@ export default function Leverage() {
       });
     };
 
-    let pT = 0, p = 0, last = 0, raf = 0, inView = false;
+    const N = STEPS_TEXT.length;
+    // cur walks toward target (both step positions 0…N-1); p is where that
+    // puts the animation
+    let cur = 0, target = 0, p = 0, last = 0, raf = 0, inView = false;
+    let readyAt = 0, bypass = 0, programmatic = false;
+    let lastRaw = -1, swipedAt = 0; // where the last scroll left the page; when a wheel/swipe last moved
+    const pAt = (pos: number) => {
+      const lo = Math.floor(pos), hi = Math.min(N - 1, lo + 1);
+      return lerp(LAND[lo], LAND[hi], easeInOut(pos - lo));
+    };
 
     const draw = (t: number) => {
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -210,34 +237,142 @@ export default function Leverage() {
       }
     };
 
-    const syncUI = () => {
-      let step = 0;
-      STEPS.forEach(([a], i) => { if (p >= a - 0.0001) step = i; });
+    // the title of the step coming in rolls like a slot machine: every letter
+    // is a reel of random letters that stops on the real one, left to right
+    const spins = new Map<HTMLElement, number>();
+    const spin = (el: HTMLElement) => {
+      const text = el.dataset.text ?? '';
+      clearTimeout(spins.get(el));
+      el.textContent = '';
+      let i = 0, longest = 0;
+      text.split(' ').forEach((word, w) => {
+        if (w) el.append(' ');
+        const part = document.createElement('span');
+        part.className = 'lev-wordpart';
+        [...word].forEach((c) => {
+          const reel = document.createElement('span');
+          const strip = document.createElement('span');
+          reel.className = 'lev-reel';
+          strip.className = 'lev-strip';
+          for (let k = 0; k < REEL; k++) {
+            const it = document.createElement('span');
+            it.textContent = k === REEL - 1 ? c : spinChar(c);
+            strip.append(it);
+          }
+          // the real letter, unseen, sets the reel's width
+          const sizer = document.createElement('span');
+          sizer.className = 'lev-sizer';
+          sizer.textContent = c;
+          reel.append(sizer, strip);
+          part.append(reel);
+          const duration = SPIN_MS + i++ * SPIN_STAGGER_MS;
+          strip.animate(
+            [{ transform: 'translateY(0)' }, { transform: `translateY(${(-(REEL - 1) / REEL) * 100}%)` }],
+            { duration, easing: 'cubic-bezier(0.2, 0.6, 0.15, 1)', fill: 'both' },
+          );
+          longest = Math.max(longest, duration);
+        });
+        el.append(part);
+      });
+      // once every reel has stopped, the plain word goes back
+      spins.set(el, window.setTimeout(() => { el.textContent = text; spins.delete(el); }, longest + 60));
+    };
+    let shown = -1;
+    const showCaption = (step: number, animate: boolean) => {
+      if (step === shown) return;
+      shown = step;
       caps.forEach((c, i) => {
         c.classList.toggle('is-on', i === step);
         c.classList.toggle('is-past', i < step);
       });
+      const title = caps[step]?.querySelector<HTMLElement>('.lev-word');
+      if (title && animate) spin(title);
+    };
+
+    const syncUI = () => {
       segs.forEach((li, i) => {
-        const [a, z] = STEPS[i];
-        li.querySelector<HTMLElement>('.lev-bar')?.style.setProperty('--f', clamp01((p - a) / (z - a)).toFixed(3));
-        li.querySelector('button')?.setAttribute('aria-current', i === step ? 'step' : 'false');
+        // the first bar is full on arrival; each later one fills on the way in
+        const f = i === 0 ? 1 : clamp01((p - LAND[i - 1]) / (LAND[i] - LAND[i - 1]));
+        li.querySelector<HTMLElement>('.lev-bar')?.style.setProperty('--f', f.toFixed(3));
+        li.querySelector('button')?.setAttribute('aria-current', i === target ? 'step' : 'false');
       });
     };
 
+    // walk the scene toward the target at one step per STEP_MS
     const frame = (now: number) => {
       const dt = last ? Math.min(64, now - last) : 16;
       last = now;
-      p += (pT - p) * (1 - Math.exp(-dt / 120));
+      const d = target - cur, by = dt / STEP_MS;
+      if (d) {
+        cur = Math.abs(d) <= by ? target : cur + Math.sign(d) * by;
+        if (cur === target) readyAt = now;
+      }
+      p = pAt(cur);
       draw(now);
       syncUI();
       if (inView) raf = requestAnimationFrame(frame);
       else { raf = 0; last = 0; }
     };
     const wake = () => { if (!raf) raf = requestAnimationFrame(frame); };
-    const fromScroll = () => {
+
+    // page scroll ↔ step: each step has its own scroll offset inside the track
+    const geo = () => {
       const r = track.getBoundingClientRect();
       const span = r.height - innerHeight;
-      pT = span > 0 ? clamp01(-r.top / span) : 1;
+      return { top: scrollY + r.top, span, raw: span > 0 ? (-r.top / span) * (N - 1) : -1 };
+    };
+    const go = (to: number) => {
+      const g = geo();
+      target = to;
+      showCaption(to, true);
+      const top = g.top + (g.span * to) / (N - 1);
+      // a no-op scrollTo fires no scroll event, so only flag a real move
+      if (Math.abs(scrollY - top) > 0.5) {
+        programmatic = true;
+        scrollTo({ top, behavior: 'instant' });
+      }
+      lastRaw = to;
+      wake();
+    };
+    const inside = (raw: number) => raw > -0.01 && raw < N - 1 + 0.01;
+    const ready = () => cur === target;
+    // one step in `dir`; false when that would leave the scene (let the page go)
+    const step = (dir: number) => {
+      const to = target + dir;
+      if (to < 0 || to > N - 1) return false;
+      go(to);
+      return true;
+    };
+    // at either end, scrolling outward hands control back to the page
+    const leaving = (dir: number) => ready() && ((target <= 0 && dir < 0) || (target >= N - 1 && dir > 0));
+
+    const fromScroll = () => {
+      const g = geo();
+      if (programmatic) { programmatic = false; return; }
+      const prev = lastRaw;
+      lastRaw = g.raw;
+      // Chrome only lets the first wheel event of a scroll be cancelled, so a
+      // flick that began outside keeps its momentum and can carry the page
+      // clean through the track in one go. Hold it on the step it's on.
+      const now = performance.now();
+      const through = now >= bypass && now - swipedAt < 600 &&
+        ((g.raw > N - 1 && prev < N - 1 && target < N - 1) || (g.raw < 0 && prev > 0 && target > 0));
+      if (through) { go(target); return; }
+      // outside the track the scene rests at its nearest end: jump, no travel
+      if (g.raw < 0 || g.raw > N - 1) {
+        const end = g.raw < 0 ? 0 : N - 1;
+        if (target !== end || cur !== end) { target = cur = end; p = pAt(end); showCaption(end, false); syncUI(); }
+        return;
+      }
+      // in-page links scroll straight through; the scene just follows
+      if (performance.now() < bypass) {
+        const to = Math.max(0, Math.min(N - 1, Math.round(g.raw)));
+        if (to !== target) { target = to; showCaption(to, true); wake(); }
+        return;
+      }
+      // momentum, scrollbar or keys landing mid-track: hold the page where
+      // the scene is — only gestures move it on
+      go(target);
     };
 
     readColors();
@@ -251,39 +386,113 @@ export default function Leverage() {
     if (calm) {
       track.classList.add('is-static');
       resize();
-      p = pT = 1;
+      p = 1;
       draw(0);
       caps.forEach((c) => c.classList.add('is-on'));
       const onResize = () => { resize(); draw(0); };
       addEventListener('resize', onResize);
       cleanups.push(() => removeEventListener('resize', onResize));
     } else {
+      let lastWheel = 0;
+      let lastDelta = 0;
+      let peak = 0; // strongest wheel event of the current gesture
+      let outside = true;
+      let entering = false; // still in the gesture that carried the page in
+      const onWheel = (e: WheelEvent) => {
+        const now = performance.now();
+        const mag = Math.abs(e.deltaY);
+        swipedAt = now;
+        // the scroll that carried the page in is not a gesture of its own:
+        // keep timing it outside, and count arriving as a landing
+        if (!inside(geo().raw) || now < bypass) {
+          outside = true;
+          lastWheel = now;
+          lastDelta = mag;
+          return;
+        }
+        if (outside) { outside = false; entering = true; readyAt = now; }
+        // momentum that can no longer be cancelled is still the scroll that
+        // carried the page in: the hold in fromScroll keeps the page, it never steps
+        if (!e.cancelable) { lastWheel = now; lastDelta = mag; return; }
+        const dir = Math.sign(e.deltaY);
+        if (!dir || leaving(dir)) return;
+        e.preventDefault();
+        // a new gesture: a pause after the last one, or a fresh flick rising out
+        // of a decaying inertia tail
+        const fresh = now - lastWheel > GESTURE_GAP_MS || (mag > 20 && mag > lastDelta * 1.6);
+        peak = fresh ? mag : Math.max(peak, mag);
+        if (fresh) entering = false;
+        // a wheel kept spinning at strength moves on, one landing at a time;
+        // a trackpad's fading inertia tail never counts
+        // the spin that carried the page in only lands; it never moves on
+        const sustained = !entering && now - readyAt > SUSTAIN_MS && mag >= peak * 0.6 && mag >= lastDelta;
+        lastWheel = now;
+        lastDelta = mag;
+        if ((fresh || sustained) && ready()) step(dir);
+      };
+      let touchY = 0;
+      let touchDir = 0;
+      const onTouchStart = (e: TouchEvent) => { touchY = e.touches[0].clientY; touchDir = 0; };
+      const onTouchMove = (e: TouchEvent) => {
+        swipedAt = performance.now();
+        // a swipe that carried the page in only lands; the next one moves on
+        if (!inside(geo().raw) || performance.now() < bypass) { touchDir = 1; return; }
+        const dy = touchY - e.touches[0].clientY;
+        const dir = Math.sign(dy);
+        if (!dir || leaving(dir)) return;
+        e.preventDefault();
+        if (!touchDir && Math.abs(dy) > SWIPE_PX && ready()) { touchDir = dir; step(dir); }
+      };
+      const onKey = (e: KeyboardEvent) => {
+        if (!inside(geo().raw) || e.metaKey || e.ctrlKey || e.altKey) return;
+        const el = document.activeElement as HTMLElement | null;
+        if (el && (/^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName) || el.isContentEditable)) return;
+        const dir = ['ArrowDown', 'PageDown', ' '].includes(e.key) ? (e.shiftKey && e.key === ' ' ? -1 : 1)
+          : ['ArrowUp', 'PageUp'].includes(e.key) ? -1 : 0;
+        if (!dir || leaving(dir)) return;
+        e.preventDefault();
+        if (ready()) step(dir);
+      };
+      const onClick = (e: MouseEvent) => {
+        if ((e.target as Element).closest?.('a[href*="#"]')) bypass = performance.now() + BYPASS_MS;
+      };
+
       const io = new IntersectionObserver((entries) => {
         inView = entries.some((e) => e.isIntersecting);
-        if (inView) { fromScroll(); wake(); }
+        if (inView) wake();
       });
       io.observe(track);
-      const onResize = () => { resize(); fromScroll(); };
+      const onResize = () => { resize(); if (inside(geo().raw)) go(target); };
       addEventListener('scroll', fromScroll, { passive: true });
+      addEventListener('wheel', onWheel, { passive: false });
+      addEventListener('touchstart', onTouchStart, { passive: true });
+      addEventListener('touchmove', onTouchMove, { passive: false });
+      addEventListener('keydown', onKey);
+      document.addEventListener('click', onClick, true);
       addEventListener('resize', onResize);
+      // picking a step walks the scene there, one step after another
       const jumps = segs.map((li, i) => {
         const btn = li.querySelector('button')!;
-        const go = () => {
-          const r = track.getBoundingClientRect();
-          const span = r.height - innerHeight;
-          const [a, z] = STEPS[i];
-          scrollTo({ top: scrollY + r.top + span * (a + (z - a) * 0.6), behavior: 'smooth' });
-        };
-        btn.addEventListener('click', go);
-        return () => btn.removeEventListener('click', go);
+        const pick = () => go(i);
+        btn.addEventListener('click', pick);
+        return () => btn.removeEventListener('click', pick);
       });
-      fromScroll();
+      const start = Math.max(0, Math.min(N - 1, Math.round(geo().raw)));
+      target = cur = start;
+      p = pAt(start);
+      showCaption(start, false);
       syncUI();
       cleanups.push(
         () => io.disconnect(),
         () => removeEventListener('scroll', fromScroll),
+        () => removeEventListener('wheel', onWheel),
+        () => removeEventListener('touchstart', onTouchStart),
+        () => removeEventListener('touchmove', onTouchMove),
+        () => removeEventListener('keydown', onKey),
+        () => document.removeEventListener('click', onClick, true),
         () => removeEventListener('resize', onResize),
         () => cancelAnimationFrame(raf),
+        () => spins.forEach((id) => clearTimeout(id)),
         ...jumps,
       );
     }
@@ -307,7 +516,7 @@ export default function Leverage() {
             {STEPS_TEXT.map(({ title, say }, i) => (
               <li className="lev-cap" key={title}>
                 <p className="lev-cap-n">{i + 1}/{STEPS_TEXT.length}</p>
-                <h3>{title}</h3>
+                <h3 aria-label={title}><span className="lev-word" data-text={title} aria-hidden="true">{title}</span></h3>
                 <p className="lev-say">{say}</p>
               </li>
             ))}
