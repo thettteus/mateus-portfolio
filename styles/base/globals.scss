@@ -1287,7 +1287,7 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
    search, filter by area, or paste a job description into */
 .stk {
   --stk-gap: clamp(16px, 1.9vw, 28px);
-  padding-top: clamp(64px, 11vh, 128px);
+  padding-top: var(--space-section);
   font-family: var(--font-sans);
   font-size: 1rem;
   line-height: 1.5;
@@ -1310,18 +1310,17 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
   column-gap: var(--stk-gap);
-  align-items: end;
+  /* title, search and count sit on one line */
+  align-items: last baseline;
 }
 .stk-title {
   grid-column: 1 / 6;
-  margin: 0 0 0 -0.03em;
-  font: 300 clamp(2rem, 3.1vw, 3.5rem)/1 var(--font-sans);
   letter-spacing: -0.035em;
   color: var(--ink);
 }
 .stk-panel { display: contents; }
 
-.stk-search { grid-column: 6 / 10; position: relative; }
+.stk-search { grid-column: 8 / -1; position: relative; }
 .stk-search input {
   width: 100%;
   padding: 8px 60px 10px 0;
@@ -1351,27 +1350,21 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
 }
 .stk-search .link-btn { font-size: 0.8125rem; }
 
-/* the score: how much of the stack matches */
-.stk-score { grid-column: 10 / -1; justify-self: end; margin: 0; text-align: right; }
-.stk-score-num {
-  display: block;
-  margin-right: -0.04em;
-  font: 300 clamp(2.75rem, 4.2vw, 4.75rem)/0.85 var(--font-sans);
-  letter-spacing: -0.045em;
-  font-variant-numeric: tabular-nums;
-  color: var(--ink);
-  transition: color 0.3s;
-}
-.stk-score-num.has-hit { color: var(--accent); }
-.stk-score-cap {
-  display: block;
-  margin-top: 8px;
+/* the count: how much of the stack matches, in the same small type as its caption */
+.stk-score {
+  grid-column: 8 / -1;
+  grid-row: 2;
+  justify-self: end;
+  margin: 0;
+  text-align: right;
   color: var(--ink-2);
   font-size: 0.8125rem;
   line-height: 1.4;
 }
-.stk-score-cap .link-btn, .stk-score-cap a { margin-left: 0.4em; }
-.stk-score-cap a {
+.stk-score-num { color: var(--ink); font-variant-numeric: tabular-nums; transition: color 0.3s; }
+.stk-score-num.has-hit { color: var(--accent); }
+.stk-score .link-btn, .stk-score a { margin-left: 0.4em; }
+.stk-score a {
   color: var(--ink);
   text-decoration: underline;
   text-decoration-thickness: 1px;
@@ -1380,7 +1373,7 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
 }
 
 /* index */
-.stk-index { margin: clamp(32px, 5vh, 52px) 0 0; padding: 0; list-style: none; }
+.stk-index { margin: var(--space-head) 0 0; padding: 0; list-style: none; }
 .stk-row {
   position: relative;
   display: grid;
@@ -1461,18 +1454,11 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
 @media (max-width: 959px) {
   .stk-top { display: contents; }
   .stk-title { display: block; font-size: clamp(2rem, 8vw, 3rem); }
-  .stk-panel {
-    position: sticky;
-    top: calc(env(safe-area-inset-top, 0px) + 64px); /* below the fixed header */
-    z-index: 2;
-    display: block;
-    margin: 16px calc(-1 * var(--gutter)) 0;
-    padding: 8px var(--gutter) 12px;
-    background: var(--bg);
-  }
-  .stk-score { display: flex; justify-self: stretch; justify-content: flex-start; align-items: baseline; gap: 8px; margin-top: 10px; text-align: left; }
-  .stk-score-num { font-size: 1.5rem; line-height: 1; letter-spacing: -0.03em; margin: 0; }
-  .stk-score-cap { margin: 0; }
+  /* scrolls with the list: pinned, it sat over the content */
+  .stk-panel { display: block; margin-top: 16px; padding: 8px 0 12px; }
+  .stk-score { justify-self: start; margin-top: 10px; text-align: left; }
+  /* no keyboard to press "/" on */
+  .stk-search kbd { display: none; }
   .stk-index { margin-top: 12px; }
   .stk-row { grid-template-columns: minmax(0, 1fr); row-gap: 4px; padding: 12px 0 14px; }
   .stk-row-head { grid-column: 1; justify-content: flex-start; }

@@ -99,7 +99,6 @@ export default function TechStack() {
   const index = useRef<HTMLOListElement>(null);
   const [query, setQuery] = useState('');
   const [area, setArea] = useState<number | null>(null);
-  const [anim, setAnim] = useState<'' | 'js-anim' | 'js-anim is-in'>('');
   const [shown, setShown] = useState(TOTAL);
   const shownRef = useRef(TOTAL);
 
@@ -157,16 +156,6 @@ export default function TechStack() {
     return () => document.removeEventListener('keydown', onKey);
   }, []);
 
-  // rules draw and rows resolve once, when the index scrolls in
-  useEffect(() => {
-    if (matchMedia('(prefers-reduced-motion: reduce)').matches || !index.current) return;
-    setAnim('js-anim');
-    const io = new IntersectionObserver((entries) => {
-      if (entries.some((e) => e.isIntersecting)) { io.disconnect(); setAnim('js-anim is-in'); }
-    }, { threshold: 0.12 });
-    io.observe(index.current);
-    return () => io.disconnect();
-  }, []);
 
   const { hit } = result;
   const filtering = hit !== null;
@@ -196,15 +185,15 @@ export default function TechStack() {
               {query ? link('Clear', () => { setQuery(''); input.current?.focus(); }) : <kbd aria-hidden="true">/</kbd>}
             </span>
           </div>
-          <p className="stk-score">
-            <span className={`stk-score-num${result.hasHit ? ' has-hit' : ''}`} aria-hidden="true">{shown}</span>
-            <span className="stk-score-cap" aria-hidden="true">{result.cap}{extra}</span>
+          {/* the count speaks only while filtering */}
+          <p className="stk-score" aria-hidden="true" hidden={!filtering}>
+            <span className={`stk-score-num${result.hasHit ? ' has-hit' : ''}`}>{shown}</span> {result.cap}{extra}
           </p>
           <p className="sr-only" aria-live="polite">{filtering ? `${result.count} ${result.cap}` : ''}</p>
         </div>
       </div>
 
-      <ol className={`stk-index ${anim}${filtering ? ' is-filtering' : ''}`} ref={index}>
+      <ol className={`stk-index${filtering ? ' is-filtering' : ''}`} ref={index}>
         {AREAS.map((a, r) => {
           const tools = TOOLS.filter((t) => t.area === r);
           const m = hit ? tools.filter((t) => hit.has(t.id)).length : 0;
