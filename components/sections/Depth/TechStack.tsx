@@ -185,8 +185,8 @@ export default function TechStack() {
               {query ? link('Clear', () => { setQuery(''); input.current?.focus(); }) : <kbd aria-hidden="true">/</kbd>}
             </span>
           </div>
-          {/* the count speaks only while filtering */}
-          <p className="stk-score" aria-hidden="true" hidden={!filtering}>
+          {/* Keep the result space reserved even before a filter is entered. */}
+          <p className={`stk-score${filtering ? '' : ' is-empty'}`} aria-hidden="true">
             <span className={`stk-score-num${result.hasHit ? ' has-hit' : ''}`}>{shown}</span> {result.cap}{extra}
           </p>
           <p className="sr-only" aria-live="polite">{filtering ? `${result.count} ${result.cap}` : ''}</p>

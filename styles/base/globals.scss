@@ -1359,7 +1359,9 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
   color: var(--ink-2);
   font-size: 0.8125rem;
   line-height: 1.4;
+  min-height: 2.8em;
 }
+.stk-score.is-empty { visibility: hidden; }
 .stk-score-num { color: var(--ink); font-variant-numeric: tabular-nums; transition: color 0.3s; }
 .stk-score-num.has-hit { color: var(--accent); }
 .stk-score .link-btn, .stk-score a { margin-left: 0.4em; }
