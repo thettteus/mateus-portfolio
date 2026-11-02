@@ -258,6 +258,33 @@ img { max-width: 100%; height: auto; }
   border: 0;
 }
 
+/* ---------------- RHYTHM ----------------
+   Three spaces, repeated everywhere so the page keeps one cadence:
+   between sections, from a section's title to its content, between blocks. */
+:root {
+  --space-section: clamp(96px, 12vh, 152px);
+  --space-head: clamp(32px, 5vh, 52px);
+  --space-block: clamp(20px, 3vh, 32px);
+}
+
+/* ---------------- COLOUR RULE ----------------
+   ink   — text, headings (emphasis by weight, never by colour), buttons at rest
+   greys — secondary text (--ink-2), labels and meta (--ink-3), lines (--rule)
+   teal  — a signal only: what is active, selected, live or in progress, focus,
+           hover on primary actions, and the outcome in a drawing. Never a
+           heading colour, never a large fill at rest. */
+
+/* ---------------- SECTION TITLE ----------------
+   One style for every section title; the emphasised part is set in <b>. */
+.wk-top h2, .stk-title, .lev-head h2, .range-head h2 {
+  margin: 0 0 0 -0.03em;
+  font: 300 clamp(2rem, 3.1vw, 3.5rem)/1 var(--font-sans);
+  letter-spacing: -0.035em;
+  color: var(--ink);
+  text-wrap: balance;
+}
+.wk-top h2 b, .stk-title b, .lev-head h2 b, .range-head h2 b { font-weight: 500; }
+
 /* ---------------- LAYOUT ---------------- */
 .container {
   max-width: var(--maxw);
@@ -269,7 +296,7 @@ img { max-width: 100%; height: auto; }
    boundary, and the 144–232px of stacked padding carries the separation. */
 section {
   position: relative;
-  padding: clamp(72px, 8vw, 116px) 0;
+  padding: var(--space-section) 0;
 }
 
 .mono {
@@ -316,7 +343,7 @@ section {
   color: var(--ink);
   text-wrap: balance;
 }
-.sec-head h2 em { color: var(--accent); font-style: normal; }
+.sec-head h2 em { font-style: normal; }
 .sec-head .sub {
   font-size: clamp(18px, 1.5vw, 21px);
   color: var(--ink-2);
