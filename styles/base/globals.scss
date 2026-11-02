@@ -553,157 +553,131 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
 .btn-primary:hover svg, .btn-ghost:hover svg { transform: translateX(3px); }
 
 /* ============================================================
-   HERO
+   HERO — the name in front of the range; scrolling plays the scene
+   (the name sets, the title rises, the range flattens into a rule)
    ============================================================ */
-.hero {
-  position: relative;
-  /* tight vertical chrome — the whole stack must fit the first fold.
-     +env keeps the same gap below the header now that the header is offset
-     down by the iOS safe-area inset */
-  padding: calc(env(safe-area-inset-top, 0px) + 64px + 20px) 0 44px;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
+.cover-track {
+  --scrub: calc(2 * 30svh); /* two steps, like the range stack */
+  height: calc(var(--cover-height, 100svh) + var(--scrub));
+}
+.cover-track > .cover { position: sticky; top: 0; }
+@media (prefers-reduced-motion: reduce) {
+  .cover-track { height: auto; }
+  .cover-track > .cover { position: relative; }
+}
+.cover {
+  --margin: clamp(20px, 4.5vw, 96px);
+  /* at least a full screen, so on tall screens the next section never shows early */
   min-height: 100svh;
-}
-.hero::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: radial-gradient(
-    ellipse 62% 72% at 92% 8%,
-    color-mix(in srgb, var(--accent) 7%, transparent),
-    transparent 64%
-  );
-  z-index: 0;
-}
-/* full container width — the hero aligns with every other section */
-.hero-inner {
-  position: relative;
-  z-index: 1;
-  width: 100%;
-}
+  padding: calc(64px + env(safe-area-inset-top, 0px)) 0 clamp(20px, 3.5vh, 36px);
+  overflow: clip;
+  .container { width: 100%; max-width: none; padding-inline: var(--margin); }
+  .wk-grid { column-gap: clamp(16px, 1.9vw, 28px); }
 
-/* the "+" grid — full section width, short enough to keep the fold */
-.hero-plus { color: var(--ink); margin: 0 0 32px; }
-.hero-plus svg { display: block; width: 100%; height: auto; overflow: visible; }
-.hero-plus.is-mobile { display: none; }
+  /* the name's size and the room under it, as the script will set them, so the
+     page is laid out right from the first paint */
+  --fs: min(calc((100vw - 2 * var(--margin)) * 0.2558), calc((100svh - 260px) / 1.97));
+  --foot: 1.02;
+  .stage { position: relative; margin-top: clamp(4px, 2vh, 24px); }
+  .land { position: absolute; inset: 0; width: 100%; height: 100%; display: block; pointer-events: none; }
+  /* the name and the rising words sit in front of the drawing; the range only
+     hides them through a clip that follows its crest */
+  .sky { position: relative; z-index: 1; display: flex; flex-direction: column; justify-content: flex-end; padding-bottom: calc(var(--fs) * var(--foot)); }
+  .masthead {
+    margin: 0;
+    font: 500 var(--fs)/.8 var(--font-sans);
+    letter-spacing: -0.06em;
+    white-space: nowrap;
+    padding: .07em 0 .04em;
+  }
+  .masthead .in { display: inline-block; margin-left: -0.04em; will-change: transform; }
+  .masthead .ch { display: inline-block; }
+  .masthead .sp { margin-right: -0.035em; }
+  .hero-role {
+    display: block;
+    margin-top: 16px;
+    padding-left: var(--role-inset, calc(var(--name-size, var(--fs)) * .07));
+    font: 500 clamp(28px, 2vw, 32px)/1.4 var(--font-sans);
+    letter-spacing: .01em;
+    color: var(--ink-2);
+  }
 
-/* each mark settles from its own messy start into the grid */
-.hero-plus .pm {
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: plus-settle var(--pdur, 1s) var(--ease) var(--pd, 0s) both;
-}
-/* hover wrapper — pushed by the cursor, springs back smoothly */
-.hero-plus .pw {
-  transform-box: fill-box;
-  transform-origin: center;
-  transition: transform 0.5s var(--ease);
-  will-change: transform;
-}
-@keyframes plus-settle {
-  from { transform: translate(var(--dx, 0px), var(--dy, 0px)) rotate(var(--dr, 0deg)); }
-  to   { transform: none; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .hero-plus .pm { animation: none; }
-}
+  .rise { position: absolute; top: 0; left: var(--margin); right: var(--margin); align-items: start; }
+  .rise > * { will-change: transform; }
+  .rise.is-flow { position: static; margin-top: clamp(24px, 4vh, 44px); }
+  /* until the scene is set up, the name and the words wait out of sight */
+  &:not(.is-calm):not(.is-live) .masthead .in,
+  &:not(.is-calm):not(.is-live) .rise { visibility: hidden; }
+  /* what follows the hero waits too, so nothing is ever seen out of place */
+  &:not(.is-live) .after { visibility: hidden; }
 
-/* commit graph — real contribution calendar, same slot as the plus grid.
-   Cells ignite in a diagonal wave; intensity maps to --accent opacity so it
-   lives inside the site's system instead of GitHub green. */
-.hero-commit { margin: 0 0 8px; }
-.hero-commit-caption {
-  margin: 0 0 32px;
-  text-align: left;
-  font-size: 12px;
-  line-height: 1.5;
-  color: var(--ink-4);
-}
-.hero-commit-caption strong { color: var(--ink-3); font-weight: 600; }
-.hero-commit-caption.is-mobile { display: none; }
-.hero-commit svg { display: block; width: 100%; height: auto; overflow: visible; }
-.hero-commit.is-mobile { display: none; }
-.hero-commit rect {
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: commit-ignite 0.35s var(--ease) var(--d, 0s) both;
-  transition: fill 0.25s var(--ease);
-}
-.hero-commit .lvl-0 { fill: var(--rule); }
-.hero-commit .lvl-1 { fill: color-mix(in srgb, var(--accent) 55%, transparent); }
-.hero-commit .lvl-2 { fill: color-mix(in srgb, var(--accent) 68%, transparent); }
-.hero-commit .lvl-3 { fill: color-mix(in srgb, var(--accent) 84%, transparent); }
-.hero-commit .lvl-4 { fill: var(--accent); }
-/* days that haven't happened yet (rest of the current week) — lighter than
-   a real no-commit day (.lvl-0) so the two read as distinct states */
-.hero-commit .is-blank { fill: color-mix(in srgb, var(--rule) 40%, transparent); }
-.hero-commit rect:not(.is-blank):hover { fill: var(--accent); }
-@keyframes commit-ignite {
-  from { opacity: 0; transform: scale(0.4); }
-  to   { opacity: 1; transform: none; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .hero-commit rect { animation: none; }
-}
+  .cover-line {
+    grid-column: 1 / 8;
+    margin: 0 0 0 -0.03em;
+    font: 400 clamp(2.75rem, 5.2vw, 5.75rem)/1 var(--font-sans);
+    letter-spacing: -0.03em;
+    color: var(--ink);
+    text-box: trim-both cap alphabetic;
+  }
+  .cover-line .line { display: block; }
+  .side { grid-column: 8 / -1; display: flex; flex-direction: column; gap: 18px; }
+  .dek { margin: 0; max-width: 30em; font-size: clamp(1rem, .92rem + .25vw, 1.125rem); line-height: 1.45; text-wrap: pretty; text-box: trim-start cap alphabetic; }
+  .links { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 26px; margin: 0; font-size: 1.0625rem; }
+  /* the same black button as "Book a call" in the top bar */
+  .cta {
+    display: inline-flex; align-items: center; height: 52px; padding: 0 24px;
+    border-radius: 999px; background: var(--ink); color: var(--bg);
+    font-weight: 500; text-decoration: none;
+    transition: background-color .25s;
+  }
+  .cta:hover { background: var(--accent); }
+  .quiet { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: .34em; text-decoration-color: var(--rule); transition: text-decoration-color .2s; }
+  .quiet:hover { text-decoration-color: var(--ink); }
+  .side-flow { margin-top: 28px; }
 
-/* the headline — Helvetica throughout, thin by default, bold on the emphasis words */
-.hero h1.hero-line {
-  font-family: var(--font-sans);
-  font-size: clamp(48px, 8.5vw, 100px);
-  line-height: 0.98;
-  letter-spacing: -0.02em;
-  font-weight: 400;
-  color: var(--ink);
-  margin: 0 0 40px;
-}
-.hero-line .hl-bold { font-weight: 800; }
+  .areas {
+    /* breathing room between the rule and the areas */
+    margin: clamp(24px, 4vh, 44px) 0 0;
+    padding: 0 0 16px;
+    list-style: none;
+    border-bottom: 1px solid var(--rule);
+  }
+  .areas li { grid-column: span 3; display: flex; flex-direction: column; gap: 4px; }
+  .areas b {
+    font: 400 clamp(1.125rem, .95rem + .7vw, 1.625rem)/1.1 var(--font-sans);
+    letter-spacing: -0.02em;
+  }
+  .areas span { color: var(--ink-2); font-size: .8125rem; line-height: 1.4; }
 
-/* the sentence under the grid — plain Helvetica, each craft in its own hue */
-.hero-copy {
-  font-family: var(--font-sans);
-  font-size: clamp(22px, 2.8vw, 32px);
-  font-weight: 700;
-  line-height: 1.45;
-  letter-spacing: -0.012em;
-  color: var(--ink-2);
-  margin: 0 0 36px;
+  @media (max-width: 959px) {
+    .rise { right: var(--margin); }
+    .cover-line, .side { grid-column: 1 / -1; }
+    .rise.is-flow .side { margin-top: 28px; }
+    .areas { row-gap: 16px; }
+    .areas li { grid-column: span 6; }
+  }
+  @media (max-width: 599px) {
+    --foot: 1.18;
+    padding-bottom: max(40px, env(safe-area-inset-bottom, 0px));
+    .stage { margin-top: clamp(36px, 5svh, 52px); }
+    .cover-line { font-size: clamp(38px, 11.6vw, 56px); }
+    .side { gap: 24px; }
+    .dek { font-size: 1rem; line-height: 1.55; color: var(--ink-2); }
+    .links { flex-direction: column; align-items: stretch; gap: 8px; font-size: 1rem; }
+    .cta { justify-content: center; }
+    .quiet { display: flex; min-height: 44px; align-items: center; justify-content: center; }
+    .areas { margin-top: 20px; padding: 0 0 20px; row-gap: 18px; }
+    .areas b { font-size: 1rem; }
+    .areas span { font-size: .75rem; }
+  }
 }
-.hero-copy .hl-w {
-  font-weight: 700;
-  white-space: nowrap;
-  color: var(--accent);
+.topbar .container { max-width: none; padding-inline: clamp(20px, 4.5vw, 96px); }
+@media (max-width: 959px) {
+  .topbar .nav { padding-inline: clamp(20px, 4.5vw, 96px); }
 }
-
-.br-mobile { display: none; }
-
-/* hero CTAs — quiet text links (no button chrome), the same idiom as .ac-read
-   and .dl-pdf elsewhere on the site. The hero only points the way; the real
-   commitment CTA lives in Contact. */
-.hero-actions .hero-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 16px;
-  font-weight: 500;
-  color: var(--ink);
-  border-bottom: 1px solid var(--rule);
-  padding-bottom: 2px;
-  transition: border-color 0.25s var(--ease), color 0.25s var(--ease);
-}
-.hero-actions .hero-link svg { width: 14px; height: 14px; color: var(--accent); transition: transform 0.25s var(--ease); }
-.hero-actions .hero-link:hover { border-color: var(--accent); }
-.hero-actions .hero-link:first-child:hover svg { transform: translateY(3px); }
-.hero-actions .hero-link:last-child:hover svg { transform: translateX(3px); }
-
-.hero-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 28px;
-  align-items: center;
-  margin-bottom: 26px;
+@media (max-width: 599px) {
+  .topbar-inner { justify-content: flex-end; gap: 12px; }
+  .topbar-right { flex-shrink: 0; }
 }
 
 /* ============================================================
@@ -2108,16 +2082,6 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
 [data-theme="dark"] .topo-bg {
   opacity: 0.12;
 }
-.hero-inner { z-index: 1; }
-
-.hero .topo-bg {
-  opacity: 0.08;
-  -webkit-mask-image: radial-gradient(85% 90% at 80% 40%, #000 0%, transparent 68%);
-  mask-image: radial-gradient(85% 90% at 80% 40%, #000 0%, transparent 68%);
-}
-[data-theme="dark"] .hero .topo-bg { opacity: 0.13; }
-
-
 /* mobile stage strip under the prism (hidden on desktop — svg labels do the job).
    Must always read as one row (POSSIBILITIES → JUDGMENT → DIRECTION → IMPACT) —
    never wrap, shrink to fit instead. */
@@ -2176,28 +2140,4 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
   .ai-flow-svg .flow-k,
   .ai-flow-svg .flow-sub { display: none; }
   .ai-flow-stages { display: flex; }
-  /* hero: swap to the 15-col grid so the marks keep real size. Content is
-     shorter than a full screen now — top-align instead of forcing 100svh
-     centering, which left big empty gaps above/below on mobile. Extra
-     breathing room top (clear of the fixed header) and bottom (mobile
-     browser chrome — the address-bar strip — sits over the fold and
-     hides content right at the bottom edge otherwise). */
-  .hero { padding: calc(env(safe-area-inset-top, 0px) + 64px + 54px) 0 100px; min-height: auto; align-items: flex-start; }
-  .hero-plus { margin: 16px 0 28px; }
-  .hero-plus.is-desktop { display: none; }
-  .hero-plus.is-mobile { display: block; }
-  .hero-commit { margin: 16px 0 8px; }
-  .hero-commit.is-desktop { display: none; }
-  .hero-commit.is-mobile { display: block; }
-  .hero-commit-caption { margin: 0 0 28px; }
-  .hero-commit-caption.is-desktop { display: none; }
-  .hero-commit-caption.is-mobile { display: block; text-align: left; }
-  /* as large as the two hard line-breaks ("From ambiguity" / "to production.")
-     allow without an unwanted 3rd wrap — measured per-width via headless
-     binary search (safe max width at 360px=44/620px=81, ~4px margin below that) */
-  .hero h1.hero-line { font-size: clamp(40px, calc(15vw - 10px), 90px); margin-bottom: 28px; }
-  .hero-copy { font-size: clamp(24px, 6vw, 30px); margin-bottom: 28px; }
-  /* forces the "product thinking / into engineering execution" break on
-     narrow screens — desktop lets the sentence wrap naturally instead */
-  .br-mobile { display: inline; }
 }
