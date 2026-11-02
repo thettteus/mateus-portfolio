@@ -1,5 +1,5 @@
 'use client';
-import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react';
+import { useCallback, useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { IsoLayer } from '@/components/ui/generative/IsoLayer';
 import { type LineArtVariant } from '@/components/ui/generative/LineArt';
 
@@ -52,21 +52,24 @@ const ease = (t: number) =>
  * glide there on their own clock, and the label hands over once they land.
  * The page scroll follows along underneath, so leaving at either end is natural.
  */
-export default function RangeStack({ layers }: { layers: RangeLayer[] }) {
+// `head` is the section heading: it rides in the pinned screen, so it stays in
+// view for the whole walk through the stack
+export default function RangeStack({ layers, head }: { layers: RangeLayer[]; head?: ReactNode }) {
   const track = useRef<HTMLDivElement>(null);
   const stage = useRef<HTMLDivElement>(null);
   const plates = useRef<(HTMLDivElement | null)[]>([]);
   const labels = useRef<(HTMLLIElement | null)[]>([]);
   const descs = useRef<(HTMLDivElement | null)[]>([]);
   const [active, setActive] = useState(0);
-  const [assembled, setAssembled] = useState(false);
-  const [settled, setSettled] = useState(false);
+  // the plates are in place from the start: the hero's opening is the only entrance
+  const assembled = true;
+  const settled = true;
   const [tileW, setTileW] = useState(0);
   const n = layers.length;
   // positions run 0 (first layer open) … n-1, then n (closed at the end)
 
   // live values the frame loop reads without re-rendering
-  const live = useRef({ w: 0, h: 0, target: 0, cur: 0, dir: 1, assembled: false, raf: 0, last: 0, bypass: 0, programmatic: false, readyAt: 0, descH: [] as number[],
+  const live = useRef({ w: 0, h: 0, target: 0, cur: 0, dir: 1, assembled: true, raf: 0, last: 0, bypass: 0, programmatic: false, readyAt: 0, descH: [] as number[],
     // label handover: `open` per label, tweened from `from` toward `label`
     label: 0, open: [1] as number[], from: [] as number[], textStart: 0, textRaf: 0 });
 
@@ -195,33 +198,6 @@ export default function RangeStack({ layers }: { layers: RangeLayer[] }) {
     return () => ro.disconnect();
   }, [paintLabels]);
 
-  // drop the plates in, foundation first, once the stage is in view
-  useEffect(() => {
-    const el = stage.current;
-    if (!el) return;
-    const io = new IntersectionObserver((entries) => {
-      if (entries.some((e) => e.isIntersecting)) {
-        io.disconnect();
-        requestAnimationFrame(() => requestAnimationFrame(() => {
-          live.current.assembled = true;
-          live.current.cur = live.current.target;
-          setAssembled(true);
-          paint(live.current.cur);
-        }));
-      }
-    }, { threshold: 0.3 });
-    io.observe(el);
-    return () => io.disconnect();
-  }, [paint]);
-
-  // the staggered drop (a CSS transition) only applies to the first assemble;
-  // after that the frame loop moves the plates
-  useEffect(() => {
-    if (!assembled) return;
-    const t = setTimeout(() => setSettled(true), (n - 1) * 66 + 590);
-    return () => clearTimeout(t);
-  }, [assembled, n]);
-
   // page scroll ↔ stack position: each position has its own scroll offset
   // inside the pinned track
   const geo = useCallback(() => {
@@ -258,18 +234,31 @@ export default function RangeStack({ layers }: { layers: RangeLayer[] }) {
       return true;
     };
     // at either closed end, scrolling outward hands control back to the page
-    const leaving = (dir: number) => ready() && ((L.target <= 0 && dir < 0) || (L.target >= n && dir > 0));
+    const atEnd = (dir: number) => (L.target <= 0 && dir < 0) || (L.target >= n && dir > 0);
+    // a new gesture at either end lets the page go, even while that step plays;
+    // the momentum of the gesture that got there never does
+    let letGo = false;
+    const leaving = (dir: number) => atEnd(dir) && (ready() || letGo);
+    // a new gesture is taken mid-step too, once the step is half played
+    const canTake = (dir: number) => Math.abs(L.target + dir - L.cur) <= 1.5;
 
+    let prevRaw = -1;
     const fromScroll = () => {
       const g = geo();
       if (!g) return;
-      if (L.programmatic) { L.programmatic = false; return; }
+      if (L.programmatic) { L.programmatic = false; prevRaw = g.raw; return; }
+      const prev = prevRaw;
+      prevRaw = g.raw;
       // outside the track the stack rests at its nearest end: jump, no travel
       if (g.raw < 0 || g.raw > n) {
         const end = g.raw < 0 ? 0 : n;
         if (L.target !== end || L.cur !== end) { L.target = end; L.cur = end; paint(end); }
         return;
       }
+      // coming back up into the stack (a swipe can't be stopped before it
+      // crosses in): take that as a step back, in the direction of travel,
+      // rather than pulling the page down against it
+      if (prev > n && g.raw < n && L.target >= n && performance.now() >= L.bypass) { go(n - 1); return; }
       // in-page links scroll straight through; the stack just follows
       if (performance.now() < L.bypass) {
         const to = clamp(Math.round(g.raw), 0, n);
@@ -284,17 +273,29 @@ export default function RangeStack({ layers }: { layers: RangeLayer[] }) {
     let lastWheel = 0;
     let lastDelta = 0;
     let peak = 0; // strongest wheel event of the current gesture
+    let outside = true; // the page was last outside the track
+    let entering = false; // still in the gesture that carried the page in
     const onWheel = (e: WheelEvent) => {
       const g = geo();
-      if (!g || !inside(g.raw) || performance.now() < L.bypass) return;
+      if (!g || !inside(g.raw) || performance.now() < L.bypass) {
+        outside = true;
+        lastWheel = performance.now();
+        lastDelta = Math.abs(e.deltaY);
+        return;
+      }
+      // the scroll that carried the page in only lands on the first card; it
+      // never moves the stack on by itself
+      if (outside) { outside = false; entering = true; }
       const dir = Math.sign(e.deltaY);
-      if (!dir || leaving(dir)) return;
-      e.preventDefault();
+      if (!dir) return;
       const now = performance.now();
       const mag = Math.abs(e.deltaY);
       // a new gesture: a pause after the last one, or a fresh flick rising out
       // of a decaying inertia tail
       const fresh = now - lastWheel > GESTURE_GAP_MS || (mag > 20 && mag > lastDelta * 1.6);
+      if (fresh) { letGo = atEnd(dir); entering = false; }
+      if (leaving(dir)) { lastWheel = now; lastDelta = mag; return; }
+      e.preventDefault();
       peak = fresh ? mag : Math.max(peak, mag);
       // a wheel kept spinning at strength also moves on, one landing at a time.
       // A trackpad flick ramps up, peaks, then its inertia only ever fades —
@@ -302,19 +303,21 @@ export default function RangeStack({ layers }: { layers: RangeLayer[] }) {
       const sustained = now - L.readyAt > SUSTAIN_MS && mag >= peak * 0.6 && mag >= lastDelta;
       lastWheel = now;
       lastDelta = mag;
-      if ((fresh || sustained) && ready()) step(dir);
+      if (fresh ? canTake(dir) : sustained && !entering && ready()) step(dir);
     };
     let touchY = 0;
     let touchDir = 0;
-    const onTouchStart = (e: TouchEvent) => { touchY = e.touches[0].clientY; touchDir = 0; };
+    const onTouchStart = (e: TouchEvent) => { touchY = e.touches[0].clientY; touchDir = 0; letGo = false; };
     const onTouchMove = (e: TouchEvent) => {
       const g = geo();
       if (!g || !inside(g.raw) || performance.now() < L.bypass) return;
       const dy = touchY - e.touches[0].clientY;
       const dir = Math.sign(dy);
-      if (!dir || leaving(dir)) return;
+      if (!dir) return;
+      if (!touchDir) letGo = atEnd(dir);
+      if (leaving(dir)) return;
       e.preventDefault();
-      if (!touchDir && Math.abs(dy) > SWIPE_PX && ready()) { touchDir = dir; step(dir); }
+      if (!touchDir && Math.abs(dy) > SWIPE_PX && canTake(dir)) { touchDir = dir; step(dir); }
     };
     const onKey = (e: KeyboardEvent) => {
       const g = geo();
@@ -323,9 +326,9 @@ export default function RangeStack({ layers }: { layers: RangeLayer[] }) {
       if (el && (/^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName) || el.isContentEditable)) return;
       const dir = ['ArrowDown', 'PageDown', ' '].includes(e.key) ? (e.shiftKey && e.key === ' ' ? -1 : 1)
         : ['ArrowUp', 'PageUp'].includes(e.key) ? -1 : 0;
-      if (!dir || leaving(dir)) return;
+      if (!dir || atEnd(dir)) return;
       e.preventDefault();
-      if (ready()) step(dir);
+      if (canTake(dir)) step(dir);
     };
     const onClick = (e: MouseEvent) => {
       if ((e.target as Element).closest?.('a[href*="#"]')) L.bypass = performance.now() + BYPASS_MS;
@@ -371,6 +374,7 @@ export default function RangeStack({ layers }: { layers: RangeLayer[] }) {
   return (
     <div className="range-track" ref={track} style={{ height: `calc(100svh + ${n * STEP_SVH}svh)` }}>
       <div className="range-pin">
+        {head && <div className="range-head">{head}</div>}
         <div className={`range-stage${settled ? ' is-settled' : ''}`} ref={stage} aria-hidden="true">
           {layers.map(({ ix, art }, i) => (
             <div

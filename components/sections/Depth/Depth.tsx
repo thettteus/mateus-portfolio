@@ -1,4 +1,3 @@
-import { FadeIn } from '@/components/ui/FadeIn';
 import RangeStack, { type RangeLayer } from './RangeStack';
 import TechStack from './TechStack';
 
@@ -45,14 +44,10 @@ export default function Depth() {
   return (
     <section className="depth" id="depth">
       <div className="container">
-        <FadeIn as="header" className="sec-head">
-          <div className="sec-eyebrow">
-            <span className="lbl">The range</span>
-          </div>
-          <h2>Problems cut across layers. <em>So do I.</em></h2>
-        </FadeIn>
-
-        <RangeStack layers={layers} />
+        <RangeStack
+          layers={layers}
+          head={<h2>Problems cut across layers. <b>So do I.</b></h2>}
+        />
 
         <TechStack />
       </div>

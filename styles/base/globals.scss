@@ -1158,22 +1158,40 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
    down the stack, opening and lighting one plate at a time */
 .range-track {
   position: relative;
-  /* the pinned screen centres its content, which leaves a tall empty band
-     above it — pull the track up under the heading to close that gap */
-  margin-top: calc((100svh - 64px - min(76svh, 640px)) / -2 - 64px - 46px);
+  /* the pinned screen keeps room for the fixed header; the section's own
+     padding already does that job before it pins */
+  margin-top: -64px;
 }
+/* the heading rides in the pinned screen, above the stack and the list */
 .range-pin {
-  pointer-events: none; /* the empty band overlaps the heading before pinning */
+  --pin-pad: clamp(16px, 3vh, 32px);
+  --rh: clamp(2rem, 3.1vw, 3.5rem); /* the heading's size, which the stage makes room for */
+  pointer-events: none;
   position: sticky;
   top: 0;
   height: 100svh;
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  column-gap: clamp(24px, 4vw, 72px);
+  grid-template-rows: auto auto;
+  /* heading, stack and list sit together as one group, centred in the screen,
+     the heading a title's distance above the rest */
+  align-content: center;
   align-items: center;
-  padding-top: 64px; /* clear the fixed header */
+  column-gap: clamp(24px, 4vw, 72px);
+  row-gap: var(--space-head);
+  padding: calc(64px + var(--pin-pad)) 0 var(--pin-pad); /* clear the fixed header */
 }
-.range-stage { position: relative; height: min(76svh, 640px); }
+.range-head { grid-column: 1 / -1; align-self: start; pointer-events: auto; }
+.range-head h2 { font-size: var(--rh); }
+/* short screens (laptops at 650–760px): a tighter heading and list, so the
+   heading, the stack and the open list all fit the pinned screen */
+@media (max-height: 760px) and (min-width: 621px) {
+  .range-pin { --rh: clamp(28px, 6svh, 46px); }
+  .range-item button { padding: 9px 0; }
+  .range-item .db-title { font-size: clamp(17px, 2.9svh, 22px); }
+  .range-item .db-items { padding-bottom: 10px; }
+}
+.range-stage { position: relative; height: min(calc(100svh - 64px - 2 * var(--pin-pad) - var(--rh) - var(--space-head)), 640px); }
 .iso-plate {
   position: absolute;
   top: 0;
@@ -2115,13 +2133,13 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
   /* range stack → stage on top, list below, both inside the pinned screen */
   .range-pin {
     grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: 36svh auto;
+    grid-template-rows: auto 30svh auto;
     align-content: start;
     align-items: start;
     row-gap: 8px;
   }
-  .range-stage { height: 36svh; }
-  .range-track { margin-top: -75px; }
+  .range-head { margin-bottom: 8px; }
+  .range-stage { height: 30svh; }
   .range-item button { padding: 9px 0; }
   .range-item .db-title { font-size: 17px; }
   .range-item .db-items { padding-bottom: 12px; }
