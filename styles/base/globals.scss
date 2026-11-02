@@ -597,7 +597,7 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
     display: block;
     margin-top: 16px;
     padding-left: var(--role-inset, calc(var(--name-size, var(--fs)) * .07));
-    font: 500 clamp(24px, 1.8vw, 28px)/1.4 var(--font-sans);
+    font: 500 clamp(17px, 1.2vw + 12px, 28px)/1.4 var(--font-sans);
     letter-spacing: .01em;
     color: var(--ink-2);
   }
@@ -661,6 +661,7 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
     padding-bottom: max(40px, env(safe-area-inset-bottom, 0px));
     .stage { margin-top: clamp(36px, 5svh, 52px); }
     .cover-line { font-size: clamp(38px, 11.6vw, 56px); }
+    .hero-role { margin-top: 10px; }
     .side { gap: 24px; }
     .dek { font-size: 1rem; line-height: 1.55; color: var(--ink-2); }
     .links { flex-direction: column; align-items: stretch; gap: 8px; font-size: 1rem; }

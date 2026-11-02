@@ -152,9 +152,10 @@ export default function Hero() {
       // Align actual glyph edges, not the different font sizes' line boxes.
       const nameStyle = getComputedStyle(m), roleStyle = getComputedStyle(role);
       probe.font = `${nameStyle.fontWeight} ${nameStyle.fontSize} ${nameStyle.fontFamily}`;
-      const nameInset = -probe.measureText(NAME[0]).actualBoundingBoxLeft;
+      // WebKit flips the sign of actualBoundingBoxLeft; both glyphs start right of the origin
+      const nameInset = Math.abs(probe.measureText(NAME[0]).actualBoundingBoxLeft);
       probe.font = `${roleStyle.fontWeight} ${roleStyle.fontSize} ${roleStyle.fontFamily}`;
-      const roleInset = -probe.measureText('S').actualBoundingBoxLeft;
+      const roleInset = Math.abs(probe.measureText('S').actualBoundingBoxLeft);
       role.style.setProperty('--role-inset', `${nameInset - roleInset}px`);
     };
     // the smallest the screen gets (100svh): mobile toolbars never hide the cover

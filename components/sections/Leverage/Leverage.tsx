@@ -349,10 +349,10 @@ export default function Leverage() {
     };
     // at either end, scrolling outward hands control back to the page
     const atEnd = (dir: number) => (target <= 0 && dir < 0) || (target >= N - 1 && dir > 0);
-    // a new gesture at either end lets the page go, even while that step plays;
-    // the momentum of the gesture that got there never does
+    // only a new gesture, begun once the end step has landed, lets the page go;
+    // the gesture that got there (and its momentum) never does
     let letGo = false;
-    const leaving = (dir: number) => atEnd(dir) && (ready() || letGo);
+    const leaving = (dir: number) => atEnd(dir) && letGo;
     // a new gesture is taken mid-step too, once the step is half played
     const canTake = (dir: number) => Math.abs(target + dir - cur) <= 1.5;
 
@@ -432,7 +432,7 @@ export default function Leverage() {
         // a new gesture: a pause after the last one, or a fresh flick rising out
         // of a decaying inertia tail
         const fresh = now - lastWheel > GESTURE_GAP_MS || (mag > 20 && mag > lastDelta * 1.6);
-        if (fresh) letGo = atEnd(dir);
+        if (fresh) letGo = atEnd(dir) && ready();
         if (leaving(dir)) { lastWheel = now; lastDelta = mag; return; }
         e.preventDefault();
         peak = fresh ? mag : Math.max(peak, mag);
@@ -453,7 +453,7 @@ export default function Leverage() {
         const dy = touchY - e.touches[0].clientY;
         const dir = Math.sign(dy);
         if (!dir) return;
-        if (!touchDir) letGo = atEnd(dir);
+        if (!touchDir) letGo = atEnd(dir) && ready();
         if (leaving(dir)) return;
         e.preventDefault();
         if (!touchDir && Math.abs(dy) > SWIPE_PX && canTake(dir)) { touchDir = dir; step(dir); }
@@ -464,7 +464,7 @@ export default function Leverage() {
         if (el && (/^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName) || el.isContentEditable)) return;
         const dir = ['ArrowDown', 'PageDown', ' '].includes(e.key) ? (e.shiftKey && e.key === ' ' ? -1 : 1)
           : ['ArrowUp', 'PageUp'].includes(e.key) ? -1 : 0;
-        if (!dir || atEnd(dir)) return;
+        if (!dir || (atEnd(dir) && ready())) return;
         e.preventDefault();
         if (canTake(dir)) step(dir);
       };
