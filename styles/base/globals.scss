@@ -1900,7 +1900,7 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
    CONTACT — the last screen of the site: the ask, one filled button, who
    this is for, the footer columns and the name
    ============================================================ */
-.contact { padding: clamp(96px, 16vh, 180px) 0 0; overflow: hidden; font-size: 1rem; line-height: 1.5; letter-spacing: normal; }
+.contact { padding: var(--space-section) 0 0; overflow: hidden; font-size: 1rem; line-height: 1.5; letter-spacing: normal; }
 .contact section { padding: 0; }
 
 .c-main { grid-column: 1 / 9; }
@@ -1934,7 +1934,7 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
   height: clamp(68px, 9vh, 84px);
   padding: 0 clamp(28px, 2.6vw, 40px);
   border-radius: 999px;
-  background: var(--accent);
+  background: var(--ink);
   color: var(--bg);
   font: 500 clamp(1.125rem, 1rem + .4vw, 1.375rem)/1 var(--font-sans);
   letter-spacing: -0.01em;
@@ -1947,7 +1947,7 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
   position: absolute;
   inset: 0;
   z-index: -1;
-  background: var(--ink);
+  background: var(--accent);
   clip-path: circle(0% at var(--mx, 50%) var(--my, 50%));
   transition: clip-path .6s cubic-bezier(.2, .8, .2, 1);
 }

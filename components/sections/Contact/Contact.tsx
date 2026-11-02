@@ -16,29 +16,10 @@ export default function Contact() {
   const main = useRef<HTMLDivElement>(null);
   const mark = useRef<HTMLParagraphElement>(null);
   const inner = useRef<HTMLSpanElement>(null);
-  const [anim, setAnim] = useState('');
-  const [markAnim, setMarkAnim] = useState('');
   const [clock, setClock] = useState<{ text: string; iso: string } | null>(null);
   const [copied, setCopied] = useState(false);
   const copyTimer = useRef(0);
 
-  // things come into focus once, as the section arrives
-  useEffect(() => {
-    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    setAnim(' js-anim');
-    setMarkAnim(' js-anim');
-    const watch = (el: Element | null, done: () => void, threshold: number) => {
-      if (!el) return () => {};
-      const io = new IntersectionObserver((entries) => {
-        if (entries.some((e) => e.isIntersecting)) { done(); io.disconnect(); }
-      }, { threshold });
-      io.observe(el);
-      return () => io.disconnect();
-    };
-    const a = watch(main.current, () => setAnim(' js-anim is-in'), 0.2);
-    const b = watch(mark.current, () => setMarkAnim(' js-anim is-in'), 0.25);
-    return () => { a(); b(); };
-  }, []);
 
   // fit the name to the full width of the page
   useEffect(() => {
@@ -92,7 +73,7 @@ export default function Contact() {
   };
 
   return (
-    <footer className={`contact${anim}`} id="contact" aria-labelledby="contact-title" ref={root}>
+    <footer className="contact" id="contact" aria-labelledby="contact-title" ref={root}>
       <div className="container">
         <div className="wk-grid">
           <div className="c-main" ref={main}>
@@ -170,7 +151,7 @@ export default function Contact() {
           </div>
         </nav>
 
-        <p className={`c-wordmark${markAnim}`} ref={mark} aria-hidden="true">
+        <p className="c-wordmark" ref={mark} aria-hidden="true">
           <span ref={inner} style={{ display: 'inline-block' }}>
             {[...NAME].map((c, i) => (
               <span className="ch" key={i} style={{ '--i': i } as CSSProperties}>{c === ' ' ? ' ' : c}</span>
