@@ -4,14 +4,6 @@ import { useEffect } from 'react';
 
 export default function ScrollReveal() {
   useEffect(() => {
-    const html = document.documentElement;
-
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        html.classList.add('transitions-ready');
-      });
-    });
-
     const NAV_SECTIONS = ['depth', 'projects', 'leverage', 'writing', 'contact'];
 
     const updateActive = () => {

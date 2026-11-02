@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { motion, useScroll, useSpring } from 'framer-motion';
+import { FITZ } from '@/components/sections/Hero/skyline';
 
 // Next.js's viewport.themeColor only tracks OS prefers-color-scheme, not this
 // site's manual toggle — override the rendered meta tags so the iOS status
@@ -9,6 +10,18 @@ import { motion, useScroll, useSpring } from 'framer-motion';
 function syncThemeColorMeta(theme: 'light' | 'dark') {
   const color = theme === 'dark' ? '#161718' : '#f5f5f3';
   document.querySelectorAll('meta[name="theme-color"]').forEach((m) => m.setAttribute('content', color));
+}
+
+// the theme sweep's edge: the hero's skyline across the screen, `y` px down
+const SWEEP_POINTS = 48;
+function sweepEdge(y: number) {
+  const w = innerWidth, amp = innerHeight * 0.22;
+  const pts = [`${w}px ${innerHeight * 2}px`, `0px ${innerHeight * 2}px`];
+  for (let i = 0; i <= SWEEP_POINTS; i++) {
+    const v = FITZ[Math.round((i / SWEEP_POINTS) * (FITZ.length - 1))];
+    pts.push(`${((i / SWEEP_POINTS) * w).toFixed(1)}px ${(y + amp * v).toFixed(1)}px`);
+  }
+  return `polygon(${pts.join(', ')})`;
 }
 
 const LINKS = [
@@ -26,30 +39,52 @@ export default function Header() {
   const prevY = useRef(0);
   const lastVisibleY = useRef(0);
   const openRef = useRef(false);
+  const switchTimer = useRef(0);
   const { scrollYProgress } = useScroll();
   const progress = useSpring(scrollYProgress, { stiffness: 180, damping: 28 });
 
   // Keep openRef in sync so the scroll handler can read it without a stale closure.
   useEffect(() => { openRef.current = open; }, [open]);
 
-  // Reveal on any upward scroll; hide while scrolling down.
+  // Reveal only when the reader scrolls up on purpose (wheel up, a finger
+  // dragging down, the up keys); hide while scrolling down. The pinned scenes
+  // nudge the page back to hold a step, and that must not count as going up.
   // Direct DOM manipulation avoids React batching delays.
   useEffect(() => {
+    let upAt = -1e9;
+    let touchY = 0;
+    const UP_MS = 450;
+    const onWheel = (e: WheelEvent) => { if (e.deltaY < 0) upAt = performance.now(); };
+    const onTouchStart = (e: TouchEvent) => { touchY = e.touches[0]?.clientY ?? 0; };
+    const onTouchMove = (e: TouchEvent) => { if ((e.touches[0]?.clientY ?? 0) > touchY + 4) upAt = performance.now(); };
+    const onKey = (e: KeyboardEvent) => {
+      if (['ArrowUp', 'PageUp', 'Home'].includes(e.key) || (e.key === ' ' && e.shiftKey)) upAt = performance.now();
+    };
     const onScroll = () => {
       const header = headerRef.current;
       if (!header || openRef.current) return;
       const y = window.scrollY;
       const prev = prevY.current;
       prevY.current = y;
-      if (y < 80 || y < prev) {
+      if (y < 80 || (y < prev && performance.now() - upAt < UP_MS)) {
         header.classList.remove('is-hidden');
         lastVisibleY.current = y;
       } else if (y - lastVisibleY.current > 100) {
         header.classList.add('is-hidden');
       }
     };
+    window.addEventListener('wheel', onWheel, { passive: true });
+    window.addEventListener('touchstart', onTouchStart, { passive: true });
+    window.addEventListener('touchmove', onTouchMove, { passive: true });
+    window.addEventListener('keydown', onKey);
     window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
+    return () => {
+      window.removeEventListener('wheel', onWheel);
+      window.removeEventListener('touchstart', onTouchStart);
+      window.removeEventListener('touchmove', onTouchMove);
+      window.removeEventListener('keydown', onKey);
+      window.removeEventListener('scroll', onScroll);
+    };
   }, []);
 
   useEffect(() => {
@@ -67,82 +102,80 @@ export default function Header() {
     return () => media.removeEventListener('change', onChange);
   }, []);
 
-  // Lock scroll + close on Escape while the mobile menu is open.
+  // Close the mobile menu on Escape.
   useEffect(() => {
     if (!open) return;
-    document.body.style.overflow = 'hidden';
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setOpen(false);
     };
     window.addEventListener('keydown', onKey);
-    return () => {
-      document.body.style.overflow = '';
-      window.removeEventListener('keydown', onKey);
-    };
+    return () => window.removeEventListener('keydown', onKey);
   }, [open]);
 
   const toggleTheme = useCallback(() => {
-    setTheme((prev) => {
-      const next = prev === 'light' ? 'dark' : 'light';
-      document.documentElement.setAttribute('data-theme', next);
+    const html = document.documentElement;
+    const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    const apply = () => {
+      html.setAttribute('data-theme', next);
       localStorage.setItem('theme', next);
       syncThemeColorMeta(next);
-      return next;
-    });
+      setTheme(next);
+    };
+    const doc = document as Document & { startViewTransition?: (cb: () => void) => { ready: Promise<void> } };
+    if (!doc.startViewTransition || matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      // no sweep available: the colours ease across, then every other transition is back
+      html.classList.add('theme-switching');
+      clearTimeout(switchTimer.current);
+      switchTimer.current = window.setTimeout(() => html.classList.remove('theme-switching'), 400);
+      apply();
+      return;
+    }
+    // the new theme comes in under the range's edge, sweeping up the screen
+    const vt = doc.startViewTransition(apply);
+    vt.ready.then(() => {
+      html.animate(
+        { clipPath: [sweepEdge(innerHeight * 1.25), sweepEdge(-innerHeight * 0.45)] },
+        { duration: 900, easing: 'cubic-bezier(0.65, 0, 0.35, 1)', pseudoElement: '::view-transition-new(root)' },
+      );
+    }).catch(() => {});
   }, []);
 
   return (
-    <>
-      <header ref={headerRef} className="topbar">
-        <motion.span className="scroll-progress" style={{ scaleX: progress }} aria-hidden="true" />
-        <div className="container topbar-inner">
-        <a className="brand" href="#top" aria-label="Back to top" onClick={() => setOpen(false)}>
-          <strong>Matt P. S.</strong>
-        </a>
+    <header ref={headerRef} className={`topbar${open ? ' is-open' : ''}`}>
+      <motion.span className="scroll-progress" style={{ scaleX: progress }} aria-hidden="true" />
+      <div className="container topbar-inner">
 
-        <nav className="nav" aria-label="Page sections">
+        <nav className="nav" id="site-nav" aria-label="Page sections">
           {LINKS.map((l) => (
-            <a key={l.href} href={l.href}>{l.label}</a>
+            // on desktop "Book a call" stands in for Contact
+            <a key={l.href} href={l.href} className={l.href === '#contact' ? 'nav-contact' : undefined} onClick={() => setOpen(false)}>{l.label}</a>
           ))}
         </nav>
 
         <div className="topbar-right">
+          <a className="tb-cta" href="#contact">Book a call</a>
           <button
-            className="theme-toggle"
-            onClick={toggleTheme}
-            aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
-          >
-            {/* Moon — shown when dark mode is active */}
-            <svg className="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-            </svg>
-            {/* Sun — shown when light mode is active */}
-            <svg className="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <circle cx="12" cy="12" r="5" />
-              <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
-            </svg>
-          </button>
-
-          <button
-            className="nav-toggle"
-            aria-label={open ? 'Close menu' : 'Open menu'}
+            className="tb-menu"
+            type="button"
             aria-expanded={open}
-            aria-controls="mobile-nav"
+            aria-controls="site-nav"
             onClick={() => setOpen((o) => !o)}
           >
-            <span className="nt-bars" aria-hidden="true"><i /><i /></span>
+            {open ? 'Close' : 'Menu'}
+          </button>
+          <button
+            className="theme-toggle"
+            type="button"
+            onClick={toggleTheme}
+            aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} theme`}
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+              <circle cx="8" cy="8" r="6.25" fill="none" stroke="currentColor" strokeWidth="1.5" />
+              <path d="M8 1.75a6.25 6.25 0 0 1 0 12.5z" fill="currentColor" />
+            </svg>
           </button>
         </div>
-        </div>
-      </header>
-
-      <div id="mobile-nav" className={`mobile-nav${open ? ' is-open' : ''}`}>
-        <nav aria-label="Site navigation">
-          {LINKS.map((l) => (
-            <a key={l.href} href={l.href} onClick={() => setOpen(false)}>{l.label}</a>
-          ))}
-        </nav>
       </div>
-    </>
+    </header>
   );
 }

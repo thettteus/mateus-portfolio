@@ -226,11 +226,17 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 em { font-style: italic; }
 h1, h2, h3, h4 { font-weight: 600; margin: 0; letter-spacing: -0.02em; }
 
-/* Smooth theme switching — enabled after first paint to prevent flash */
-html.transitions-ready,
-html.transitions-ready *,
-html.transitions-ready *::before,
-html.transitions-ready *::after {
+/* The theme sweep: the new theme is revealed by the Header's clip animation,
+   so the default crossfade is off */
+::view-transition-old(root),
+::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+
+/* Smooth theme switching — only while the switch runs: on all the time, the
+   !important here would override every other transition on the page */
+html.theme-switching,
+html.theme-switching *,
+html.theme-switching *::before,
+html.theme-switching *::after {
   transition:
     background-color 0.35s var(--ease),
     color 0.2s var(--ease),
@@ -387,8 +393,7 @@ section {
   pointer-events: none;
 }
 .topbar.is-hidden { border-bottom-color: transparent; }
-/* theme switch should still ease the bar's bg/border (transitions-ready * would
-   otherwise be fine, but we scope explicitly to keep the collapse crisp) */
+/* Keep the header collapse independent of the theme colour transition. */
 html .topbar { transition: background-color 0.35s var(--ease), border-color 0.25s var(--ease) !important; }
 .scroll-progress {
   position: absolute;
@@ -405,11 +410,12 @@ html .topbar { transition: background-color 0.35s var(--ease), border-color 0.25
 }
 .topbar-inner {
   display: grid;
-  grid-template-columns: auto 1fr auto;
-  gap: 28px;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: clamp(16px, 1.9vw, 28px);
   align-items: center;
   height: 64px;
   overflow: hidden;
+  font-size: 0.875rem;
 }
 /* on scroll-down the header "hides": the nav content collapses away (logo,
    links, buttons all gone) while the solid top strip + progress bar stay put */
@@ -418,27 +424,23 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
 @media (prefers-reduced-motion: reduce) {
   html .topbar-inner { transition: none !important; }
 }
-.brand {
-  white-space: nowrap;
-}
-.brand strong { font-weight: 600; font-size: 15px; letter-spacing: -0.01em; color: var(--ink); }
 
 .nav {
+  grid-column: 4 / 10;
+  grid-row: 1;
+  justify-self: center;
   display: flex;
-  justify-content: center;
-  gap: 30px;
+  gap: clamp(18px, 2.2vw, 36px);
+  margin-right: 0;
 }
 .nav a {
   position: relative;
-  font-size: 14px;
-  font-weight: 450;
-  letter-spacing: -0.01em;
+  font-size: 0.9375rem;
   white-space: nowrap;
   color: var(--ink-2);
   transition: color 0.2s;
 }
-.nav a:hover { color: var(--accent-text); }
-.nav a.nav-active { color: var(--ink); }
+.nav a:hover, .nav a.nav-active { color: var(--ink); }
 .nav a.nav-active::after {
   content: "";
   position: absolute;
@@ -448,81 +450,75 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
   background: var(--accent);
   border-radius: 8px;
 }
+.nav a.nav-contact { display: none; }
 
 .topbar-right {
+  grid-column: 10 / 13;
+  grid-row: 1;
+  justify-self: end;
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 8px;
 }
-.theme-toggle {
-  width: 40px; height: 40px;
-  display: grid; place-items: center;
-  border-radius: 10px;
-  border: 1px solid var(--rule);
-  color: var(--ink-2);
-  transition: color 0.2s, border-color 0.2s, background 0.2s;
+.tb-cta {
+  display: inline-flex;
+  align-items: center;
+  height: 36px;
+  padding: 0 16px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--bg);
+  font-size: 0.875rem;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: background-color 0.25s;
 }
-.theme-toggle:hover { color: var(--ink); border-color: var(--ink-3); }
-.theme-toggle svg { width: 16px; height: 16px; }
-.theme-toggle .i-sun { display: none; }
-[data-theme="light"] .theme-toggle .i-sun { display: block; }
-[data-theme="light"] .theme-toggle .i-moon { display: none; }
-
-/* mobile hamburger — hidden on desktop */
-.nav-toggle {
-  display: none;
-  width: 40px; height: 40px;
+.tb-cta:hover { background: var(--accent); }
+.theme-toggle, .tb-menu {
+  height: 36px;
+  display: inline-grid;
   place-items: center;
-  border-radius: 10px;
   border: 1px solid var(--rule);
-  color: var(--ink-2);
-  transition: color 0.2s, border-color 0.2s;
-}
-.nav-toggle:hover { color: var(--ink); border-color: var(--ink-3); }
-.nt-bars { position: relative; display: block; width: 18px; height: 12px; }
-.nt-bars i {
-  position: absolute;
-  left: 0; right: 0;
-  height: 1.6px;
-  border-radius: 2px;
-  background: currentColor;
-  transition: transform 0.3s var(--ease), opacity 0.2s;
-}
-.nt-bars i:first-child { top: 1px; }
-.nt-bars i:last-child { bottom: 1px; }
-.nav-toggle[aria-expanded="true"] .nt-bars i:first-child { transform: translateY(4px) rotate(45deg); }
-.nav-toggle[aria-expanded="true"] .nt-bars i:last-child { transform: translateY(-4px) rotate(-45deg); }
-
-/* full-screen mobile menu (only mounted ≤900px) */
-.mobile-nav {
-  display: none;
-  position: fixed;
-  inset: 0;
-  z-index: 70;
-  flex-direction: column;
-  padding: calc(92px + env(safe-area-inset-top, 0px)) var(--gutter) 40px;
-  background: var(--bg);
-  overflow-y: auto;
-  opacity: 0;
-  visibility: hidden;
-  transform: translateY(-10px);
-  transition: opacity 0.3s var(--ease), transform 0.34s var(--ease), visibility 0.3s;
-}
-.mobile-nav.is-open { opacity: 1; visibility: visible; transform: none; }
-.mobile-nav nav { display: flex; flex-direction: column; }
-.mobile-nav nav a {
-  font-family: var(--font-display);
-  font-size: clamp(22px, 6.5vw, 34px);
-  line-height: 1.15;
-  letter-spacing: -0.02em;
+  border-radius: 999px;
+  background: none;
   color: var(--ink);
-  padding: 14px 0;
-  border-bottom: 1px solid var(--rule-soft);
-  transition: color 0.2s;
+  font: inherit;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: border-color 0.2s;
 }
-.mobile-nav nav a:hover, .mobile-nav nav a:active { color: var(--accent); }
-@media (prefers-reduced-motion: reduce) {
-  .mobile-nav { transition: opacity 0.2s, visibility 0.2s; transform: none; }
+.theme-toggle { width: 36px; padding: 0; }
+.tb-menu { display: none; padding: 0 14px; }
+.theme-toggle:hover, .tb-menu:hover { border-color: var(--ink-2); }
+
+/* small screens: "Menu" drops the sections down under the bar */
+@media (max-width: 959px) {
+  .tb-cta { display: none; }
+  .topbar-inner { display: flex; justify-content: flex-end; }
+  .tb-menu { display: inline-grid; }
+  .nav {
+    position: absolute;
+    top: calc(env(safe-area-inset-top, 0px) + 64px);
+    left: 0;
+    right: 0;
+    display: none;
+    flex-direction: column;
+    gap: 0;
+    margin: 0;
+    padding: 4px var(--gutter) 28px;
+    background: var(--bg);
+    border-bottom: 1px solid var(--rule);
+  }
+  .topbar.is-open .nav { display: flex; }
+  .nav a, .nav a.nav-contact {
+    display: block;
+    padding: 10px 0;
+    font-size: 1.75rem;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+  }
+  .nav a.nav-active::after { display: none; }
 }
 
 /* ============================================================
@@ -2150,15 +2146,8 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
 }
 @media (max-width: 900px) {
   :root { --gutter: 24px; }
-  .nav { display: none; }
-  .nav-toggle { display: grid; }
-  .topbar-inner { display: flex; justify-content: space-between; }
-  .mobile-nav { display: flex; }
 }
 @media (max-width: 620px) {
-  .topbar-inner {
-    gap: 14px;
-  }
   /* range stack → stage on top, list below, both inside the pinned screen */
   .range-pin {
     grid-template-columns: minmax(0, 1fr);
