@@ -597,7 +597,7 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
     display: block;
     margin-top: 16px;
     padding-left: var(--role-inset, calc(var(--name-size, var(--fs)) * .07));
-    font: 500 clamp(28px, 2vw, 32px)/1.4 var(--font-sans);
+    font: 500 clamp(24px, 1.8vw, 28px)/1.4 var(--font-sans);
     letter-spacing: .01em;
     color: var(--ink-2);
   }
