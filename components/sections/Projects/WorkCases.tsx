@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import { useRef, useState, type CSSProperties, type ReactNode } from 'react';
 
 export type WorkCase = {
   id: string;
@@ -24,18 +24,7 @@ export type WorkCase = {
 export default function WorkCases({ cases }: { cases: WorkCase[] }) {
   const list = useRef<HTMLOListElement>(null);
   const [open, setOpen] = useState<string | null>(cases[0]?.id ?? null);
-  const [anim, setAnim] = useState('');
 
-  // rules draw and rows resolve once, when the list scrolls in
-  useEffect(() => {
-    if (matchMedia('(prefers-reduced-motion: reduce)').matches || !list.current) return;
-    setAnim(' js-anim');
-    const io = new IntersectionObserver((entries) => {
-      if (entries.some((e) => e.isIntersecting)) { io.disconnect(); setAnim(' js-anim is-in'); }
-    }, { threshold: 0.1 });
-    io.observe(list.current);
-    return () => io.disconnect();
-  }, []);
 
   return (
     <>
@@ -43,7 +32,7 @@ export default function WorkCases({ cases }: { cases: WorkCase[] }) {
         <span>Project</span><span>Role</span><span>Type</span><span>Status</span>
       </div>
 
-      <ol className={`wk-cases${anim}`} ref={list}>
+      <ol className="wk-cases" ref={list}>
         {cases.map((c, r) => {
           const isOpen = open === c.id;
           return (
