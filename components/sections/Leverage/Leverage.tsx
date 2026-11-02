@@ -11,7 +11,7 @@ const STEPS_TEXT = [
 // where the scene rests on each step (0–1 through the animation)
 const LAND = [0, 0.44, 0.68, 1];
 
-const STEP_MS = 850; // how long the scene takes to travel to the next step
+const STEP_MS = 520; // how long the scene takes to travel to the next step
 const GESTURE_GAP_MS = 180; // a pause this long between wheel events starts a new gesture
 const SUSTAIN_MS = 300; // a wheel still spinning this long after a landing moves on again
 const SWIPE_PX = 40; // touch travel that counts as a swipe
@@ -23,7 +23,7 @@ const REEL = 9; // letters on each reel, the last one being the real letter
 const clamp01 = (x: number) => (x < 0 ? 0 : x > 1 ? 1 : x);
 const smooth = (a: number, b: number, x: number) => { const t = clamp01((x - a) / (b - a)); return t * t * (3 - 2 * t); };
 const easeOut = (t: number) => 1 - (1 - t) ** 3;
-const easeInOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2);
+const easeOutQuart = (t: number) => 1 - (1 - t) ** 4;
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 const LOWER = 'abcdefghijklmnopqrstuvwxyz';
 const UPPER = LOWER.toUpperCase();
@@ -150,9 +150,12 @@ export default function Leverage() {
     let cur = 0, target = 0, p = 0, last = 0, raf = 0, inView = false;
     let readyAt = 0, bypass = 0, programmatic = false;
     let lastRaw = -1, swipedAt = 0; // where the last scroll left the page; when a wheel/swipe last moved
+    let travel = 1; // which way the scene is moving
     const pAt = (pos: number) => {
       const lo = Math.floor(pos), hi = Math.min(N - 1, lo + 1);
-      return lerp(LAND[lo], LAND[hi], easeInOut(pos - lo));
+      // answers the gesture at once and lands softly, whichever way it runs
+      const t = pos - lo;
+      return lerp(LAND[lo], LAND[hi], travel > 0 ? easeOutQuart(t) : 1 - easeOutQuart(1 - t));
     };
 
     const draw = (t: number) => {
@@ -303,6 +306,7 @@ export default function Leverage() {
       const dt = last ? Math.min(64, now - last) : 16;
       last = now;
       const d = target - cur, by = dt / STEP_MS;
+      if (d) travel = Math.sign(d);
       if (d) {
         cur = Math.abs(d) <= by ? target : cur + Math.sign(d) * by;
         if (cur === target) readyAt = now;
@@ -344,7 +348,13 @@ export default function Leverage() {
       return true;
     };
     // at either end, scrolling outward hands control back to the page
-    const leaving = (dir: number) => ready() && ((target <= 0 && dir < 0) || (target >= N - 1 && dir > 0));
+    const atEnd = (dir: number) => (target <= 0 && dir < 0) || (target >= N - 1 && dir > 0);
+    // a new gesture at either end lets the page go, even while that step plays;
+    // the momentum of the gesture that got there never does
+    let letGo = false;
+    const leaving = (dir: number) => atEnd(dir) && (ready() || letGo);
+    // a new gesture is taken mid-step too, once the step is half played
+    const canTake = (dir: number) => Math.abs(target + dir - cur) <= 1.5;
 
     const fromScroll = () => {
       const g = geo();
@@ -358,6 +368,10 @@ export default function Leverage() {
       const through = now >= bypass && now - swipedAt < 600 &&
         ((g.raw > N - 1 && prev < N - 1 && target < N - 1) || (g.raw < 0 && prev > 0 && target > 0));
       if (through) { go(target); return; }
+      // coming back up into the scene (a swipe can't be stopped before it
+      // crosses in): take that as a step back, in the direction of travel,
+      // rather than pulling the page down against it
+      if (prev > N - 1 && g.raw < N - 1 && target >= N - 1 && now >= bypass) { go(N - 2); return; }
       // outside the track the scene rests at its nearest end: jump, no travel
       if (g.raw < 0 || g.raw > N - 1) {
         const end = g.raw < 0 ? 0 : N - 1;
@@ -397,7 +411,6 @@ export default function Leverage() {
       let lastDelta = 0;
       let peak = 0; // strongest wheel event of the current gesture
       let outside = true;
-      let entering = false; // still in the gesture that carried the page in
       const onWheel = (e: WheelEvent) => {
         const now = performance.now();
         const mag = Math.abs(e.deltaY);
@@ -410,38 +423,40 @@ export default function Leverage() {
           lastDelta = mag;
           return;
         }
-        if (outside) { outside = false; entering = true; readyAt = now; }
+        if (outside) { outside = false; readyAt = now; }
         // momentum that can no longer be cancelled is still the scroll that
         // carried the page in: the hold in fromScroll keeps the page, it never steps
         if (!e.cancelable) { lastWheel = now; lastDelta = mag; return; }
         const dir = Math.sign(e.deltaY);
-        if (!dir || leaving(dir)) return;
-        e.preventDefault();
+        if (!dir) return;
         // a new gesture: a pause after the last one, or a fresh flick rising out
         // of a decaying inertia tail
         const fresh = now - lastWheel > GESTURE_GAP_MS || (mag > 20 && mag > lastDelta * 1.6);
+        if (fresh) letGo = atEnd(dir);
+        if (leaving(dir)) { lastWheel = now; lastDelta = mag; return; }
+        e.preventDefault();
         peak = fresh ? mag : Math.max(peak, mag);
-        if (fresh) entering = false;
         // a wheel kept spinning at strength moves on, one landing at a time;
         // a trackpad's fading inertia tail never counts
-        // the spin that carried the page in only lands; it never moves on
-        const sustained = !entering && now - readyAt > SUSTAIN_MS && mag >= peak * 0.6 && mag >= lastDelta;
+        const sustained = now - readyAt > SUSTAIN_MS && mag >= peak * 0.6 && mag >= lastDelta;
         lastWheel = now;
         lastDelta = mag;
-        if ((fresh || sustained) && ready()) step(dir);
+        if (fresh ? canTake(dir) : sustained && ready()) step(dir);
       };
       let touchY = 0;
       let touchDir = 0;
-      const onTouchStart = (e: TouchEvent) => { touchY = e.touches[0].clientY; touchDir = 0; };
+      const onTouchStart = (e: TouchEvent) => { touchY = e.touches[0].clientY; touchDir = 0; letGo = false; };
       const onTouchMove = (e: TouchEvent) => {
         swipedAt = performance.now();
         // a swipe that carried the page in only lands; the next one moves on
         if (!inside(geo().raw) || performance.now() < bypass) { touchDir = 1; return; }
         const dy = touchY - e.touches[0].clientY;
         const dir = Math.sign(dy);
-        if (!dir || leaving(dir)) return;
+        if (!dir) return;
+        if (!touchDir) letGo = atEnd(dir);
+        if (leaving(dir)) return;
         e.preventDefault();
-        if (!touchDir && Math.abs(dy) > SWIPE_PX && ready()) { touchDir = dir; step(dir); }
+        if (!touchDir && Math.abs(dy) > SWIPE_PX && canTake(dir)) { touchDir = dir; step(dir); }
       };
       const onKey = (e: KeyboardEvent) => {
         if (!inside(geo().raw) || e.metaKey || e.ctrlKey || e.altKey) return;
@@ -449,9 +464,9 @@ export default function Leverage() {
         if (el && (/^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName) || el.isContentEditable)) return;
         const dir = ['ArrowDown', 'PageDown', ' '].includes(e.key) ? (e.shiftKey && e.key === ' ' ? -1 : 1)
           : ['ArrowUp', 'PageUp'].includes(e.key) ? -1 : 0;
-        if (!dir || leaving(dir)) return;
+        if (!dir || atEnd(dir)) return;
         e.preventDefault();
-        if (ready()) step(dir);
+        if (canTake(dir)) step(dir);
       };
       const onClick = (e: MouseEvent) => {
         if ((e.target as Element).closest?.('a[href*="#"]')) bypass = performance.now() + BYPASS_MS;
@@ -529,7 +544,6 @@ export default function Leverage() {
           </ol>
         </div>
       </div>
-      <div className="lev-after" />
     </section>
   );
 }
