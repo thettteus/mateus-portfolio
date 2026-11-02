@@ -141,6 +141,22 @@ export default function Hero() {
         : (v.match(/[\d.]+/g) ?? ['0', '0', '0']).slice(0, 3).join(',');
     };
 
+    // where a glyph's ink starts, right of its origin: drawn and scanned, since
+    // Safari's measureText bounds can't be trusted
+    const glyph = document.createElement('canvas').getContext('2d', { willReadFrequently: true })!;
+    const inkLeft = (cs: CSSStyleDeclaration, ch: string) => {
+      const size = parseFloat(cs.fontSize), pad = Math.ceil(size * 0.5);
+      const w = Math.ceil(size * 1.5) + pad, h = Math.ceil(size * 1.6);
+      glyph.canvas.width = w;
+      glyph.canvas.height = h;
+      glyph.font = `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+      glyph.textBaseline = 'middle';
+      glyph.fillText(ch, pad, h / 2);
+      const data = glyph.getImageData(0, 0, w, h).data;
+      for (let x = 0; x < w; x++)
+        for (let y = 0; y < h; y++) if (data[(y * w + x) * 4 + 3] > 64) return x - pad;
+      return 0;
+    };
     // the masthead fills the width, but never more than a third of the screen height
     // the masthead fills the width, up to `most` px (set so the whole cover fits)
     const fit = (most = Infinity) => {
@@ -151,11 +167,8 @@ export default function Hero() {
       m.style.setProperty('--name-size', m.style.fontSize);
       // Align actual glyph edges, not the different font sizes' line boxes.
       const nameStyle = getComputedStyle(m), roleStyle = getComputedStyle(role);
-      probe.font = `${nameStyle.fontWeight} ${nameStyle.fontSize} ${nameStyle.fontFamily}`;
-      // WebKit flips the sign of actualBoundingBoxLeft; both glyphs start right of the origin
-      const nameInset = Math.abs(probe.measureText(NAME[0]).actualBoundingBoxLeft);
-      probe.font = `${roleStyle.fontWeight} ${roleStyle.fontSize} ${roleStyle.fontFamily}`;
-      const roleInset = Math.abs(probe.measureText('S').actualBoundingBoxLeft);
+      const nameInset = inkLeft(nameStyle, NAME[0]);
+      const roleInset = inkLeft(roleStyle, 'S');
       role.style.setProperty('--role-inset', `${nameInset - roleInset}px`);
     };
     // the smallest the screen gets (100svh): mobile toolbars never hide the cover
