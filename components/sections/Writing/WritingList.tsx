@@ -62,20 +62,9 @@ function Mark({ kind }: { kind: Essay['mark'] }) {
 export default function WritingList({ essays }: { essays: Essay[] }) {
   const list = useRef<HTMLOListElement>(null);
   const preview = useRef<HTMLDivElement>(null);
-  const [anim, setAnim] = useState('');
   const [shown, setShown] = useState<number | null>(null);
   const live = useRef({ x: 0, y: 0, tx: 0, ty: 0, tilt: 0, raf: 0, on: false, calm: false, anchor: null as Element | null });
 
-  // rules draw and rows resolve once, when the list scrolls in
-  useEffect(() => {
-    if (matchMedia('(prefers-reduced-motion: reduce)').matches || !list.current) return;
-    setAnim(' js-anim');
-    const io = new IntersectionObserver((entries) => {
-      if (entries.some((e) => e.isIntersecting)) { io.disconnect(); setAnim(' js-anim is-in'); }
-    }, { threshold: 0.2 });
-    io.observe(list.current);
-    return () => io.disconnect();
-  }, []);
 
   useEffect(() => {
     const L = live.current;
@@ -117,7 +106,7 @@ export default function WritingList({ essays }: { essays: Essay[] }) {
 
   return (
     <>
-      <ol className={`wr-list${anim}`} ref={list}>
+      <ol className="wr-list" ref={list}>
         {essays.map((e, i) => (
           <li className="wr-row" key={e.slug} style={{ '--r': i } as CSSProperties}>
             <Link

@@ -1610,7 +1610,7 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
 .wk-top h2 b { font-weight: 500; }
 .writing .wk-top h2 { grid-column: 1 / 8; }
 
-.wr-list { margin: clamp(32px, 5vh, 52px) 0 0; padding: 0; list-style: none; font-size: 1rem; line-height: 1.5; letter-spacing: normal; }
+.wr-list { margin: var(--space-head) 0 0; padding: 0; list-style: none; font-size: 1rem; line-height: 1.5; letter-spacing: normal; }
 .wr-row { position: relative; }
 .wr-row::before, .wr-row:last-child::after {
   content: "";
