@@ -11,33 +11,21 @@ export default function Depth() {
     },
     {
       ix: '02',
-      title: 'Designing the architecture',
-      items: ['System design', 'Data modeling', 'APIs & SDKs', 'Event-driven systems', 'Multi-tenant scale', 'Technical trade-offs'],
+      title: 'Designing & shipping',
+      items: ['System design', 'Data modeling', 'APIs & SDKs', 'Full-stack delivery', 'RAG & agent workflows', 'Production ownership'],
       art: 'architecture',
     },
     {
       ix: '03',
-      title: 'Building & shipping',
-      items: ['Full-stack delivery', 'Cloud', 'Data workflows', 'RAG & agent workflows', 'Model selection', 'Production ownership'],
-      art: 'engineering',
-    },
-    {
-      ix: '04',
       title: 'Building the tools that build',
-      items: ['Internal platforms', 'Workflow automation', 'SDKs & templates', 'Agent infrastructure', 'Validation systems', 'Developer experience'],
+      items: ['Internal platforms', 'Workflow automation', 'Agent infrastructure', 'Validation systems', 'Developer experience'],
       art: 'harness',
     },
     {
-      ix: '05',
-      title: 'Running lean at scale',
-      items: ['Cloud cost', 'SQL optimization', 'Latency', 'Performance', 'Observability', 'Reliability'],
+      ix: '04',
+      title: 'Running lean & secure',
+      items: ['Cloud cost', 'Performance', 'Observability', 'Reliability', 'Hardening', 'Access & secrets'],
       art: 'scale',
-    },
-    {
-      ix: '06',
-      title: 'Securing the system',
-      items: ['Threat modeling', 'Pentest', 'Hardening', 'Audits & compliance', 'Access & secrets', 'Secure defaults'],
-      art: 'security',
     },
   ];
 
