@@ -81,6 +81,13 @@
 }
 
 :root {
+  /* where the eye should land (CTAs, outcomes, live marks). Without a palette
+     it is the signature itself, and the CTAs stay ink */
+  --focus:     var(--accent);
+  --focus-2:   var(--accent-2);
+  --focus-ink: var(--bg);
+  --cta-bg:    var(--ink);
+  --cta-hover: var(--accent);
   --maxw: 1240px;
   --gutter: 40px;
   --font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -99,6 +106,50 @@
 [data-theme="dark"] {
   --shadow-card: 0 1px 1px rgba(0,0,0,0.6), 0 3px 8px -2px rgba(0,0,0,0.5), 0 22px 44px -20px rgba(0,0,0,0.75);
   --shadow-lift: 0 1px 1px rgba(0,0,0,0.65), 0 8px 18px -4px rgba(0,0,0,0.55), 0 38px 66px -24px rgba(0,0,0,0.85);
+}
+
+/* ---------------- PALETTE: EMERALD (trial) ----------------
+   Monochrome black on warm white, with an emerald for the signature. CTAs
+   stay black and turn green on hover; outcomes and live marks are the green.
+   Remove data-palette="emerald" from <html> to return to the teal. */
+[data-palette="emerald"] {
+  --bg:        #fafaf8;
+  --panel-1:   #ffffff;
+  --panel-2:   #efefec;
+  --ink:       #111111;
+  --rule:      #deded9;
+  --rule-soft: #ecece8;
+  --accent:    #00a86b;
+  --accent-2:  #008f5b;
+  /* #00a86b is 3:1 on this paper: graphics and large type only */
+  --accent-text: #007d50;
+  --accent-ink:#ffffff;
+  --accent-dim:#dcf2e8;
+  --glow: rgba(0,168,107,0.3);
+  --selection: rgba(0,168,107,0.18);
+  /* the calls to book are green: one step deeper, so white text holds 4.5:1 */
+  --cta-bg:    #00875a;
+  --cta-hover: #006f4a;
+  --focus-ink: #ffffff;
+}
+[data-palette="emerald"][data-theme="dark"] {
+  --bg:        #111211;
+  --panel-1:   #1a1b1a;
+  --panel-2:   #222322;
+  --ink:       #f4f4f1;
+  --rule:      #2b2c2b;
+  --rule-soft: #1e1f1e;
+  --accent:    #1fc384;
+  --accent-2:  #3fd598;
+  --accent-text: #1fc384;
+  --accent-ink:#0b0b0b;
+  --accent-dim:#0c2c20;
+  --glow: rgba(31,195,132,0.42);
+  --selection: rgba(31,195,132,0.32);
+  /* bright green on the dark field, with dark text */
+  --cta-bg:    #1fc384;
+  --cta-hover: #3fd598;
+  --focus-ink: #0b0b0b;
 }
 
 /* Hairlines are engraved, not printed: --rule draws the cut and --edge-hi
@@ -466,14 +517,14 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
   height: 36px;
   padding: 0 16px;
   border-radius: 999px;
-  background: var(--ink);
-  color: var(--bg);
+  background: var(--cta-bg);
+  color: var(--focus-ink);
   font-size: 0.875rem;
   font-weight: 500;
   white-space: nowrap;
   transition: background-color 0.25s;
 }
-.tb-cta:hover { background: var(--accent); }
+.tb-cta:hover { background: var(--cta-hover); }
 .theme-toggle, .tb-menu {
   height: 36px;
   display: inline-grid;
@@ -537,8 +588,8 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
   transition: transform 0.25s var(--ease), background 0.25s var(--ease), border-color 0.25s, box-shadow 0.25s var(--ease);
 }
 .btn-primary {
-  background: var(--ink);
-  color: var(--bg);
+  background: var(--cta-bg);
+  color: var(--focus-ink);
   box-shadow: var(--shadow-card);
 }
 .btn-primary:hover { transform: translateY(-2px); box-shadow: var(--shadow-lift); }
@@ -626,11 +677,11 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
   /* the same black button as "Book a call" in the top bar */
   .cta {
     display: inline-flex; align-items: center; height: 52px; padding: 0 24px;
-    border-radius: 999px; background: var(--ink); color: var(--bg);
+    border-radius: 999px; background: var(--cta-bg); color: var(--focus-ink);
     font-weight: 500; text-decoration: none;
     transition: background-color .25s;
   }
-  .cta:hover { background: var(--accent); }
+  .cta:hover { background: var(--cta-hover); }
   .quiet { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: .34em; text-decoration-color: var(--rule); transition: text-decoration-color .2s; }
   .quiet:hover { text-decoration-color: var(--ink); }
   .side-flow { margin-top: 28px; }
@@ -768,11 +819,11 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
   stroke-linecap: round;
   vector-effect: non-scaling-stroke;
 }
-.ring { fill: none; stroke: var(--accent); stroke-width: 1.2; vector-effect: non-scaling-stroke; }
-.impact-dot { fill: var(--accent); }
+.ring { fill: none; stroke: var(--focus); stroke-width: 1.2; vector-effect: non-scaling-stroke; }
+.impact-dot { fill: var(--focus); }
 .impact-ping {
   fill: none;
-  stroke: var(--accent);
+  stroke: var(--focus);
   stroke-width: 1.5;
   vector-effect: non-scaling-stroke;
 }
@@ -944,7 +995,7 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
   height: 6px;
   margin-right: 0.55em;
   border-radius: 50%;
-  background: var(--accent);
+  background: var(--focus);
   vertical-align: 0.12em;
 }
 .wk-icon {
@@ -1527,7 +1578,7 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
   letter-spacing: -0.04em;
   color: var(--ink);
 }
-.lev-cap:last-child h3 { color: var(--accent); }
+.lev-cap:last-child h3 { color: var(--focus); }
 /* the slot-machine roll: one clipped reel per letter. Each reel shows one line
    plus room for descenders, and gives that room back so the line doesn't grow */
 .lev-wordpart { white-space: nowrap; }
@@ -1579,7 +1630,7 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
   transform-origin: left;
   transform: scaleX(var(--f, 0));
 }
-.lev-progress li:last-child .lev-bar::after { background: var(--accent); }
+.lev-progress li:last-child .lev-bar::after { background: var(--focus); }
 
 
 
@@ -1937,8 +1988,8 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
   height: clamp(68px, 9vh, 84px);
   padding: 0 clamp(28px, 2.6vw, 40px);
   border-radius: 999px;
-  background: var(--ink);
-  color: var(--bg);
+  background: var(--cta-bg);
+  color: var(--focus-ink);
   font: 500 clamp(1.125rem, 1rem + .4vw, 1.375rem)/1 var(--font-sans);
   letter-spacing: -0.01em;
   text-decoration: none;
@@ -1950,7 +2001,7 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
   position: absolute;
   inset: 0;
   z-index: -1;
-  background: var(--accent);
+  background: var(--cta-hover);
   clip-path: circle(0% at var(--mx, 50%) var(--my, 50%));
   transition: clip-path .6s cubic-bezier(.2, .8, .2, 1);
 }

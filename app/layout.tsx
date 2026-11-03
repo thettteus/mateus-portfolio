@@ -58,6 +58,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html
       lang="en"
       data-theme="light"
+      data-palette="emerald"
+      data-range="ascii"
       suppressHydrationWarning
     >
       <head>

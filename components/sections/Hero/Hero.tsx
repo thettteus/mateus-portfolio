@@ -70,6 +70,32 @@ const clamp01 = (x: number) => (x < 0 ? 0 : x > 1 ? 1 : x);
 const phase = ([a, b]: [number, number], p: number) => clamp01((p - a) / (b - a));
 const easeInOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2);
 const easeOut = (t: number) => 1 - (1 - t) ** 3;
+const smoothstep = (a: number, b: number, x: number) => { const t = clamp01((x - a) / (b - a)); return t * t * (3 - 2 * t); };
+
+// The range as ASCII (data-range="ascii" on <html>): Fitz Roy itself, set in
+// micro monospace glyphs. The relief is the photo the skyline was traced from,
+// stored crest-relative (column = along the profile, row = photo px under the
+// crest), so it follows the drawn crest wherever the scene moves it. Each cell
+// takes the glyph whose ink, over a 2×3 grid, best matches the rock under it:
+// the silhouette, the walls and the cracks come out of the glyphs' own shapes.
+const RELIEF_SRC = '/assets/hero/fitz-roy-relief.webp';
+const RELIEF_PX = 291.4; // photo px from the summit to the skyline's lowest point (one unit of FITZ)
+// every printable glyph but the straight bars
+const GLYPHS = ` .,'\`:;!ilIj1rt(){}[]?<>+*^"cvxzsunoaeLJTYFCUOQ0ZXmwqpdbkhgyfAEVKPRSDGHNBW8M#%&$@`;
+// smooth rock is set from a ramp of round, even glyphs so it reads as tone, not
+// as noise; only cells with an edge in them (the crest, a wall, a couloir)
+// reach for the whole set to match its shape
+const RAMP_FROM = '.:;*+cosaexzun%#&8$@BWM';
+const RAMP_STEPS = 16;
+const EDGE = 0.32; // ink spread inside a cell that makes it an edge
+const SUB_X = 2, SUB_Y = 3; // the grid a glyph's ink is compared on
+// the tone curve from rock to ink: on paper the rock is the ink and the snow
+// the paper, so the pivot sits lower; on the dark field the light is the ink
+const CONTRAST = 8, PIVOT_PAPER = 0.4, PIVOT_DARK = 0.52;
+const GLYPH_PX: [number, number] = [4.5, 5.5]; // micro: the likeness lives in resolution
+// TEMP tuning overrides (?px=…&k=…&pp=…&pd=…&w=…&ac=0)
+const TUNE = typeof location === 'undefined' ? new URLSearchParams() : new URLSearchParams(location.search);
+const tune = (k: string, d: number) => (TUNE.has(k) ? Number(TUNE.get(k)) : d);
 
 /**
  * Hero — a magazine cover: the name is the masthead, set as wide as the page
@@ -268,6 +294,7 @@ export default function Hero() {
         most = fs - over / (0.95 + footK);
       }
       g = measure();
+      if (TUNE.has('dump')) document.documentElement.dataset.geo = JSON.stringify({ W: g.W, H: g.H, base: g.base, cap: g.cap, nameL: g.nameL, nameR: g.nameR, end: g.end, lineY: g.lineY }); // TEMP
       const dpr = Math.min(2, devicePixelRatio || 1);
       cvs.width = Math.round(g.W * dpr);
       cvs.height = Math.round(g.H * dpr);
@@ -312,6 +339,207 @@ export default function Hero() {
       return `polygon(${pts.join(',')})`;
     };
 
+    let ascii = document.documentElement.dataset.range === 'ascii';
+    // the relief, read once into plain arrays; on failure the range falls back to lines
+    let relief: { w: number; h: number; lum: Uint8ClampedArray } | null = null;
+    const reliefReady = !ascii ? Promise.resolve() : new Promise<void>((done) => {
+      const img = new Image();
+      img.decoding = 'async';
+      img.onload = () => {
+        const c = document.createElement('canvas');
+        c.width = img.naturalWidth;
+        c.height = img.naturalHeight;
+        const x = c.getContext('2d', { willReadFrequently: true })!;
+        x.drawImage(img, 0, 0);
+        const px = x.getImageData(0, 0, c.width, c.height).data;
+        // luminance in the red channel, presence in alpha: no photo reads as -1
+        const lum = new Uint8ClampedArray(c.width * c.height);
+        for (let i = 0; i < lum.length; i++) lum[i] = px[i * 4 + 3] < 128 ? 0 : 1 + Math.min(254, px[i * 4]);
+        relief = { w: c.width, h: c.height, lum };
+        done();
+      };
+      img.onerror = () => { ascii = false; done(); };
+      img.src = RELIEF_SRC;
+    });
+
+    // the glyphs, each set once in the ink, and how their ink falls over the sub-grid
+    const atlas = document.createElement('canvas'), sheet = document.createElement('canvas');
+    const sctx = sheet.getContext('2d')!;
+    let glyphKey = '', sheetKey = '', cellW = 0, cellH = 0;
+    let feat = new Float32Array(0), mean = new Float32Array(0), ramp: number[] = [];
+    const buildGlyphs = (G: Geo, dpr: number) => {
+      const px = tune('px', Math.max(GLYPH_PX[0], Math.min(GLYPH_PX[1], G.cap * 0.022)));
+      const key = `${px.toFixed(2)}|${dpr}|${inkRGB}`;
+      if (key === glyphKey) return;
+      glyphKey = key;
+      sheetKey = '';
+      const mono = getComputedStyle(document.documentElement).getPropertyValue('--font-code').trim() || 'monospace';
+      const a = atlas.getContext('2d', { willReadFrequently: true })!;
+      a.font = `${tune('w', 600)} ${px}px ${mono}`;
+      cellW = a.measureText('M').width;
+      cellH = px * 1.16;
+      const gw = Math.ceil(cellW * dpr), gh = Math.ceil(cellH * dpr);
+      atlas.width = gw * GLYPHS.length;
+      atlas.height = gh;
+      a.setTransform(dpr, 0, 0, dpr, 0, 0);
+      a.font = `${tune('w', 600)} ${px}px ${mono}`;
+      a.textAlign = 'center';
+      a.textBaseline = 'middle';
+      a.fillStyle = `rgb(${inkRGB})`;
+      for (let i = 0; i < GLYPHS.length; i++) a.fillText(GLYPHS[i], (i * gw) / dpr + cellW / 2, cellH / 2);
+      // ink per sub-block, scaled so the densest glyph reads as full darkness
+      const data = a.getImageData(0, 0, atlas.width, gh).data;
+      const S = SUB_X * SUB_Y;
+      feat = new Float32Array(GLYPHS.length * S);
+      mean = new Float32Array(GLYPHS.length);
+      let most = 0;
+      for (let i = 0; i < GLYPHS.length; i++) {
+        for (let sy = 0; sy < SUB_Y; sy++) for (let sx = 0; sx < SUB_X; sx++) {
+          const x0 = Math.floor((sx * gw) / SUB_X), x1 = Math.floor(((sx + 1) * gw) / SUB_X);
+          const y0 = Math.floor((sy * gh) / SUB_Y), y1 = Math.floor(((sy + 1) * gh) / SUB_Y);
+          let sum = 0;
+          for (let y = y0; y < y1; y++) for (let x = x0; x < x1; x++) sum += data[(y * atlas.width + i * gw + x) * 4 + 3];
+          feat[i * S + sy * SUB_X + sx] = sum / (255 * Math.max(1, (x1 - x0) * (y1 - y0)));
+        }
+        let m = 0;
+        for (let k = 0; k < S; k++) m += feat[i * S + k];
+        mean[i] = m / S;
+        most = Math.max(most, mean[i]);
+      }
+      for (let k = 0; k < feat.length; k++) feat[k] /= most;
+      for (let i = 0; i < mean.length; i++) mean[i] /= most;
+      // the ramp: for each step of ink, the closest round glyph not yet taken
+      const pool = [...RAMP_FROM].map((ch) => GLYPHS.indexOf(ch)).filter((i) => i > 0);
+      ramp = [];
+      for (let k = 1; k <= RAMP_STEPS; k++) {
+        let pick = -1;
+        for (const i of pool) if (!ramp.includes(i) && (pick < 0 || Math.abs(mean[i] - k / RAMP_STEPS) < Math.abs(mean[pick] - k / RAMP_STEPS))) pick = i;
+        if (pick >= 0) ramp.push(pick);
+      }
+      ramp.sort((x, y) => mean[x] - mean[y]);
+    };
+    // the crest as first laid out, anywhere along the stage
+    const crestBase = (G: Geo, x: number) => {
+      const st = G.xs[1] - G.xs[0], u = Math.max(0, Math.min(G.xs.length - 1.001, x / st));
+      const i = Math.floor(u);
+      return G.c0[i] + (G.c0[i + 1] - G.c0[i]) * (u - i);
+    };
+    // where x falls along the profile (0…1), as crest0 lays it out
+    const along = (G: Geo, x: number) => x < G.nameL ? U_L * Math.max(0, x / G.nameL)
+      : x < G.nameR ? U_L + (U_R - U_L) * (x - G.nameL) / (G.nameR - G.nameL)
+      : U_R + (1 - U_R) * Math.min(1, (x - G.nameR) / (G.end - G.nameR));
+    // the rock's darkness as ink (0 bare … 1 densest), `d` stage px under the crest
+    const inkAt = (G: Geo, x: number, d: number, fx: number, fy: number, darkInk: boolean) => {
+      const R = relief!;
+      const c = along(G, x) * (R.w - 1), r = (d * RELIEF_PX) / (G.cap * RELIEF);
+      // average over the cell's footprint in the photo, so small screens don't alias
+      const nx = Math.max(1, Math.min(4, Math.round(fx))), ny = Math.max(1, Math.min(4, Math.round(fy)));
+      let sum = 0, hits = 0;
+      for (let j = 0; j < ny; j++) for (let i = 0; i < nx; i++) {
+        const tx = Math.round(c + ((i + 0.5) / nx - 0.5) * fx), ty = Math.round(r + ((j + 0.5) / ny - 0.5) * fy);
+        if (tx < 0 || ty < 0 || tx >= R.w || ty >= R.h) continue;
+        const v = R.lum[ty * R.w + tx];
+        if (!v) continue;
+        sum += (v - 1) / 254;
+        hits++;
+      }
+      if (!hits) return 0;
+      const L = sum / hits;
+      // on paper the shadows carry the ink; on the dark field, the light does
+      const t = darkInk ? 1 - L : L;
+      // an S-curve: snow and lit faces fall away, shadow and cracks set dense
+      const k = tune('k', CONTRAST), pv = darkInk ? tune('pp', PIVOT_PAPER) : tune('pd', PIVOT_DARK);
+      const s = (z: number) => 1 / (1 + Math.exp(-k * (z - pv)));
+      return clamp01((s(t) - s(0)) / (s(1) - s(0))) * (hits / (nx * ny));
+    };
+    // the whole range at rest, set once per size and theme
+    const buildSheet = (G: Geo, dpr: number) => {
+      buildGlyphs(G, dpr);
+      const key = `${G.W}x${G.H}|${glyphKey}|${G.base}|${G.nameL}|${G.nameR}`;
+      if (key === sheetKey || !relief) return;
+      sheetKey = key;
+      if (sheet.width !== cvs.width || sheet.height !== cvs.height) { sheet.width = cvs.width; sheet.height = cvs.height; }
+      sctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      sctx.clearRect(0, 0, G.W, G.H);
+      sctx.globalAlpha = 1;
+      const [ir, ig, ib] = inkRGB.split(',').map(Number);
+      const darkInk = 0.2126 * ir + 0.7152 * ig + 0.0722 * ib < 128;
+      const S = SUB_X * SUB_Y, t = new Float32Array(S);
+      const subW = cellW / SUB_X, subH = cellH / SUB_Y;
+      const scaleY = RELIEF_PX / (G.cap * RELIEF);
+      const gw = Math.ceil(cellW * dpr), gh = Math.ceil(cellH * dpr);
+      const cols = Math.ceil(G.W / cellW), rows = Math.ceil(G.H / cellH);
+      for (let col = 0; col < cols; col++) {
+        const xc = (col + 0.5) * cellW;
+        // photo px per stage px across, where this column falls on the profile
+        const scaleX = ((along(G, xc + 1) - along(G, xc - 1)) / 2) * (relief.w - 1);
+        const top = Math.floor((crestBase(G, xc) - cellH) / cellH);
+        for (let row = Math.max(0, top); row < rows; row++) {
+          const y0 = row * cellH;
+          // the range dissolves toward the bottom of the stage
+          const fade = 1 - smoothstep(0.62, 1, (y0 - G.base) / Math.max(1, G.H - G.base));
+          if (fade <= 0) break;
+          let any = 0, low = 1, tm = 0;
+          for (let sy = 0; sy < SUB_Y; sy++) for (let sx = 0; sx < SUB_X; sx++) {
+            const x = col * cellW + (sx + 0.5) * subW, y = y0 + (sy + 0.5) * subH;
+            const d = y - crestBase(G, x);
+            const v = d < 0 ? 0 : inkAt(G, x, d, subW * scaleX, subH * scaleY, darkInk) * fade;
+            t[sy * SUB_X + sx] = v;
+            tm += v;
+            any = Math.max(any, v);
+            low = Math.min(low, v);
+          }
+          if (any < 0.04) continue;
+          tm /= S;
+          let best = 0;
+          if (any - low > tune('edge', EDGE)) {
+            // an edge: the glyph that matches the cell's shape, held to its tone
+            let bestErr = Infinity;
+            for (let i = 0; i < GLYPHS.length; i++) {
+              let e = 0;
+              for (let k = 0; k < S; k++) { const q = t[k] - feat[i * S + k]; e += q * q; }
+              const dm = tm - mean[i];
+              e += dm * dm * S;
+              if (e < bestErr) { bestErr = e; best = i; }
+            }
+          } else {
+            // smooth rock: the ramp glyph at or just above the tone
+            best = ramp[ramp.length - 1];
+            for (const i of ramp) if (mean[i] >= tm) { best = i; break; }
+          }
+          if (best === 0) continue;
+          // the glyph keeps its shape; its opacity settles the tone exactly
+          sctx.globalAlpha = tune('ac', 1) ? clamp01(tm / Math.max(0.05, mean[best])) : 1;
+          sctx.drawImage(atlas, best * gw, 0, gw, gh, col * cellW, y0, gw / dpr, gh / dpr);
+        }
+      }
+      sctx.globalAlpha = 1;
+    };
+    // per frame, each column of the sheet follows its own crest: down into the
+    // rule as the range flattens, and in from the back on the entrance
+    const drawRelief = (G: Geo, f: number, keep: number, te: number, dpr: number) => {
+      buildSheet(G, dpr);
+      if (!relief || sheetKey === '') return;
+      const full = te >= LINES_MS;
+      if (full && f === 0) { ctx.drawImage(sheet, 0, 0, G.W, G.H); return; }
+      const stagger = (LINES_MS - LINE_MS) / Math.max(1, G.lines);
+      const cols = Math.ceil(G.W / cellW);
+      for (let col = 0; col < cols; col++) {
+        const x0 = col * cellW, xc = x0 + cellW / 2;
+        const c = crestBase(G, xc), now = c + (G.lineY - c) * f;
+        const top = Math.max(0, (Math.floor(c / cellH) - 1) * cellH);
+        let h = G.H - top;
+        if (!full) {
+          // the k-th contour reaches xc once te passes k·stagger + LINE_MS·xc/W
+          const k = (te - (LINE_MS * xc) / G.W) / stagger;
+          if (k < 0) continue;
+          h = Math.min(h, c - top + (Math.floor(k) + 1) * G.gap);
+        }
+        if (h <= 0) continue;
+        ctx.drawImage(sheet, x0 * dpr, top * dpr, cellW * dpr, h * dpr, x0, now + (top - c) * keep, cellW, h * keep);
+      }
+    };
+
     const draw = (te: number) => {
       const G = g!;
       const dpr = cvs.width / G.W;
@@ -331,8 +559,9 @@ export default function Hero() {
       if (crest.length !== n) crest = new Float32Array(n);
       for (let i = 0; i < n; i++) crest[i] = lineAt(0, i);
 
+      if (ascii && keep > 0.001) drawRelief(G, f, keep, te, dpr);
       // contours, dissolving toward the bottom and into the rule as it flattens
-      if (keep > 0.001) {
+      if (!ascii && keep > 0.001) {
         const fadeOut = ctx.createLinearGradient(0, G.low, 0, G.H);
         fadeOut.addColorStop(0, `rgba(${inkRGB},1)`);
         fadeOut.addColorStop(1, `rgba(${inkRGB},0)`);
@@ -370,7 +599,7 @@ export default function Hero() {
           ctx.stroke();
         };
         ctx.lineWidth = 1;
-        if (keep > 0.001) { ctx.strokeStyle = ink; ctx.globalAlpha = 0.45 * keep; stroke(); }
+        if (!ascii && keep > 0.001) { ctx.strokeStyle = ink; ctx.globalAlpha = 0.45 * keep; stroke(); }
         if (f > 0.001) { ctx.strokeStyle = rule; ctx.globalAlpha = f; stroke(); }
       }
       ctx.globalAlpha = 1;
@@ -586,7 +815,8 @@ export default function Hero() {
     let rz = 0;
     const ro = new ResizeObserver(() => { clearTimeout(rz); rz = window.setTimeout(() => { if (g) layout(); }, 80); });
 
-    document.fonts.ready.then(() => {
+    // the relief comes in with the font, so the entrance never starts half-drawn
+    Promise.all([document.fonts.ready, reliefReady]).then(() => {
       if (disposed) return;
       // a reload part-way down the page lands on the nearest step, with no travel
       if (!calm) {

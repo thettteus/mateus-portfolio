@@ -76,7 +76,7 @@ export default function Leverage() {
     const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     // colours come from the theme; any CSS colour is normalised through a canvas
-    let C: { ink: RGB; dot: RGB; accent: RGB } = { ink: [0, 0, 0], dot: [0, 0, 0], accent: [0, 0, 0] };
+    let C: { ink: RGB; dot: RGB; accent: RGB; focus: RGB } = { ink: [0, 0, 0], dot: [0, 0, 0], accent: [0, 0, 0], focus: [0, 0, 0] };
     const probe = document.createElement('canvas').getContext('2d')!;
     const toRGB = (v: string): RGB => {
       probe.fillStyle = '#000';
@@ -89,7 +89,7 @@ export default function Leverage() {
     const rgba = (c: RGB, a: number) => `rgba(${c[0]},${c[1]},${c[2]},${a.toFixed(3)})`;
     const readColors = () => {
       const cs = getComputedStyle(track);
-      C = { ink: toRGB(cs.getPropertyValue('--ink')), dot: toRGB(cs.getPropertyValue('--lev-dot')), accent: toRGB(cs.getPropertyValue('--accent')) };
+      C = { ink: toRGB(cs.getPropertyValue('--ink')), dot: toRGB(cs.getPropertyValue('--lev-dot')), accent: toRGB(cs.getPropertyValue('--accent')), focus: toRGB(cs.getPropertyValue('--focus')) };
     };
 
     // layout: horizontal on wide screens, vertical on tall ones
@@ -227,14 +227,14 @@ export default function Leverage() {
         R.forEach((r, j) => {
           const tj = smooth(j * 0.18, 0.55 + j * 0.18, o);
           if (tj <= 0) return;
-          ctx.strokeStyle = rgba(C.accent, A[j] * tj);
+          ctx.strokeStyle = rgba(C.focus, A[j] * tj);
           ctx.beginPath(); ctx.arc(L.T[0], L.T[1], r * (0.6 + 0.4 * easeOut(tj)), 0, 6.2832); ctx.stroke();
         });
-        ctx.fillStyle = rgba(C.accent, o);
+        ctx.fillStyle = rgba(C.focus, o);
         ctx.beginPath(); ctx.arc(L.T[0], L.T[1], L.s * 0.11 * (0.4 + 0.6 * o), 0, 6.2832); ctx.fill();
         if (o > 0.6) {
           const ph = (t % 2000) / 2000;
-          ctx.strokeStyle = rgba(C.accent, 0.4 * (1 - ph) * smooth(0.6, 1, o));
+          ctx.strokeStyle = rgba(C.focus, 0.4 * (1 - ph) * smooth(0.6, 1, o));
           ctx.beginPath(); ctx.arc(L.T[0], L.T[1], L.s * (0.12 + 1.6 * easeOut(ph)), 0, 6.2832); ctx.stroke();
         }
       }
