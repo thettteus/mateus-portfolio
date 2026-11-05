@@ -1,42 +1,41 @@
-import RangeStack, { type RangeLayer } from './RangeStack';
+import Layers, { type Layer } from './Layers';
 import TechStack from './TechStack';
 
 export default function Depth() {
-  const layers: RangeLayer[] = [
+  const layers: Layer[] = [
     {
-      ix: '01',
+      short: 'Product',
       title: 'Shaping the product',
       items: ['Ambiguous problems', 'Stakeholder alignment', 'Product scoping', 'MVP definition', 'Prototyping', 'UX thinking'],
-      art: 'discovery',
     },
     {
-      ix: '02',
+      short: 'Engineering',
       title: 'Designing & shipping',
       items: ['System design', 'Data modeling', 'APIs & SDKs', 'Full-stack delivery', 'RAG & agent workflows', 'Production ownership'],
-      art: 'architecture',
     },
     {
-      ix: '03',
+      short: 'Platform',
       title: 'Building the tools that build',
       items: ['Internal platforms', 'Workflow automation', 'Agent infrastructure', 'Validation systems', 'Developer experience'],
-      art: 'harness',
     },
     {
-      ix: '04',
+      short: 'Operations',
       title: 'Running lean & secure',
       items: ['Cloud cost', 'Performance', 'Observability', 'Reliability', 'Hardening', 'Access & secrets'],
-      art: 'scale',
     },
   ];
 
   return (
-    <section className="depth" id="depth">
+    <section className="depth" id="depth" aria-labelledby="depth-title">
       <div className="container">
-        <RangeStack
-          layers={layers}
-          head={<h2>Problems cut across layers. <b>So do I.</b></h2>}
-        />
+        <div className="dl-head wk-grid">
+          <h2 id="depth-title">Problems cut across layers. <b>So do I.</b></h2>
+        </div>
+      </div>
 
+      <Layers layers={layers} />
+
+      <div className="container">
         <TechStack />
       </div>
     </section>

@@ -199,84 +199,6 @@ main, footer, header { position: relative; z-index: 1; }
 
 ::selection { background: var(--selection); }
 
-/* ============================================================
-   GENERATIVE GRAPHICS — LineArt (Depth)
-   ============================================================ */
-.line-art { display: block; width: 100%; height: 100%; }
-/* motif on the iso tile face is solid at rest; when the layer scrolls into view
-   it plays a one-shot motion that fits what the icon means. */
-.iso-motif [pathLength] { stroke-dasharray: 1; stroke-dashoffset: 0; }
-
-/* Every layer animates the way the shield does — strokes draw themselves in and
-   fills gently appear, staggered so each reads like the thing it depicts coming
-   to life. No transforms: the isometric matrix shears them (that's what made the
-   old scale/drop motions feel off). */
-@keyframes la-draw { from { stroke-dashoffset: 1; } }
-@keyframes la-fade { from { opacity: 0; } }
-
-/* security — shield draws, then the check snaps in: locked / verified */
-.iso-plate.is-drawn .iso-motif.la-security path { animation: la-draw 0.36s var(--ease) both; }
-.iso-plate.is-drawn .iso-motif.la-security path:last-of-type { animation: la-draw 0.252s var(--ease) 0.216s both; }
-
-/* discovery — dotted probes stream out from the origin (each dot delayed by its
-   distance) and form the end nodes where they land: exploring the space */
-.iso-plate.is-drawn .iso-motif.la-discovery .disc-trail { animation: la-fade 0.18s var(--ease) both; animation-delay: calc(var(--dd, 0s) * 0.6); }
-.iso-plate.is-drawn .iso-motif.la-discovery circle[pathLength] { animation: la-fade 0.204s var(--ease) both; animation-delay: calc(var(--dd, 0s) * 0.6); }
-
-/* architecture — signals draw out from the core, then the nodes light: connecting */
-.iso-plate.is-drawn .iso-motif.la-architecture line { animation: la-draw 0.3s var(--ease) both; }
-.iso-plate.is-drawn .iso-motif.la-architecture line:nth-of-type(2) { animation-delay: 0.03s; }
-.iso-plate.is-drawn .iso-motif.la-architecture line:nth-of-type(3) { animation-delay: 0.06s; }
-.iso-plate.is-drawn .iso-motif.la-architecture line:nth-of-type(4) { animation-delay: 0.09s; }
-.iso-plate.is-drawn .iso-motif.la-architecture line:nth-of-type(5) { animation-delay: 0.12s; }
-.iso-plate.is-drawn .iso-motif.la-architecture line:nth-of-type(6) { animation-delay: 0.15s; }
-.iso-plate.is-drawn .iso-motif.la-architecture line:nth-of-type(7) { animation-delay: 0.18s; }
-.iso-plate.is-drawn .iso-motif.la-architecture line:nth-of-type(8) { animation-delay: 0.21s; }
-.iso-plate.is-drawn .iso-motif.la-architecture circle { animation: la-fade 0.24s var(--ease) 0.216s both; }
-
-/* engineering — gears slide in from apart and give a counter-rotating turn as
-   they mesh; each spins about its own centre (projects as an in-plane turn) */
-.la-engineering .eng-gear { transform-box: fill-box; transform-origin: center; }
-@keyframes la-gear {
-  from { transform: translate(var(--tx), var(--ty)) rotate(var(--rot)); opacity: 0; }
-  55%  { opacity: 1; }
-  to   { transform: translate(0, 0) rotate(0deg); opacity: 1; }
-}
-.iso-plate.is-drawn .iso-motif.la-engineering .eng-gear { animation: la-gear 0.45s var(--ease) both; }
-.iso-plate.is-drawn .iso-motif.la-engineering .eng-gear:nth-of-type(2) { animation-delay: 0.036s; }
-.iso-plate.is-drawn .iso-motif.la-engineering .eng-gear:nth-of-type(3) { animation-delay: 0.072s; }
-
-/* harness — the machine draws first (with the seed of its product inside),
-   connectors extend outward, then the blocks it builds snap in one by one:
-   build the thing that builds the thing */
-.iso-plate.is-drawn .iso-motif.la-harness rect { animation: la-draw 0.3s var(--ease) both; }
-.iso-plate.is-drawn .iso-motif.la-harness rect:nth-of-type(2) { animation-delay: 0.072s; }
-.iso-plate.is-drawn .iso-motif.la-harness line { animation: la-draw 0.24s var(--ease) 0.18s both; }
-.iso-plate.is-drawn .iso-motif.la-harness line:nth-of-type(2) { animation-delay: 0.228s; }
-.iso-plate.is-drawn .iso-motif.la-harness line:nth-of-type(3) { animation-delay: 0.276s; }
-.iso-plate.is-drawn .iso-motif.la-harness rect:nth-of-type(3) { animation-delay: 0.33s; }
-.iso-plate.is-drawn .iso-motif.la-harness rect:nth-of-type(4) { animation-delay: 0.378s; }
-.iso-plate.is-drawn .iso-motif.la-harness rect:nth-of-type(5) { animation-delay: 0.426s; }
-
-/* scale — baseline draws, bars draw left to right, then the trend line: climbing */
-.iso-plate.is-drawn .iso-motif.la-scale line { animation: la-draw 0.24s var(--ease) both; }
-.iso-plate.is-drawn .iso-motif.la-scale rect { animation: la-draw 0.3s var(--ease) both; }
-.iso-plate.is-drawn .iso-motif.la-scale rect:nth-of-type(2) { animation-delay: 0.036s; }
-.iso-plate.is-drawn .iso-motif.la-scale rect:nth-of-type(3) { animation-delay: 0.072s; }
-.iso-plate.is-drawn .iso-motif.la-scale rect:nth-of-type(4) { animation-delay: 0.108s; }
-.iso-plate.is-drawn .iso-motif.la-scale rect:nth-of-type(5) { animation-delay: 0.144s; }
-.iso-plate.is-drawn .iso-motif.la-scale rect:nth-of-type(6) { animation-delay: 0.18s; }
-.iso-plate.is-drawn .iso-motif.la-scale polyline { animation: la-fade 0.3s var(--ease) 0.252s both; }
-
-@media (prefers-reduced-motion: reduce) {
-  .iso-plate.is-drawn .iso-motif * { animation: none; }
-}
-
-a { color: inherit; text-decoration: none; }
-button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
-em { font-style: italic; }
-h1, h2, h3, h4 { font-weight: 600; margin: 0; letter-spacing: -0.02em; }
-
 /* The theme sweep: the new theme is revealed by the Header's clip animation,
    so the default crossfade is off */
 ::view-transition-old(root),
@@ -333,14 +255,14 @@ img { max-width: 100%; height: auto; }
 
 /* ---------------- SECTION TITLE ----------------
    One style for every section title; the emphasised part is set in <b>. */
-.wk-top h2, .stk-title, .lev-head h2, .range-head h2 {
+.wk-top h2, .stk-title, .lev-head h2, .dl-head h2 {
   margin: 0 0 0 -0.03em;
   font: 300 clamp(2rem, 3.1vw, 3.5rem)/1 var(--font-sans);
   letter-spacing: -0.035em;
   color: var(--ink);
   text-wrap: balance;
 }
-.wk-top h2 b, .stk-title b, .lev-head h2 b, .range-head h2 b { font-weight: 500; }
+.wk-top h2 b, .stk-title b, .lev-head h2 b, .dl-head h2 b { font-weight: 500; }
 
 /* ---------------- LAYOUT ---------------- */
 .container {
@@ -1297,135 +1219,220 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
 
 
 /* ============================================================
-   TECHNICAL DEPTH
+   TECHNICAL DEPTH — "problems cut across layers": the same pinned frame as
+   Leverage. Four strata drawn across the screen, a cut going one layer deeper
+   per gesture; the words in front
    ============================================================ */
-/* "Every layer" — pinned isometric stack: scrolling through the track walks
-   down the stack, opening and lighting one plate at a time */
-.range-track {
-  position: relative;
-  /* the pinned screen keeps room for the fixed header; the section's own
-     padding already does that job before it pins */
-  margin-top: -64px;
+.depth {
+  padding-bottom: 0;
+  --dl-dot: #4a4a4f;
+  /* captions and progress line up with the page column */
+  --dl-edge: max(var(--gutter), calc((100% - var(--maxw)) / 2 + var(--gutter)));
 }
-/* the heading rides in the pinned screen, above the stack and the list */
-.range-pin {
-  --pin-pad: clamp(16px, 3vh, 32px);
-  --rh: clamp(2rem, 3.1vw, 3.5rem); /* the heading's size, which the stage makes room for */
-  pointer-events: none;
+[data-theme='dark'] .depth {
+  --dl-dot: #c9c9cc;
+}
+.dl-head {
+  padding-bottom: var(--space-head);
+}
+.dl-head h2 {
+  grid-column: 1 / 10;
+}
+
+.dl-track {
+  position: relative;
+  height: calc(100svh + 3 * 30svh);
+  font-size: 1rem;
+  line-height: 1.5;
+  letter-spacing: normal;
+}
+.dl-pin {
   position: sticky;
   top: 0;
   height: 100svh;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  grid-template-rows: auto auto;
-  /* heading, stack and list sit together as one group, centred in the screen,
-     the heading a title's distance above the rest */
-  align-content: center;
-  align-items: center;
-  column-gap: clamp(24px, 4vw, 72px);
-  row-gap: var(--space-head);
-  padding: calc(64px + var(--pin-pad)) 0 var(--pin-pad); /* clear the fixed header */
+  overflow: hidden;
 }
-.range-head { grid-column: 1 / -1; align-self: start; pointer-events: auto; }
-.range-head h2 { font-size: var(--rh); }
-/* short screens (laptops at 650–760px): a tighter heading and list, so the
-   heading, the stack and the open list all fit the pinned screen */
-@media (max-height: 760px) and (min-width: 621px) {
-  .range-pin { --rh: clamp(28px, 6svh, 46px); }
-  .range-item button { padding: 9px 0; }
-  .range-item .db-title { font-size: clamp(17px, 2.9svh, 22px); }
-  .range-item .db-items { padding-bottom: 10px; }
-}
-.range-stage { position: relative; height: min(calc(100svh - 64px - 2 * var(--pin-pad) - var(--rh) - var(--space-head)), 640px); }
-.iso-plate {
+.dl-pin canvas {
   position: absolute;
-  top: 0;
-  left: 50%;
-  opacity: 0;
-  cursor: pointer;
-  transition: transform 0.54s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.36s ease;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
 }
-.range-stage:not(.is-settled) .iso-plate { transition-delay: var(--drop-delay, 0s); }
-/* once assembled, the scroll drives the plates frame by frame */
-.range-stage.is-settled .iso-plate { transition: opacity 0.36s ease; will-change: transform; }
-.iso-plate.is-in { opacity: 1; }
-/* the plate boxes overlap — only the drawn tile takes the click, so whichever
-   plate is visibly under the pointer is the one picked */
-.iso-plate { pointer-events: none; }
-.iso-plate.is-in .iso-side, .iso-plate.is-in .iso-top { pointer-events: visiblePainted; }
-.iso-tile { width: 100%; display: block; overflow: visible; }
-.iso-side { stroke: var(--rule); stroke-width: 1; transition: stroke 0.4s var(--ease); }
-/* both side faces share the same light tone */
-.iso-side { fill: color-mix(in srgb, var(--ink) 6%, var(--bg)); }
-.iso-top { fill: var(--panel-1); stroke: var(--ink-4); stroke-width: 1; transition: stroke 0.4s var(--ease), fill 0.4s var(--ease); }
-.iso-dot { fill: var(--ink-4); }
-.iso-motif { fill: none; stroke: var(--ink-3); stroke-width: 1.5; transition: stroke 0.4s var(--ease); }
-.iso-motif * { vector-effect: non-scaling-stroke; }
-/* soft accent halo behind the active tile — a radial pool, never a hard box, so
-   it fades identically on mobile and desktop */
-.iso-plate::before {
+
+.dl-captions {
+  position: absolute;
+  left: var(--dl-edge);
+  bottom: clamp(40px, 9vh, 96px);
+  width: min(58vw, 56rem);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  /* the four captions share one cell: only the one for the cut's layer shows */
+  display: grid;
+}
+.dl-cap {
+  grid-area: 1 / 1;
+  align-self: end;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+.dl-cap.is-on {
+  opacity: 1;
+}
+.dl-cap-n {
+  margin: 0 0 10px;
+  color: var(--ink-2);
+  font-size: 0.8125rem;
+}
+.dl-cap-n span {
+  margin-right: 1em;
+  font-variant-numeric: tabular-nums;
+}
+/* the word slides through a mask in the direction the cut travels: in from
+   below going deeper, in from above coming back up */
+.dl-cap h3 {
+  margin: 0 0 -0.14em -0.04em;
+  padding-bottom: 0.14em; /* room for descenders inside the mask */
+  overflow: hidden;
+  font: 300 clamp(3rem, 6.6vw, 8rem)/0.95 var(--font-sans);
+  letter-spacing: -0.04em;
+  color: var(--ink);
+}
+.dl-word {
+  display: inline-block;
+  transform: translateY(110%);
+  transition: transform 0.6s var(--ease);
+}
+.dl-cap.is-past .dl-word {
+  transform: translateY(-110%);
+}
+.dl-cap.is-on .dl-word {
+  transform: none;
+}
+.dl-items {
+  max-width: 34em;
+  margin: 18px 0 0;
+  padding: 0;
+  list-style: none;
+  color: var(--ink-2);
+  font-size: clamp(1rem, 0.9rem + 0.3vw, 1.1875rem);
+  line-height: 1.45;
+}
+.dl-items li {
+  display: inline;
+}
+/* the dot sticks to the word before it, so a line never starts with one */
+.dl-items li:not(:last-child)::after {
+  content: '\00a0· ';
+  color: var(--ink-3);
+}
+
+/* progress: four layers you can jump to */
+.dl-progress {
+  position: absolute;
+  right: var(--dl-edge);
+  bottom: clamp(40px, 9vh, 96px);
+  display: flex;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.dl-progress button {
+  display: block;
+  width: clamp(40px, 4.2vw, 64px);
+  padding: 14px 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+.dl-bar {
+  display: block;
+  height: 2px;
+  background: var(--rule);
+  position: relative;
+  overflow: hidden;
+}
+.dl-bar::after {
   content: '';
   position: absolute;
-  left: 50%;
-  top: 40%;
-  width: 90%;
-  height: 82%;
-  transform: translate(-50%, -50%);
-  background: radial-gradient(50% 50% at 50% 50%, color-mix(in srgb, var(--accent) 22%, transparent), transparent 72%);
-  opacity: 0;
-  pointer-events: none;
-  z-index: -1;
-  transition: opacity 0.38s var(--ease);
+  inset: 0;
+  background: var(--ink);
+  transform-origin: left;
+  transform: scaleX(var(--f, 0));
 }
-.iso-plate.is-active::before { opacity: 1; }
-.iso-plate.is-active .iso-top { stroke: var(--accent); fill: color-mix(in srgb, var(--accent) 6%, var(--panel-1)); }
-.iso-plate.is-active .iso-side { stroke: color-mix(in srgb, var(--accent) 55%, transparent); }
-.iso-plate.is-active .iso-motif { stroke: var(--accent); }
-.iso-plate.is-active .iso-dot { fill: var(--accent); }
 
-/* layer list — titles always visible, the active one expands its pills */
-.range-list { list-style: none; margin: 0; padding: 0; pointer-events: auto; }
-.range-item { border-top: 1px solid var(--rule); }
-.range-item:last-child { border-bottom: 1px solid var(--rule); }
-.range-item h3 { margin: 0; font: inherit; }
-.range-item button {
-  display: flex;
-  align-items: baseline;
-  gap: 14px;
-  width: 100%;
-  padding: clamp(12px, 1.4vw, 18px) 0;
-  text-align: left;
+/* reduced motion: no pinning, the finished picture and all four layers */
+.dl-track.is-static {
+  height: auto;
 }
-.range-item .db-ix {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.14em;
-  /* --open (0–1) is tweened in JS when a plate lands */
-  color: color-mix(in srgb, var(--accent-text) calc(var(--open, 0) * 100%), var(--ink-4));
+.is-static .dl-pin {
+  position: relative;
+  height: 100svh;
 }
-.range-item .db-title {
-  font-size: clamp(18px, 1.9vw, 24px);
-  font-weight: 600;
-  letter-spacing: -0.015em;
-  line-height: 1.15;
-  color: color-mix(in srgb, var(--ink) calc(var(--open, 0) * 100%), var(--ink-3));
+.is-static .dl-captions {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(16px, 1.9vw, 28px);
+  width: auto;
+  right: var(--dl-edge);
 }
-.range-item button:hover .db-title { color: var(--ink); }
-/* height is tweened in JS, in step with the label it hands over to */
-.range-desc { height: 0; overflow: hidden; }
-.range-item .db-items { list-style: none; margin: 0; padding: 0 0 clamp(14px, 1.6vw, 20px) 30px; display: flex; flex-wrap: wrap; gap: 6px; opacity: clamp(0, calc(var(--open, 0) * 2 - 1), 1); /* pills fade in the second half of the unfold */ }
-.range-item .db-items li {
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  letter-spacing: 0.02em;
-  color: var(--ink-2);
-  padding: 4px 9px;
-  border: 1px solid var(--rule);
-  border-radius: 6px;
-  background: var(--bg);
+.is-static .dl-cap {
+  grid-area: auto;
+  align-self: start;
+  opacity: 1;
+}
+.is-static .dl-word {
+  transform: none;
+}
+.is-static .dl-cap h3 {
+  font-size: clamp(1.5rem, 2.4vw, 2.5rem);
+}
+.is-static .dl-items {
+  font-size: 0.9375rem;
+}
+.is-static .dl-progress {
+  display: none;
+}
+
+@media (max-width: 759px), (orientation: portrait) and (max-width: 1023px) {
+  .dl-head h2 {
+    grid-column: 1 / -1;
+  }
+  .dl-captions {
+    right: var(--dl-edge);
+    width: auto;
+    bottom: calc(28px + 30px);
+  }
+  .dl-cap h3 {
+    font-size: clamp(2.5rem, 11.5vw, 4rem);
+  }
+  .dl-items {
+    margin-top: 12px;
+    font-size: 0.9375rem;
+  }
+  .dl-progress {
+    left: var(--dl-edge);
+    right: var(--dl-edge);
+    bottom: 14px;
+  }
+  .dl-progress li {
+    flex: 1;
+  }
+  .dl-progress button {
+    width: 100%;
+  }
+  .is-static .dl-captions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 @media (prefers-reduced-motion: reduce) {
-  .iso-plate, .iso-plate::before { transition: none; }
+  .dl-track *,
+  .dl-track *::before,
+  .dl-track *::after {
+    transition: none !important;
+  }
 }
 
 /* tools index — a compact masthead, then a one-line-per-area list you can
@@ -2348,19 +2355,6 @@ html .topbar-inner { transition: height 0.42s var(--ease), opacity 0.3s var(--ea
   :root { --gutter: 24px; }
 }
 @media (max-width: 620px) {
-  /* range stack → stage on top, list below, both inside the pinned screen */
-  .range-pin {
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: auto 30svh auto;
-    align-content: start;
-    align-items: start;
-    row-gap: 8px;
-  }
-  .range-head { margin-bottom: 8px; }
-  .range-stage { height: 30svh; }
-  .range-item button { padding: 9px 0; }
-  .range-item .db-title { font-size: 17px; }
-  .range-item .db-items { padding-bottom: 12px; }
   /* Process orbits: the component crops the viewBox on mobile — the diagram
      fits the viewport whole, ring edges bleed off both sides, no scroll */
   /* keep the section title close to its lead paragraph, then push the orbit
