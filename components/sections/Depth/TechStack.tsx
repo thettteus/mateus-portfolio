@@ -113,6 +113,7 @@ const DEFAULT_CAP = `tools across ${AREAS.length} areas.`;
 /** A fixed typographic field; scrolling changes its focus, never its layout. */
 export default function TechStack() {
   const field = useRef<HTMLUListElement>(null);
+  const strip = useRef<HTMLElement>(null);
   const [area, setArea] = useState<number | null>(0);
   const [preview, setPreview] = useState<number | null>(null);
   const activeArea = preview ?? area;
@@ -125,11 +126,40 @@ export default function TechStack() {
   const cap = activeArea === null ? DEFAULT_CAP : `tools in ${AREAS[activeArea].name}.`;
 
   useEffect(() => {
-    const timer = window.setInterval(() => {
-      setArea((current) => (current === null ? 0 : (current + 1) % AREAS.length));
-    }, 3000);
-    return () => window.clearInterval(timer);
-  }, []);
+    const el = strip.current;
+    if (!el || preview !== null) return;
+    const motion = matchMedia('(prefers-reduced-motion: reduce)');
+    const buttons = [...el.querySelectorAll('button')];
+    let raf = 0;
+    let lastArea = -1;
+
+    // Both copies share area indices. Follow the visible copy through the
+    // seamless loop instead of advancing selection on an unrelated timer.
+    const followStrip = () => {
+      if (!motion.matches) {
+        const bounds = el.getBoundingClientRect();
+        const center = bounds.left + bounds.width / 2;
+        let closest = -1;
+        let distance = Infinity;
+        buttons.forEach((button, index) => {
+          const rect = button.getBoundingClientRect();
+          if (rect.left < bounds.left || rect.right > bounds.right) return;
+          const delta = Math.abs(rect.left + rect.width / 2 - center);
+          if (delta < distance) {
+            closest = index % AREAS.length;
+            distance = delta;
+          }
+        });
+        if (closest !== -1 && closest !== lastArea) {
+          lastArea = closest;
+          setArea(closest);
+        }
+      }
+      raf = requestAnimationFrame(followStrip);
+    };
+    followStrip();
+    return () => cancelAnimationFrame(raf);
+  }, [preview]);
 
   useEffect(() => {
     const el = field.current;
@@ -231,31 +261,39 @@ export default function TechStack() {
         </header>
 
         <nav
+          ref={strip}
           className="stk-areas"
           aria-label="Highlight tools by area"
           onPointerLeave={() => setPreview(null)}
         >
-          {AREAS.map((a, r) => (
-            <button
-              key={a.name}
-              type="button"
-              className={activeArea === r ? 'is-active' : undefined}
-              aria-pressed={area === r}
-              aria-controls="stack-tools"
-              onPointerEnter={(e) => {
-                if (e.pointerType === 'mouse') setPreview(r);
-              }}
-              onFocus={(e) => {
-                if (e.currentTarget.matches(':focus-visible')) setPreview(r);
-              }}
-              onBlur={() => setPreview(null)}
-              onClick={() => {
-                setArea(r);
-              }}
-            >
-              {a.name}
-            </button>
-          ))}
+          <div className="stk-areas-track">
+            {[0, 1].map((copy) => (
+              <div className="stk-areas-group" key={copy} aria-hidden={copy === 1 ? true : undefined}>
+                {AREAS.map((a, r) => (
+                  <button
+                    key={a.name}
+                    tabIndex={copy === 1 ? -1 : undefined}
+                    type="button"
+                    className={activeArea === r ? 'is-active' : undefined}
+                    aria-pressed={activeArea === r}
+                    aria-controls="stack-tools"
+                    onPointerEnter={(e) => {
+                      if (e.pointerType === 'mouse') setPreview(r);
+                    }}
+                    onFocus={(e) => {
+                      if (e.currentTarget.matches(':focus-visible')) setPreview(r);
+                    }}
+                    onBlur={() => setPreview(null)}
+                    onClick={() => {
+                      setArea(r);
+                    }}
+                  >
+                    {a.name}
+                  </button>
+                ))}
+              </div>
+            ))}
+          </div>
         </nav>
 
         <ul
