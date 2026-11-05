@@ -93,6 +93,13 @@ const SUB_X = 2, SUB_Y = 3; // the grid a glyph's ink is compared on
 // the paper, so the pivot sits lower; on the dark field the light is the ink
 const CONTRAST = 8, PIVOT_PAPER = 0.4, PIVOT_DARK = 0.52;
 const GLYPH_PX: [number, number] = [4.5, 5.5]; // micro: the likeness lives in resolution
+// The range fades in as one image. Each occupied cell then keeps changing
+// independently, like signal noise, using glyphs that retain the rock's tone.
+const FLOW_TICK_MS = 40; // redraw the signal at up to 25 fps
+const FLOW_CELL_MS = 90; // every cell changes within 90–140 ms
+const FLOW_ALTS = 4; // distinct, tone-matched alternatives per cell
+const FORM_MS = 1000; // opacity only: the cells stay in their final positions
+
 // TEMP tuning overrides (?px=…&k=…&pp=…&pd=…&w=…&ac=0)
 const TUNE = typeof location === 'undefined' ? new URLSearchParams() : new URLSearchParams(location.search);
 const tune = (k: string, d: number) => (TUNE.has(k) ? Number(TUNE.get(k)) : d);
@@ -155,16 +162,19 @@ export default function Hero() {
     // colours come from the theme
     const probe = document.createElement('canvas').getContext('2d')!;
     let ink = '#000', rule = '#ccc', inkRGB = '0,0,0';
+    const toRGB = (c: string) => {
+      probe.fillStyle = '#000';
+      probe.fillStyle = c;
+      const v = String(probe.fillStyle);
+      return v.startsWith('#')
+        ? [1, 3, 5].map((i) => parseInt(v.slice(i, i + 2), 16)).join(',')
+        : (v.match(/[\d.]+/g) ?? ['0', '0', '0']).slice(0, 3).join(',');
+    };
     const readColors = () => {
       const cs = getComputedStyle(document.documentElement);
       ink = cs.getPropertyValue('--ink').trim() || '#000';
       rule = cs.getPropertyValue('--rule').trim() || '#ccc';
-      probe.fillStyle = '#000';
-      probe.fillStyle = ink;
-      const v = String(probe.fillStyle);
-      inkRGB = v.startsWith('#')
-        ? [1, 3, 5].map((i) => parseInt(v.slice(i, i + 2), 16)).join(',')
-        : (v.match(/[\d.]+/g) ?? ['0', '0', '0']).slice(0, 3).join(',');
+      inkRGB = toRGB(ink);
     };
 
     // where a glyph's ink starts, right of its origin: drawn and scanned, since
@@ -367,6 +377,13 @@ export default function Hero() {
     const sctx = sheet.getContext('2d')!;
     let glyphKey = '', sheetKey = '', cellW = 0, cellH = 0;
     let feat = new Float32Array(0), mean = new Float32Array(0), ramp: number[] = [];
+    // Cell positions and tone stay fixed; only the chosen glyph changes.
+    let rows = 0, cols = 0;
+    let cellTone = new Float32Array(0), cellGlyph = new Uint8Array(0), alts = new Uint8Array(0);
+    let rockK = new Int32Array(0), rockN = new Uint8Array(0), rockBand = new Int32Array(0);
+    let rockX = new Float32Array(0), rockY = new Float32Array(0), rockSeed = new Float32Array(0);
+    // a glyph's opacity in a cell: its shape stays, the opacity settles the tone
+    const alphaOf = (k: number, i: number) => (tune('ac', 1) ? clamp01(cellTone[k] / Math.max(0.05, mean[i])) : 1);
     const buildGlyphs = (G: Geo, dpr: number) => {
       const px = tune('px', Math.max(GLYPH_PX[0], Math.min(GLYPH_PX[1], G.cap * 0.022)));
       const key = `${px.toFixed(2)}|${dpr}|${inkRGB}`;
@@ -468,7 +485,22 @@ export default function Hero() {
       const subW = cellW / SUB_X, subH = cellH / SUB_Y;
       const scaleY = RELIEF_PX / (G.cap * RELIEF);
       const gw = Math.ceil(cellW * dpr), gh = Math.ceil(cellH * dpr);
-      const cols = Math.ceil(G.W / cellW), rows = Math.ceil(G.H / cellH);
+      cols = Math.ceil(G.W / cellW);
+      rows = Math.ceil(G.H / cellH);
+      cellTone = new Float32Array(cols * rows);
+      cellGlyph = new Uint8Array(cols * rows);
+      alts = new Uint8Array(cols * rows * FLOW_ALTS);
+      const found: number[] = [];
+      const errs = new Float32Array(GLYPHS.length);
+      // Ignore duplicate characters and empty raster glyphs so every
+      // alternative is visibly different, including along the silhouette.
+      const everyGlyph = [...GLYPHS].map((_, i) => i).filter(i => i > 0 && mean[i] > 0 && GLYPHS.indexOf(GLYPHS[i]) === i);
+      const closest = (pool: number[], err: (i: number) => number, at: number) => {
+        const candidates = pool.filter(i => i > 0 && mean[i] > 0);
+        const picks = (candidates.length >= 2 ? candidates : everyGlyph)
+          .map(i => [i, err(i)] as const).sort((a, b) => a[1] - b[1]).slice(0, FLOW_ALTS);
+        picks.forEach(([i], j) => { alts[at + j] = i; });
+      };
       for (let col = 0; col < cols; col++) {
         const xc = (col + 0.5) * cellW;
         // photo px per stage px across, where this column falls on the profile
@@ -492,6 +524,7 @@ export default function Hero() {
           if (any < 0.04) continue;
           tm /= S;
           let best = 0;
+          const k0 = col * rows + row;
           if (any - low > tune('edge', EDGE)) {
             // an edge: the glyph that matches the cell's shape, held to its tone
             let bestErr = Infinity;
@@ -500,44 +533,95 @@ export default function Hero() {
               for (let k = 0; k < S; k++) { const q = t[k] - feat[i * S + k]; e += q * q; }
               const dm = tm - mean[i];
               e += dm * dm * S;
+              errs[i] = e;
               if (e < bestErr) { bestErr = e; best = i; }
             }
+            // and the next closest shapes, to flick to
+            closest(everyGlyph, (i) => errs[i], k0 * FLOW_ALTS);
           } else {
             // smooth rock: the ramp glyph at or just above the tone
             best = ramp[ramp.length - 1];
             for (const i of ramp) if (mean[i] >= tm) { best = i; break; }
+            // and the ramp glyphs nearest its tone, to flick to
+            closest(ramp, (i) => (i === best ? -1 : Math.abs(mean[i] - tm)), k0 * FLOW_ALTS);
           }
           if (best === 0) continue;
           // the glyph keeps its shape; its opacity settles the tone exactly
           sctx.globalAlpha = tune('ac', 1) ? clamp01(tm / Math.max(0.05, mean[best])) : 1;
           sctx.drawImage(atlas, best * gw, 0, gw, gh, col * cellW, y0, gw / dpr, gh / dpr);
+          cellTone[k0] = tm;
+          cellGlyph[k0] = best;
+          found.push(k0);
         }
       }
       sctx.globalAlpha = 1;
+      rockK = Int32Array.from(found);
+      rockN = new Uint8Array(found.length);
+      rockBand = new Int32Array(found.length).fill(-1);
+      rockX = new Float32Array(found.length);
+      rockY = new Float32Array(found.length);
+      rockSeed = new Float32Array(found.length);
+      found.forEach((k, q) => {
+        let n = 0;
+        while (n < FLOW_ALTS && alts[k * FLOW_ALTS + n]) n++;
+        rockN[q] = n;
+        rockX[q] = Math.floor(k / rows) * cellW;
+        rockY[q] = (k % rows) * cellH;
+        // Stable per cell, including when the sheet is rebuilt for a theme.
+        let hash = Math.imul(Math.floor(k / rows) + 1, 374761393) ^ Math.imul(k % rows + 1, 668265263);
+        hash = Math.imul(hash ^ (hash >>> 13), 1274126177);
+        rockSeed[q] = ((hash ^ (hash >>> 16)) >>> 0) / 4294967296;
+      });
+
     };
-    // per frame, each column of the sheet follows its own crest: down into the
-    // rule as the range flattens, and in from the back on the entrance
+    // Fade the complete range in; each column still follows its crest as
+    // scrolling flattens the range into the section rule.
     const drawRelief = (G: Geo, f: number, keep: number, te: number, dpr: number) => {
       buildSheet(G, dpr);
       if (!relief || sheetKey === '') return;
-      const full = te >= LINES_MS;
-      if (full && f === 0) { ctx.drawImage(sheet, 0, 0, G.W, G.H); return; }
-      const stagger = (LINES_MS - LINE_MS) / Math.max(1, G.lines);
+      ctx.globalAlpha = calm ? 1 : smoothstep(0, FORM_MS, te);
+      if (f === 0) {
+        ctx.drawImage(sheet, 0, 0, G.W, G.H);
+        ctx.globalAlpha = 1;
+        return;
+      }
       const cols = Math.ceil(G.W / cellW);
       for (let col = 0; col < cols; col++) {
         const x0 = col * cellW, xc = x0 + cellW / 2;
         const c = crestBase(G, xc), now = c + (G.lineY - c) * f;
         const top = Math.max(0, (Math.floor(c / cellH) - 1) * cellH);
-        let h = G.H - top;
-        if (!full) {
-          // the k-th contour reaches xc once te passes k·stagger + LINE_MS·xc/W
-          const k = (te - (LINE_MS * xc) / G.W) / stagger;
-          if (k < 0) continue;
-          h = Math.min(h, c - top + (Math.floor(k) + 1) * G.gap);
-        }
+        const h = G.H - top;
         if (h <= 0) continue;
         ctx.drawImage(sheet, x0 * dpr, top * dpr, cellW * dpr, h * dpr, x0, now + (top - c) * keep, cellW, h * keep);
       }
+      ctx.globalAlpha = 1;
+    };
+    // Each cell has its own clock and a new pseudo-random glyph on every
+    // tick. Always skip its current character: no cell can get stuck.
+    const stepFlow = (now: number) => {
+      const G = g!;
+      buildSheet(G, cvs.width / G.W);
+      if (!rockK.length) return;
+      const dpr = sheet.width / Math.max(1, G.W);
+      const gw = Math.ceil(cellW * dpr), gh = Math.ceil(cellH * dpr);
+      sctx.clearRect(0, 0, G.W, G.H);
+      for (let q = 0; q < rockK.length; q++) {
+        const n = rockN[q], k = rockK[q];
+        const band = Math.floor(now / (FLOW_CELL_MS + rockSeed[q] * 50) + rockSeed[q] * 1000);
+        if (n > 1 && band !== rockBand[q]) {
+          rockBand[q] = band;
+          let hash = Math.imul(band + 1, 374761393) ^ Math.imul(q + 1, 668265263);
+          hash = Math.imul(hash ^ (hash >>> 13), 1274126177);
+          const slot = ((hash ^ (hash >>> 16)) >>> 0) % n;
+          let to = alts[k * FLOW_ALTS + slot];
+          if (GLYPHS[to] === GLYPHS[cellGlyph[k]]) to = alts[k * FLOW_ALTS + (slot + 1) % n];
+          cellGlyph[k] = to;
+        }
+        const glyph = cellGlyph[k];
+        sctx.globalAlpha = alphaOf(k, glyph);
+        sctx.drawImage(atlas, glyph * gw, 0, gw, gh, rockX[q], rockY[q], gw / dpr, gh / dpr);
+      }
+      sctx.globalAlpha = 1;
     };
 
     const draw = (te: number) => {
@@ -663,7 +747,7 @@ export default function Hero() {
       const te = now - entryAt;
       draw(te);
       place(te);
-      if (cur !== target || te < NAME_FROM + NAME_MS) raf = requestAnimationFrame(frame);
+      if (cur !== target || te < Math.max(NAME_FROM + NAME_MS, ascii ? FORM_MS : 0)) raf = requestAnimationFrame(frame);
       else last = 0;
     };
     const kick = () => { if (!raf && g && !disposed) raf = requestAnimationFrame(frame); };
@@ -806,6 +890,28 @@ export default function Hero() {
       C.focus({ preventScroll: true });
     };
 
+    // the flow's own clock, only while the cover is on screen
+    let flowRaf = 0, lastTick = 0, onScreen = false;
+    const flowFrame = (now: number) => {
+      flowRaf = 0;
+      if (disposed || !g || !onScreen || document.hidden) return;
+      if (now - lastTick >= FLOW_TICK_MS) {
+        lastTick = now;
+        const te = now - entryAt;
+        if (flatAmt() < 0.999) stepFlow(te);
+        // the scene's own frame draws when it is running
+        if (!raf && flatAmt() < 1) draw(te);
+      }
+      flowRaf = requestAnimationFrame(flowFrame);
+    };
+    const flowWake = () => {
+      if (calm || !ascii || flowRaf || disposed) return;
+      lastTick = 0;
+      flowRaf = requestAnimationFrame(flowFrame);
+    };
+    const seen = new IntersectionObserver(([e]) => { onScreen = e.isIntersecting; if (onScreen) flowWake(); });
+    const onVisible = () => { if (!document.hidden) flowWake(); };
+
     readColors();
     // the site's theme toggle flips data-theme on <html>: redraw at once, so the
     // theme sweep captures the range in its new colours
@@ -833,6 +939,8 @@ export default function Hero() {
       ro.observe(S);
       ro.observe(row);
       kick();
+      seen.observe(C);
+      document.addEventListener('visibilitychange', onVisible);
     });
 
     if (!calm) {
@@ -847,6 +955,9 @@ export default function Hero() {
     return () => {
       disposed = true;
       cancelAnimationFrame(raf);
+      cancelAnimationFrame(flowRaf);
+      seen.disconnect();
+      document.removeEventListener('visibilitychange', onVisible);
       clearTimeout(rz);
       ro.disconnect();
       themeObs.disconnect();
