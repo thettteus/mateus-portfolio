@@ -8,7 +8,7 @@ type Project = Omit<WorkCase, 'status'> & {
 };
 
 const shot = (src: string, alt: string) => (
-  <Image src={src} alt={alt} width={3024} height={1470} sizes="(max-width: 959px) calc(100vw - 48px), 50vw" unoptimized />
+  <Image src={src} alt={alt} width={3024} height={1470} sizes="(max-width: 959px) calc(100vw - 48px), (max-width: 1240px) 55vw, 680px" unoptimized />
 );
 
 // go-kafka-sdk reads better as its shape than as a screenshot
@@ -53,7 +53,7 @@ const projects: Project[] = [
     role: 'Open source, thesis',
     type: 'Engineering platform',
     live: true,
-    lead: 'Engineering knowledge lives in docs and people’s heads. WEE turns well-defined workflows into versioned, replayable, budgeted pipelines, and the engine owns the loops, not the model. It has already reviewed a real PR and opened a real pull request on a public repo, end to end.',
+    lead: 'From engineering knowledge to executable workflows. WEE runs versioned, replayable AI pipelines with explicit budgets. Already used to review and open real pull requests, end to end.',
     call: {
       label: 'Key call',
       text: <><code>core/tool/git</code> deliberately has no push op. Landing a fix on GitHub goes through the generic http tool speaking GitHub’s own Git Data API, instead of a one-off integration bolted onto git.</>,
@@ -147,7 +147,7 @@ export default async function Projects() {
       <div className="container">
         <FadeIn as="header" className="wk-top wk-grid">
           <h2>Selected work.</h2>
-          <p className="wk-note">Open a project to see the decision that shaped it.</p>
+          <p className="wk-note">Products, platforms, and the engineering behind them.</p>
         </FadeIn>
 
         <WorkCases cases={cases} />

@@ -1,5 +1,4 @@
-'use client';
-import { useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import { type ReactNode } from 'react';
 
 export type WorkCase = {
   id: string;
@@ -16,74 +15,42 @@ export type WorkCase = {
   mediaClass?: string;
 };
 
-/**
- * WorkCases — the project index: one row per project (role, type, status) that
- * opens into the story, the decision that shaped it, and a picture. One open
- * at a time; the first starts open.
- */
 export default function WorkCases({ cases }: { cases: WorkCase[] }) {
-  const list = useRef<HTMLOListElement>(null);
-  const [open, setOpen] = useState<string | null>(cases[0]?.id ?? null);
-
-
   return (
-    <>
-      <div className="wk-cols wk-grid" aria-hidden="true">
-        <span>Project</span><span>Role</span><span>Type</span><span>Status</span>
-      </div>
-
-      <ol className="wk-cases" ref={list}>
-        {cases.map((c, r) => {
-          const isOpen = open === c.id;
-          return (
-            <li className={`wk-case${isOpen ? ' is-open' : ''}`} key={c.id} style={{ '--r': r } as CSSProperties}>
-              <h3>
-                <button
-                  className="wk-row wk-grid"
-                  type="button"
-                  id={`case-${c.id}-btn`}
-                  aria-expanded={isOpen}
-                  aria-controls={`case-${c.id}`}
-                  onClick={() => setOpen(isOpen ? null : c.id)}
-                >
-                  <span className="wk-title">{c.name}</span>
-                  <span className="wk-role">{c.role}</span>
-                  <span className="wk-type">{c.type}</span>
-                  <span className="wk-status">
-                    {c.live && <span className="wk-live" aria-hidden="true" />}
-                    {c.status}
-                  </span>
-                  <span className="wk-icon" aria-hidden="true" />
-                </button>
-              </h3>
-              <div className="wk-panel" id={`case-${c.id}`} role="region" aria-labelledby={`case-${c.id}-btn`} inert={!isOpen}>
-                <div className="wk-clip">
-                  <div className="wk-inner wk-grid">
-                    <div className="wk-text">
-                      <p className="wk-lead">{c.lead}</p>
-                      {c.call && (
-                        <figure className="wk-call">
-                          <figcaption>{c.call.label}</figcaption>
-                          <blockquote>{c.call.text}</blockquote>
-                        </figure>
-                      )}
-                      <dl className="wk-meta">
-                        <div><dt>Built with</dt><dd>{c.stack.join(', ')}</dd></div>
-                      </dl>
-                      <p className="wk-links">
-                        {c.links.map((l) => (
-                          <a key={l.label} href={l.href} target="_blank" rel="noopener noreferrer">{l.label}</a>
-                        ))}
-                      </p>
-                    </div>
-                    <figure className={`wk-media${c.mediaClass ? ` ${c.mediaClass}` : ''}`}>{c.media}</figure>
-                  </div>
-                </div>
+    <ol className="wk-cases">
+      {cases.map((c, index) => (
+        <li className="wk-case" key={c.id}>
+          <article className="wk-project" aria-labelledby={`case-${c.id}-title`}>
+            <div className="wk-text">
+              <p className="wk-eyebrow"><span>{String(index + 1).padStart(2, '0')}</span>{c.type}</p>
+              <h3 id={`case-${c.id}-title`}>{c.name}</h3>
+              <p className="wk-role">{c.role}</p>
+              <p className="wk-lead">{c.lead}</p>
+              <ul className="wk-stack" aria-label="Built with">
+                {c.stack.map(tech => <li key={tech}>{tech}</li>)}
+              </ul>
+              <div className="wk-links">
+                {c.links.map((link, i) => (
+                  <a className={i === 0 ? 'wk-primary' : undefined} key={link.label} href={link.href} target="_blank" rel="noopener noreferrer">
+                    {link.label}<span aria-hidden="true">↗</span>
+                  </a>
+                ))}
               </div>
-            </li>
-          );
-        })}
-      </ol>
-    </>
+
+            </div>
+            <figure className="wk-visual">
+              <div className={`wk-media${c.mediaClass ? ` ${c.mediaClass}` : ''}`}>{c.media}</div>
+              <figcaption><span>{c.name}</span>{c.status && <span>{c.live && <i className="wk-live" aria-hidden="true" />}{c.status}</span>}</figcaption>
+              {c.call && (
+                <div className="wk-detail">
+                  <span className="wk-detail-label">{c.call.label === 'My role' ? 'What I built' : 'Behind the build'}</span>
+                  <p>{c.call.text}</p>
+                </div>
+              )}
+            </figure>
+          </article>
+        </li>
+      ))}
+    </ol>
   );
 }
