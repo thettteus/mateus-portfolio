@@ -1,5 +1,4 @@
 import Layers, { type Layer } from './Layers';
-import TechStack from './TechStack';
 
 export default function Depth() {
   const layers: Layer[] = [
@@ -34,10 +33,6 @@ export default function Depth() {
       </div>
 
       <Layers layers={layers} />
-
-      <div className="container">
-        <TechStack />
-      </div>
     </section>
   );
 }
