@@ -998,12 +998,12 @@ export default function Hero() {
         <div className="stage" ref={stage}>
           <canvas className="land" ref={land} aria-hidden="true" />
           <div className="container sky" ref={sky}>
-            <h1 className="masthead" id="hero-name" ref={mast} aria-label={`${NAME}, senior software engineer`}>
+            <h1 className="masthead" id="hero-name" ref={mast} aria-label={`${NAME}, sr. software engineer`}>
               <span className="in" ref={inner} aria-hidden="true">
                 {[...NAME].map((c, i) => (
                   <span className={`ch${c === ' ' ? ' sp' : ''}`} key={i}>{c === ' ' ? '\u00a0' : c}</span>
                 ))}
-                <span className="hero-role">Senior Software Engineer</span>
+                <span className="hero-role">Sr. Software Engineer</span>
               </span>
             </h1>
             {mode !== 'calm' && (
