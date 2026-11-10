@@ -48,6 +48,19 @@ const kafkaDiagram = (
 
 const projects: Project[] = [
   {
+    id: 'pat',
+    name: 'Plan Patagonia',
+    role: 'Product & Technical Founder',
+    type: 'Travel tech, 0 to 1',
+    live: true,
+    note: 'Launched Aug 2026',
+    lead: 'A live travel platform bringing destinations, trails, stays, experiences, and practical travel tools into one Patagonia planning experience.',
+    call: { label: 'My role', text: 'I led product strategy, experience design, and engineering, taking Plan Patagonia from concept to launch.' },
+    stack: ['TypeScript', 'Next.js', 'Prisma', 'Neon Postgres', 'Claude API'],
+    links: [{ label: 'Visit site', href: 'https://planpatagonia.com/' }],
+    media: shot('/assets/projects/plan_patagonia.avif', 'Plan Patagonia project preview'),
+  },
+  {
     id: 'wee',
     name: 'Workflow Execution Engine',
     role: 'Open source, thesis',
@@ -69,19 +82,6 @@ const projects: Project[] = [
     ],
     media: shot('/assets/projects/wee.avif', 'Workflow Execution Engine project preview'),
     mediaClass: 'is-dark',
-  },
-  {
-    id: 'pat',
-    name: 'Plan Patagonia',
-    role: 'Product & Technical Founder',
-    type: 'Travel tech, 0 to 1',
-    live: true,
-    note: 'Launched Aug 2026',
-    lead: 'A live travel platform bringing destinations, trails, stays, experiences, and practical travel tools into one Patagonia planning experience.',
-    call: { label: 'My role', text: 'I led product strategy, experience design, and engineering, taking Plan Patagonia from concept to launch.' },
-    stack: ['TypeScript', 'Next.js', 'Prisma', 'Neon Postgres', 'Claude API'],
-    links: [{ label: 'Visit site', href: 'https://planpatagonia.com/' }],
-    media: shot('/assets/projects/plan_patagonia.avif', 'Plan Patagonia project preview'),
   },
   {
     id: 'kafka',
