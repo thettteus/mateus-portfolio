@@ -11,6 +11,7 @@ const SWIPE_PX = 40; // touch travel that counts as a swipe
 const BYPASS_MS = 2000; // in-page link scrolls pass straight through for this long
 const CARRY_MS = 150; // a scroll this soon after a wheel event is that wheel's doing
 const UNLOCK_MS = 700; // longer than Chrome keeps a wheel sequence latched (~500ms)
+const FLING_MS = 2500; // a touch fling can keep carrying the page this long after the finger lifts
 
 export type PinnedStepsOptions = {
   /** the tall element whose sticky child is the pinned screen */
@@ -46,18 +47,25 @@ export function bindPinnedSteps({ track, count: N, stepMs, onStep, onFrame }: Pi
 
   // Chrome lets only the first wheel event of a sequence be cancelled: a spin
   // or a flick that began before the scene keeps scrolling the page natively
-  // and would carry it straight through. When one carries the page in, the
-  // page is locked (no user scrolling, see html.steps-locked) on the step it
-  // came in on, and the rest of that wheel is read as gestures like any other.
-  // Pinned, the frame looks the same anywhere in the track, so taking back the
-  // overshoot never shows. The lock lifts once the wheel has been still.
+  // and would carry it straight through. A swipe is the same on a phone: once
+  // the page has started to follow the finger the rest of the swipe can't be
+  // cancelled, and its fling goes on after the finger lifts with no touch
+  // events at all. When one carries the page in, the page is locked (no user
+  // scrolling, see html.steps-locked) on the step it came in on, and the rest
+  // of that wheel is read as gestures like any other. Pinned, the frame looks
+  // the same anywhere in the track, so taking back the overshoot never shows.
+  // The lock lifts once the wheel has been still, or the finger has been up.
   const root = document.documentElement;
   let locked = false, unlockTimer = 0;
+  let touching = false, touchEndAt = -Infinity;
   const unlock = () => {
     clearTimeout(unlockTimer);
     if (locked) { locked = false; root.classList.remove('steps-locked'); }
   };
-  const holdLock = () => { clearTimeout(unlockTimer); unlockTimer = setTimeout(unlock, UNLOCK_MS) as unknown as number; };
+  const holdLock = () => {
+    clearTimeout(unlockTimer);
+    if (!touching) unlockTimer = setTimeout(unlock, UNLOCK_MS) as unknown as number;
+  };
   const lock = () => {
     if (!locked) { locked = true; root.classList.add('steps-locked'); }
     holdLock();
@@ -126,10 +134,12 @@ export function bindPinnedSteps({ track, count: N, stepMs, onStep, onFrame }: Pi
     lastY = scrollY;
     if (programmatic) { programmatic = false; return; }
     const now = performance.now();
-    // a wheel begun outside carried the page in (or clean across): hold it on
-    // the step it entered by. A jump of more than a screen in one scroll is
-    // not a wheel's doing (an anchor, a restored position, another scene).
-    const carriedIn = now - lastWheel < CARRY_MS && now >= bypass && moved < innerHeight && !inside(prev) &&
+    // a wheel or a swipe begun outside carried the page in (or clean across):
+    // hold it on the step it entered by. A jump of more than a screen in one
+    // scroll is not a gesture's doing (an anchor, a restored position,
+    // another scene).
+    const byGesture = now - lastWheel < CARRY_MS || touching || now - touchEndAt < FLING_MS;
+    const carriedIn = byGesture && now >= bypass && moved < innerHeight && !inside(prev) &&
       (inside(g.raw) || (prev < 0 && g.raw > N - 1) || (prev > N - 1 && g.raw < 0));
     if (carriedIn) {
       lock();
@@ -191,7 +201,19 @@ export function bindPinnedSteps({ track, count: N, stepMs, onStep, onFrame }: Pi
   };
   let touchY = 0;
   let touchDir = 0;
-  const onTouchStart = (e: TouchEvent) => { touchY = e.touches[0].clientY; touchDir = 0; letGo = false; };
+  const onTouchStart = (e: TouchEvent) => {
+    touching = true;
+    if (locked) holdLock(); // held for as long as the finger is down
+    touchY = e.touches[0].clientY;
+    touchDir = 0;
+    letGo = false;
+  };
+  const onTouchEnd = (e: TouchEvent) => {
+    if (e.touches.length) return;
+    touching = false;
+    touchEndAt = performance.now();
+    if (locked) holdLock();
+  };
   const onTouchMove = (e: TouchEvent) => {
     // a swipe that carried the page in only lands; the next one moves on
     if (!inside(geo().raw) || performance.now() < bypass) { touchDir = 1; return; }
@@ -199,7 +221,7 @@ export function bindPinnedSteps({ track, count: N, stepMs, onStep, onFrame }: Pi
     const dir = Math.sign(dy);
     if (!dir) return;
     if (!touchDir) letGo = atEnd(dir) && ready();
-    if (leaving(dir)) return;
+    if (leaving(dir)) { unlock(); return; }
     e.preventDefault();
     if (!touchDir && Math.abs(dy) > SWIPE_PX && canTake(dir)) { touchDir = dir; step(dir); }
   };
@@ -227,6 +249,8 @@ export function bindPinnedSteps({ track, count: N, stepMs, onStep, onFrame }: Pi
   addEventListener('wheel', onWheel, { passive: false });
   addEventListener('touchstart', onTouchStart, { passive: true });
   addEventListener('touchmove', onTouchMove, { passive: false });
+  addEventListener('touchend', onTouchEnd, { passive: true });
+  addEventListener('touchcancel', onTouchEnd, { passive: true });
   addEventListener('keydown', onKey);
   document.addEventListener('click', onClick, true);
   addEventListener('resize', onResize);
@@ -243,6 +267,8 @@ export function bindPinnedSteps({ track, count: N, stepMs, onStep, onFrame }: Pi
       removeEventListener('wheel', onWheel);
       removeEventListener('touchstart', onTouchStart);
       removeEventListener('touchmove', onTouchMove);
+      removeEventListener('touchend', onTouchEnd);
+      removeEventListener('touchcancel', onTouchEnd);
       removeEventListener('keydown', onKey);
       document.removeEventListener('click', onClick, true);
       removeEventListener('resize', onResize);

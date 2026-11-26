@@ -186,8 +186,9 @@ html {
   /* keeps the layout still while html.steps-locked hides the scrollbar */
   scrollbar-gutter: stable;
 }
-/* pinnedSteps.ts: a wheel that carried the page into a pinned scene can't
-   scroll it any further; only the scene's own steps move it, one at a time */
+/* pinnedSteps.ts: a wheel or a swipe (and its fling) that carried the page
+   into a pinned scene can't scroll it any further; only the scene's own steps
+   move it, one at a time */
 html.steps-locked {
   overflow: hidden;
 }

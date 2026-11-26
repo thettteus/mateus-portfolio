@@ -14,13 +14,15 @@ function setup(initialY = 0) {
   const scrolls = [];
   const rootClasses = new Set();
   const clock = { now: 1000 };
+  const timers = new Map();
+  let nextTimer = 1;
   const context = {
     exports: {},
     scrollY: initialY,
     innerHeight: 900,
     performance: { now: () => clock.now },
-    setTimeout: () => 1,
-    clearTimeout: () => {},
+    setTimeout: (fn) => { const id = nextTimer++; timers.set(id, fn); return id; },
+    clearTimeout: (id) => { timers.delete(id); },
     requestAnimationFrame: () => 1,
     cancelAnimationFrame: () => {},
     IntersectionObserver: class { observe() {} disconnect() {} },
@@ -44,6 +46,7 @@ function setup(initialY = 0) {
   return {
     api, scrolls, clock,
     get locked() { return rootClasses.has('steps-locked'); },
+    runTimers() { const due = [...timers.values()]; timers.clear(); due.forEach((fn) => fn()); },
     scroll(y) { context.scrollY = y; listeners.get('scroll')(); },
     resize() { listeners.get('resize')(); },
     wheel(deltaY, cancelable = true) {
@@ -51,6 +54,13 @@ function setup(initialY = 0) {
       listeners.get('wheel')({ deltaY, cancelable, preventDefault() { prevented = true; } });
       return prevented;
     },
+    touchStart(y) { listeners.get('touchstart')({ touches: [{ clientY: y }] }); },
+    touchMove(y, cancelable = true) {
+      let prevented = false;
+      listeners.get('touchmove')({ touches: [{ clientY: y }], cancelable, preventDefault() { prevented = true; } });
+      return prevented;
+    },
+    touchEnd() { listeners.get('touchend')({ touches: [] }); },
   };
 }
 
@@ -128,4 +138,83 @@ test('a fresh wheel gesture inside the scene still advances one step', () => {
   assert.equal(page.wheel(100), true);
   assert.equal(page.api.target, 1);
   assert.deepEqual(page.scrolls, [1240]);
+});
+
+// touch: a swipe begun above the scene scrolls the page natively (the browser
+// won't let the rest of it be cancelled) and its fling keeps going after the
+// finger lifts, with no touch events at all
+function swipeIn(page) {
+  page.touchStart(600);
+  page.touchMove(550); // begun outside the scene: not taken, the page scrolls
+  page.scroll(1100);
+  page.scroll(1000); // the hold's own scroll
+}
+
+test('a swipe that carries the page in is held on the step it entered', () => {
+  const page = setup(950);
+  page.touchStart(600);
+  page.touchMove(550);
+  page.scroll(1100);
+  assert.deepEqual(page.scrolls, [1000]);
+  assert.equal(page.api.target, 0);
+  assert.equal(page.locked, true);
+});
+
+test('a fling that carries the page in after the finger lifts is held too', () => {
+  const page = setup(950);
+  page.touchStart(600);
+  page.touchMove(400);
+  page.touchEnd();
+  page.clock.now += 600; // momentum only from here
+  page.scroll(1300);
+  assert.deepEqual(page.scrolls, [1000]);
+  assert.equal(page.api.target, 0);
+  assert.equal(page.locked, true);
+});
+
+test('a fling up into the scene is held on the last step', () => {
+  const page = setup(1800);
+  page.touchStart(400);
+  page.touchMove(500);
+  page.touchEnd();
+  page.clock.now += 300;
+  page.scroll(1600);
+  assert.deepEqual(page.scrolls, [1720]);
+  assert.equal(page.api.target, 3);
+});
+
+test('the rest of the swipe that carried the page in never steps', () => {
+  const page = setup(950);
+  swipeIn(page);
+  assert.equal(page.touchMove(100), true);
+  assert.equal(page.api.target, 0);
+});
+
+test('the hold lasts while the finger is down and lifts after it is up', () => {
+  const page = setup(950);
+  swipeIn(page);
+  page.runTimers();
+  assert.equal(page.locked, true);
+  page.touchEnd();
+  page.runTimers();
+  assert.equal(page.locked, false);
+});
+
+test('after the hold, the next swipe moves exactly one step', () => {
+  const page = setup(950);
+  swipeIn(page);
+  page.touchEnd();
+  page.clock.now += 1000;
+  page.touchStart(600);
+  assert.equal(page.touchMove(500), true);
+  assert.equal(page.api.target, 1);
+  page.touchMove(100);
+  assert.equal(page.api.target, 1);
+});
+
+test('swiping out at the last step lets the page go', () => {
+  const page = setup(1720);
+  page.touchStart(600);
+  assert.equal(page.touchMove(500), false);
+  assert.equal(page.api.target, 3);
 });
