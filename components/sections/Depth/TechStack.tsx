@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useRef, useState } from 'react';
+import { Fragment, useEffect, useRef, useState } from 'react';
 
 type Tool = { name: string };
 const AREAS: { name: string; tools: Tool[] }[] = [
@@ -257,7 +257,7 @@ export default function TechStack() {
     <section className="stk" id="toolkit" aria-labelledby="stack-title">
       <div className="container">
         <header className="stk-head">
-          <h2 id="stack-title">What I build with.</h2>
+          <h2 id="stack-title"><b>What I build with.</b></h2>
         </header>
 
         <nav
@@ -302,15 +302,18 @@ export default function TechStack() {
           ref={field}
           aria-label="Tools across eight areas"
         >
+          {/* set as justified text: the space after each word is what the
+              line stretches, so the field keeps a straight edge both sides */}
           {FIELD_TOOLS.map((t) => (
-            <li
-              className={`stk-word${KEY_TOOLS.has(t.name) ? ' is-key' : ''}${hit?.has(t.id) ? ' is-match' : ''}`}
-              key={t.id}
-              data-area={AREAS[t.area].name}
-              aria-label={`${t.name}, ${AREAS[t.area].name}`}
-            >
-              {t.name}
-            </li>
+            <Fragment key={t.id}>
+              <li
+                className={`stk-word${KEY_TOOLS.has(t.name) ? ' is-key' : ''}${hit?.has(t.id) ? ' is-match' : ''}`}
+                data-area={AREAS[t.area].name}
+                aria-label={`${t.name}, ${AREAS[t.area].name}`}
+              >
+                {t.name}
+              </li>{' '}
+            </Fragment>
           ))}
         </ul>
 

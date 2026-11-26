@@ -1,4 +1,4 @@
-// The outbound arrow used by every "Book a call": drawn, not a glyph, so its
+// The outbound arrow used by every outbound link: drawn, not a glyph, so its
 // stroke matches the rest of the line icons at any size.
 export default function ArrowUpRight() {
   return (

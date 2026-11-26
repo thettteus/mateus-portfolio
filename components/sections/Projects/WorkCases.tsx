@@ -1,4 +1,6 @@
 import { type ReactNode } from 'react';
+import ArrowUpRight from '@/components/ui/ArrowUpRight';
+import BookCall from '@/components/ui/BookCall';
 
 export type WorkCase = {
   id: string;
@@ -30,11 +32,17 @@ export default function WorkCases({ cases }: { cases: WorkCase[] }) {
                 {c.stack.map(tech => <li key={tech}>{tech}</li>)}
               </ul>
               <div className="wk-links">
-                {c.links.map((link, i) => (
-                  <a className={i === 0 ? 'wk-primary' : undefined} key={link.label} href={link.href} target="_blank" rel="noopener noreferrer">
-                    {link.label}<span aria-hidden="true">↗</span>
-                  </a>
-                ))}
+                {c.links.map((link, i) =>
+                  // the first link is the same green pill as "Book a call";
+                  // the arrows are drawn, never the ↗ glyph (iOS turns it into an emoji)
+                  i === 0 ? (
+                    <BookCall key={link.label} href={link.href} size="sm" external>{link.label}</BookCall>
+                  ) : (
+                    <a key={link.label} href={link.href} target="_blank" rel="noopener noreferrer">
+                      {link.label}<ArrowUpRight />
+                    </a>
+                  ),
+                )}
               </div>
 
             </div>

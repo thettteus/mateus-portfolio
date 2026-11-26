@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     url: 'https://mattbuilds.io/writing/stop-using-the-best-model-for-everything',
     type: 'article',
     authors: ['Mateus Pereira da Silva'],
-    images: [{ url: 'https://mattbuilds.io/og.png', width: 1200, height: 630, type: 'image/png', alt: 'Matt P. S. — Product Engineer' }],
+    images: [{ url: 'https://mattbuilds.io/og.png', width: 1200, height: 630, type: 'image/png', alt: 'Matt P. S. — Senior Software Engineer' }],
   },
 };
 

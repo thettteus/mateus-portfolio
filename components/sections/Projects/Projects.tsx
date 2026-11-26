@@ -146,7 +146,7 @@ export default async function Projects() {
     <section className="projects" id="projects">
       <div className="container">
         <FadeIn as="header" className="wk-top wk-grid">
-          <h2>Selected work.</h2>
+          <h2><b>Selected work.</b></h2>
           <p className="wk-note">Products, platforms, and the engineering behind them.</p>
         </FadeIn>
 

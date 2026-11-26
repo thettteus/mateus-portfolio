@@ -5,7 +5,7 @@ import ArrowUpRight from './ArrowUpRight';
 
 type Props = {
   href: string;
-  /** sm: the top bar · md: the hero · lg: the contact screen */
+  /** sm: a project's main link · md: the hero · lg: the contact screen */
   size?: 'sm' | 'md' | 'lg';
   /** opens the booking page in a new tab */
   external?: boolean;

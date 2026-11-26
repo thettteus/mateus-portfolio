@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState, type MouseEvent } from 'react';
 import { motion, useScroll, useSpring } from 'framer-motion';
-import BookCall from '@/components/ui/BookCall';
+import ArrowUpRight from '@/components/ui/ArrowUpRight';
 
 // Next.js's viewport.themeColor only tracks OS prefers-color-scheme, not this
 // site's manual toggle — override the rendered meta tags so the iOS status
@@ -167,7 +167,7 @@ export default function Header() {
         </nav>
 
         <div className="topbar-right">
-          <BookCall href="#contact" size="sm" className="tb-cta" />
+          <a className="tb-cta" href="#contact">Book a call<ArrowUpRight /></a>
           <button
             className="tb-menu"
             type="button"
@@ -182,10 +182,16 @@ export default function Header() {
             type="button"
             onClick={toggleTheme}
             aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} theme`}
+            title={`Switch to ${theme === 'light' ? 'dark' : 'light'} theme`}
           >
-            <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
-              <circle cx="8" cy="8" r="6.25" fill="none" stroke="currentColor" strokeWidth="1.5" />
-              <path d="M8 1.75a6.25 6.25 0 0 1 0 12.5z" fill="currentColor" />
+            {/* the icon names where the click takes you: a moon in light, a
+                sun in dark (swapped by CSS off data-theme, so no flash) */}
+            <svg className="tt-moon" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5a8.5 8.5 0 1 0 10.7 10.7z" />
+            </svg>
+            <svg className="tt-sun" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="12" cy="12" r="4" />
+              <path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4" />
             </svg>
           </button>
         </div>

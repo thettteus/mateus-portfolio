@@ -1,0 +1,107 @@
+<!doctype html>
+<!--
+  The site's Open Graph card (1200x630): the hero, set small. Same type, same
+  photo, same colours and area marks as components/sections/Hero/Hero.tsx.
+  Render with: sh scripts/og/make-og-image.sh  (writes public/og.png)
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<style>
+  :root {
+    --bg: #fafaf8;
+    --ink: #111111;
+    --ink-2: #5b5b60;
+    --photo-grey: #d0d0d0;
+    --rule: #deded9;
+    --pad: 72px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1200px; height: 630px; overflow: hidden; background: var(--bg); }
+  body {
+    position: relative;
+    padding: 52px var(--pad) 0;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .bar { display: flex; justify-content: space-between; align-items: baseline; }
+  .logo { font-size: 26px; font-weight: 500; letter-spacing: -0.025em; }
+  .site { font-size: 19px; color: var(--ink-2); letter-spacing: -0.01em; }
+
+  .main { display: flex; justify-content: space-between; margin-top: 44px; }
+  .role {
+    display: flex; align-items: center; gap: 18px;
+    font-size: 23px; line-height: 1; color: var(--ink-2); letter-spacing: -0.01em;
+  }
+  .role::before { content: ''; width: 40px; height: 1px; background: var(--photo-grey); }
+  h1 {
+    margin: 34px 0 0 -0.04em;
+    font-size: 84px; font-weight: 500; line-height: 0.98; letter-spacing: -0.045em;
+  }
+  .dek {
+    margin-top: 26px;
+    font-size: 24px; line-height: 1.32; color: var(--ink-2); letter-spacing: -0.012em;
+  }
+
+  /* from the role line to the foot of the dek, square, like the hero */
+  .photo {
+    width: 308px; height: 308px; flex: none;
+    margin-top: 4px; /* level with the role's cap top */
+    border-radius: 6px; overflow: hidden; background: var(--photo-grey);
+  }
+  .photo img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; display: block; }
+
+  .areas {
+    position: absolute; left: var(--pad); right: var(--pad); bottom: 44px;
+    display: flex; justify-content: space-between;
+    padding-top: 26px; border-top: 1px solid var(--photo-grey);
+    list-style: none;
+  }
+  .area { display: flex; align-items: center; gap: 12px; font-size: 21px; font-weight: 600; letter-spacing: -0.015em; }
+  .area svg {
+    width: 26px; height: 26px; fill: none; stroke: #a9a9a9;
+    stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;
+  }
+  .sep { width: 1px; background: var(--photo-grey); }
+</style>
+</head>
+<body>
+  <div class="bar">
+    <span class="logo">Matt P. S.</span>
+    <span class="site">mattbuilds.io</span>
+  </div>
+
+  <div class="main">
+    <div class="copy">
+      <p class="role">Sr. Software Engineer</p>
+      <h1>From ambiguity<br>to production.</h1>
+      <p class="dek">Product thinking, full-stack engineering,<br>and AI systems in production.</p>
+    </div>
+    <figure class="photo"><img src="../../public/assets/me/profile_pic.avif" alt=""></figure>
+  </div>
+
+  <ul class="areas">
+    <li class="area">
+      <svg viewBox="0 0 24 24"><path d="M12 3.5 20.5 8 12 12.5 3.5 8Z"/><path d="m3.5 12 8.5 4.5 8.5-4.5"/><path d="m3.5 16 8.5 4.5 8.5-4.5"/></svg>
+      Product
+    </li>
+    <li class="sep"></li>
+    <li class="area">
+      <svg viewBox="0 0 24 24"><path d="M8 7.5 3.5 12 8 16.5"/><path d="M16 7.5 20.5 12 16 16.5"/><path d="m13.75 5-3.5 14"/></svg>
+      Engineering
+    </li>
+    <li class="sep"></li>
+    <li class="area">
+      <svg viewBox="0 0 24 24"><rect x="3.5" y="12" width="4.5" height="8.5" rx="2.25"/><rect x="9.75" y="3.5" width="4.5" height="17" rx="2.25"/><rect x="16" y="8" width="4.5" height="12.5" rx="2.25"/></svg>
+      Data
+    </li>
+    <li class="sep"></li>
+    <li class="area">
+      <svg viewBox="0 0 24 24"><path d="M12 3c.6 5 3.9 8.4 9 9-5.1.6-8.4 4-9 9-.6-5-3.9-8.4-9-9 5.1-.6 8.4-4 9-9Z"/></svg>
+      AI
+    </li>
+  </ul>
+</body>
+</html>

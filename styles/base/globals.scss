@@ -337,19 +337,23 @@ img {
            heading colour, never a large fill at rest. */
 
 /* ---------------- SECTION TITLE ----------------
-   One style for every section title; the emphasised part is set in <b>. */
+   One style for every section title; the emphasised part is set in <b>.
+   Sized to sit clearly between the hero headline and the titles inside a
+   section (project names, essay titles): about twice their size. */
 .wk-top h2,
 .lev-head h2,
-.dl-head h2 {
+.dl-head h2,
+.stk-head h2 {
   margin: 0 0 0 -0.03em;
-  font: 300 clamp(2rem, 3.1vw, 3.5rem)/1 var(--font-sans);
-  letter-spacing: -0.035em;
+  font: 400 clamp(2.5rem, 1.5rem + 3vw, 4.25rem)/1.02 var(--font-sans);
+  letter-spacing: -0.04em;
   color: var(--ink);
   text-wrap: balance;
 }
 .wk-top h2 b,
 .lev-head h2 b,
-.dl-head h2 b {
+.dl-head h2 b,
+.stk-head h2 b {
   font-weight: 500;
 }
 
@@ -613,6 +617,20 @@ html .topbar-inner {
 .nav a.nav-contact {
   display: none;
 }
+/* "Book a call" in the bar: set like the section links, turns green on hover */
+.tb-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  margin-right: clamp(10px, 1.4vw, 24px);
+  font-size: clamp(0.9375rem, 1.15vw, 1.1875rem);
+  white-space: nowrap;
+  color: var(--ink-2);
+  transition: color 0.2s;
+}
+.tb-cta:hover {
+  color: var(--accent-text);
+}
 
 .topbar-right {
   grid-column: 10 / 13;
@@ -659,6 +677,21 @@ a:hover > .arrow-ur {
   width: 40px;
   padding: 0;
 }
+/* moon in light (go dark), sun in dark (go light) */
+.theme-toggle svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.theme-toggle .tt-sun,
+[data-theme='dark'] .theme-toggle .tt-moon {
+  display: none;
+}
+[data-theme='dark'] .theme-toggle .tt-sun {
+  display: block;
+}
 .tb-menu {
   display: none;
   padding: 0 14px;
@@ -671,6 +704,7 @@ a:hover > .arrow-ur {
   background: var(--panel-2);
 }
 .tb-logo:focus-visible,
+.tb-cta:focus-visible,
 .theme-toggle:focus-visible,
 .tb-menu:focus-visible,
 .nav a:focus-visible {
@@ -1411,8 +1445,8 @@ a:hover > .arrow-ur {
 }
 .wk-case h3 {
   margin: 0;
-  font: 400 clamp(1.8rem, 2.8vw, 3rem)/1.06 var(--font-sans);
-  letter-spacing: -0.045em;
+  font: 400 clamp(1.5rem, 1.1rem + 1.1vw, 2.25rem)/1.1 var(--font-sans);
+  letter-spacing: -0.035em;
   text-wrap: balance;
 }
 .wk-role {
@@ -1445,33 +1479,23 @@ a:hover > .arrow-ur {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 12px 24px;
-  margin: 18px 0 0;
-  font-size: 0.8125rem;
+  gap: 12px 28px;
+  margin: 22px 0 0;
+  font-size: 0.9375rem;
 }
-.wk-links a {
+.wk-links a:not(.book) {
   display: inline-flex;
   align-items: center;
-  gap: 12px;
+  gap: 0.45em;
   padding: 10px 0;
   color: var(--ink);
   text-decoration: none;
+  transition: color 0.2s;
 }
-.wk-links a:hover {
+.wk-links a:not(.book):hover {
   color: var(--accent-text);
 }
-.wk-links .wk-primary {
-  padding: 11px 16px;
-  border: 1px solid transparent;
-  border-radius: 4px;
-  background: var(--cta-bg);
-  color: var(--accent-ink);
-}
-.wk-links .wk-primary:hover {
-  background: var(--cta-hover);
-  color: var(--accent-ink);
-}
-.wk-links a:focus-visible {
+.wk-links a:not(.book):focus-visible {
   outline: 2px solid var(--accent-text);
   outline-offset: 4px;
 }
@@ -1998,12 +2022,6 @@ a:hover > .arrow-ur {
   gap: 24px;
   margin-bottom: 24px;
 }
-.stk-head h2 {
-  margin: 0;
-  font: 500 clamp(2rem, 3.1vw, 3.5rem)/1.15 var(--font-sans);
-  letter-spacing: -0.035em;
-  color: var(--ink);
-}
 .stk-areas {
   --area-gap: clamp(24px, 3vw, 44px);
   overflow: hidden;
@@ -2062,17 +2080,20 @@ a:hover > .arrow-ur {
   color: #1fc384;
 }
 .stk-field {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: clamp(14px, 1.8vw, 24px) clamp(20px, 2.5vw, 36px);
-  margin: 0;
+  /* justified text: each line stretches the spaces between words so the
+     field has a straight edge on both sides; the margins set the minimum
+     gap and the negative inline margin keeps the edges flush */
+  --word-gap: clamp(9px, 1.15vw, 16px);
+  margin: 0 calc(-1 * var(--word-gap));
   padding: 0;
   list-style: none;
+  text-align: justify;
+  text-align-last: left;
 }
 .stk-word {
   --focus: 1;
-  margin: 0;
+  display: inline-block;
+  margin: calc(clamp(14px, 1.8vw, 24px) / 2) var(--word-gap);
   padding: 0;
   color: color-mix(in srgb, var(--ink) calc(var(--focus) * 100%), var(--ink-2));
   font: 400 1rem/1.4 var(--font-sans);
@@ -2149,9 +2170,6 @@ a:hover > .arrow-ur {
   }
   .stk-word.is-key {
     font-size: 1rem;
-  }
-  .stk-field {
-    gap: 14px 20px;
   }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -3221,5 +3239,157 @@ a:hover > .arrow-ur {
   }
   .ai-flow-stages {
     display: flex;
+  }
+}
+
+/* ============================================================
+   PHONES — one centred column: section titles, the toolkit, the project
+   stories, the essays, the contact screen and the footer all share the
+   same axis (the hero and the pinned drawings keep their own composition)
+   ============================================================ */
+@media (max-width: 699px) {
+  .wk-top,
+  .dl-head,
+  .lev-head {
+    text-align: center;
+  }
+  .wk-top h2,
+  .dl-head h2,
+  .lev-head h2,
+  .stk-head h2,
+  .c-main h2 {
+    margin-inline: 0;
+  }
+  .wk-note,
+  .lev-intro {
+    justify-self: center;
+    margin-inline: auto;
+    text-align: center;
+  }
+
+  /* centred paragraphs break into even lines, no one-word last line */
+  .wk-note,
+  .lev-intro,
+  .lev-say,
+  .dl-items,
+  .wk-lead,
+  .wk-detail p,
+  .wr-dek,
+  .c-lead {
+    text-wrap: balance;
+  }
+
+  /* the pinned scenes' captions: step, word and line on the same axis */
+  .dl-cap,
+  .lev-cap {
+    text-align: center;
+  }
+  .dl-cap h3,
+  .lev-cap h3 {
+    margin-left: 0;
+  }
+  .dl-items,
+  .lev-say {
+    margin-inline: auto;
+  }
+
+  /* toolkit */
+  .stk-head {
+    justify-content: center;
+    text-align: center;
+  }
+  .stk-head h2 {
+    max-width: none;
+  }
+  .stk-field {
+    text-align-last: center;
+  }
+  .stk-status {
+    text-align: center;
+  }
+
+  /* project stories */
+  .wk-text,
+  .wk-detail {
+    text-align: center;
+  }
+  .wk-eyebrow,
+  .wk-stack,
+  .wk-links,
+  .wk-visual figcaption {
+    justify-content: center;
+  }
+  .wk-case h3 {
+    max-width: none;
+  }
+
+  .writing .wk-top h2 {
+    grid-column: 1 / -1;
+  }
+
+  /* essays: "Essay · 2026" over the title, all on the axis */
+  .wr-row a {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    column-gap: 0;
+    text-align: center;
+  }
+  .wr-kind,
+  .wr-year {
+    order: 0;
+  }
+  .wr-year::before {
+    content: '·';
+    margin: 0 0.5em;
+  }
+  .wr-title,
+  .wr-dek {
+    flex: 0 0 100%;
+    order: 1;
+  }
+  .wr-title {
+    margin-top: 6px;
+  }
+  .wr-dek {
+    margin-inline: auto;
+  }
+
+  /* contact */
+  .c-main {
+    text-align: center;
+  }
+  .c-lead {
+    margin-inline: auto;
+  }
+  .c-do {
+    justify-content: center;
+  }
+  .c-side {
+    display: block;
+    margin-top: 64px;
+    text-align: center;
+  }
+  .c-side section + section {
+    margin-top: 28px;
+    padding-top: 24px;
+    border-top: 1px solid var(--rule);
+  }
+
+  /* footer */
+  .c-foot {
+    text-align: center;
+  }
+  .f-col {
+    align-items: center;
+  }
+  .f-col:nth-child(3) {
+    grid-column: 1 / -1;
+  }
+  .f-end {
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    text-align: center;
   }
 }
