@@ -25,6 +25,10 @@
   --ink-4: #93939a;
   --rule: #dadad6;
   --rule-soft: #e9e9e5;
+  /* the studio grey behind the portrait (sampled: a flat #d0d0d0), reused for
+     the hero's secondary marks so the photo and the page share one grey */
+  --photo-grey: #d0d0d0;
+  --photo-rule: var(--photo-grey);
   /* THE SIGNATURE — display type, graphics, fills, dots, borders */
   --accent: #008c95;
   /* hover / pressed: more contrast against the paper */
@@ -61,6 +65,10 @@
   --ink-4: #55555a;
   --rule: #2c2c2e;
   --rule-soft: #202022;
+  /* the portrait shows at 90% brightness here; at full strength a 1px line
+     of it would shout against the dark field, so rules take a share of it */
+  --photo-grey: #bbbbbb;
+  --photo-rule: color-mix(in srgb, var(--photo-grey) 26%, var(--bg));
   --accent: #00a0a8;
   --accent-2: #00b2ba;
   /* 5.64:1 on --bg — the signature clears AA here, so small text keeps it */
@@ -90,8 +98,11 @@
   --cta-hover: var(--accent);
   --maxw: 1240px;
   --gutter: 40px;
+  /* the header and the hero span the screen inside this margin */
+  --frame: clamp(20px, 6.6vw, 128px);
+  --bar-h: 64px;
   --font-sans: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  /* no separate display/mono web fonts anymore — every element renders Helvetica */
+  /* Display and UI share the same Helvetica family. */
   --font-display: var(--font-sans);
   --font-mono: var(--font-sans);
   /* the only exception: real code blocks, using system monospace (no web font) */
@@ -172,6 +183,13 @@ html {
   scroll-behavior: smooth;
   overflow-x: hidden;
   background: var(--bg);
+  /* keeps the layout still while html.steps-locked hides the scrollbar */
+  scrollbar-gutter: stable;
+}
+/* pinnedSteps.ts: a wheel that carried the page into a pinned scene can't
+   scroll it any further; only the scene's own steps move it, one at a time */
+html.steps-locked {
+  overflow: hidden;
 }
 
 body {
@@ -251,6 +269,16 @@ h4 {
 ::view-transition-new(root) {
   animation: none;
   mix-blend-mode: normal;
+}
+/* the theme bloom (Header.tsx): the new theme shows through a soft radial
+   mask that starts at nothing and grows from the toggle */
+::view-transition-new(root) {
+  -webkit-mask-image: radial-gradient(closest-side, #000 70%, transparent 100%);
+  mask-image: radial-gradient(closest-side, #000 70%, transparent 100%);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: 0 0;
+  mask-size: 0 0;
 }
 
 /* Smooth theme switching — only while the switch runs: on all the time, the
@@ -394,6 +422,66 @@ section {
 }
 
 /* ============================================================
+   BOOK A CALL — the one call to action, the same button everywhere
+   (top bar sm · hero md · contact lg): a green pill with the outbound
+   arrow, filled with the deeper green from where the pointer comes in
+   ============================================================ */
+.book {
+  --h: 48px;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.9em;
+  height: var(--h);
+  padding: 0 calc(var(--h) * 0.38) 0 calc(var(--h) * 0.46);
+  border-radius: 999px;
+  background: var(--cta-bg);
+  color: var(--focus-ink);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  text-decoration: none;
+}
+.book::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--cta-hover);
+  clip-path: circle(0% at var(--mx, 50%) var(--my, 50%));
+  transition: clip-path 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.book:hover::before,
+.book:focus-visible::before {
+  clip-path: circle(150% at var(--mx, 50%) var(--my, 50%));
+}
+.book:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+.book-sm {
+  --h: clamp(40px, 3.2vw, 54px);
+  font-size: clamp(0.9375rem, 1.1vw, 1.125rem);
+}
+.book-md {
+  --h: clamp(52px, 3.9vw, 66px);
+  font-size: clamp(1rem, 1.35vw, 1.4375rem);
+}
+.book-lg {
+  --h: clamp(64px, 9vh, 84px);
+  font-size: clamp(1.125rem, 1rem + 0.4vw, 1.375rem);
+}
+@media (prefers-reduced-motion: reduce) {
+  .book::before {
+    transition: none;
+  }
+}
+
+/* ============================================================
    TOP BAR
    ============================================================ */
 .topbar {
@@ -407,7 +495,11 @@ section {
      stays covered once the bar collapses to 0 height (see ::before). */
   padding-top: env(safe-area-inset-top, 0px);
   background: var(--bg);
-  border-bottom: 1px solid var(--rule-soft);
+  /* no hairline while the bar sits over the top of the hero */
+  border-bottom: 1px solid transparent;
+}
+.topbar[data-scrolled] {
+  border-bottom-color: var(--rule-soft);
 }
 /* Safe-area shield — a solid block over the status-bar / Dynamic Island strip
    that NEVER collapses, so it holds in BOTH header states (expanded: scrolling
@@ -454,9 +546,21 @@ html .topbar {
   grid-template-columns: repeat(12, minmax(0, 1fr));
   column-gap: clamp(16px, 1.9vw, 28px);
   align-items: center;
-  height: 64px;
+  height: var(--bar-h);
   overflow: hidden;
   font-size: 0.875rem;
+}
+.tb-logo {
+  grid-column: 1 / 4;
+  grid-row: 1;
+  justify-self: start;
+  font-size: clamp(1.125rem, 1.6vw, 1.75rem);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.025em;
+  white-space: nowrap;
+  color: var(--ink);
+  text-decoration: none;
 }
 /* on scroll-down the header "hides": the nav content collapses away (logo,
    links, buttons all gone) while the solid top strip + progress bar stay put */
@@ -481,12 +585,12 @@ html .topbar-inner {
   grid-row: 1;
   justify-self: center;
   display: flex;
-  gap: clamp(18px, 2.2vw, 36px);
+  gap: clamp(20px, 3.1vw, 56px);
   margin-right: 0;
 }
 .nav a {
   position: relative;
-  font-size: 0.9375rem;
+  font-size: clamp(0.9375rem, 1.15vw, 1.1875rem);
   white-space: nowrap;
   color: var(--ink-2);
   transition: color 0.2s;
@@ -515,66 +619,82 @@ html .topbar-inner {
   justify-self: end;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
-.tb-cta {
-  display: inline-flex;
-  align-items: center;
-  height: 36px;
-  padding: 0 16px;
-  border-radius: 999px;
-  background: var(--cta-bg);
-  color: var(--focus-ink);
-  font-size: 0.875rem;
-  font-weight: 500;
-  white-space: nowrap;
-  transition: background-color 0.25s;
+
+/* the outbound arrow: one stroke, nudged out along its own diagonal on hover */
+.arrow-ur {
+  flex: none;
+  width: 1.05em;
+  height: 1.05em;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 0.3s var(--ease);
 }
-.tb-cta:hover {
-  background: var(--cta-hover);
+.arrow-ur path {
+  vector-effect: non-scaling-stroke;
 }
+a:hover > .arrow-ur {
+  transform: translate(2px, -2px);
+}
+
 .theme-toggle,
 .tb-menu {
-  height: 36px;
+  height: 40px;
   display: inline-grid;
   place-items: center;
-  border: 1px solid var(--rule);
+  border: 1px solid transparent;
   border-radius: 999px;
   background: none;
-  color: var(--ink);
+  color: var(--ink-2);
   font: inherit;
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
   cursor: pointer;
-  transition: border-color 0.2s;
+  transition: color 0.2s, background-color 0.2s;
 }
 .theme-toggle {
-  width: 36px;
+  width: 40px;
   padding: 0;
 }
 .tb-menu {
   display: none;
   padding: 0 14px;
+  border-color: var(--rule);
+  color: var(--ink);
 }
 .theme-toggle:hover,
 .tb-menu:hover {
-  border-color: var(--ink-2);
+  color: var(--ink);
+  background: var(--panel-2);
+}
+.tb-logo:focus-visible,
+.theme-toggle:focus-visible,
+.tb-menu:focus-visible,
+.nav a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
 }
 
 /* small screens: "Menu" drops the sections down under the bar */
 @media (max-width: 959px) {
-  .tb-cta {
+  .topbar-right .tb-cta {
     display: none;
   }
   .topbar-inner {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
+  }
+  .tb-logo {
+    font-size: 1.125rem;
   }
   .tb-menu {
     display: inline-grid;
   }
   .nav {
     position: absolute;
-    top: calc(env(safe-area-inset-top, 0px) + 64px);
+    top: 100%;
     left: 0;
     right: 0;
     display: none;
@@ -654,283 +774,316 @@ html .topbar-inner {
 }
 
 /* ============================================================
-   HERO — the name in front of the range; scrolling plays the scene
-   (the name sets, the title rises, the range flattens into a rule)
+   HERO — role, headline and portrait over the four working areas
    ============================================================ */
-.cover-track {
-  --scrub: calc(2 * 30svh); /* two steps, like the range stack */
-  height: calc(var(--cover-height, 100svh) + var(--scrub));
-}
-.cover-track > .cover {
-  position: sticky;
-  top: 0;
-}
-@media (prefers-reduced-motion: reduce) {
-  .cover-track {
-    height: auto;
-  }
-  .cover-track > .cover {
-    position: relative;
-  }
-}
-.cover {
-  --margin: clamp(20px, 4.5vw, 96px);
-  /* at least a full screen, so on tall screens the next section never shows early */
-  min-height: 100svh;
-  padding: calc(64px + env(safe-area-inset-top, 0px)) 0 clamp(20px, 3.5vh, 36px);
-  overflow: clip;
-  .container {
-    width: 100%;
-    max-width: none;
-    padding-inline: var(--margin);
-  }
-  .wk-grid {
-    column-gap: clamp(16px, 1.9vw, 28px);
-  }
-
-  /* the name's size and the room under it, as the script will set them, so the
-     page is laid out right from the first paint */
-  --fs: min(calc((100vw - 2 * var(--margin)) * 0.2558), calc((100svh - 260px) / 1.97));
-  --foot: 1.02;
-  .stage {
-    position: relative;
-    margin-top: clamp(4px, 2vh, 24px);
-  }
-  .land {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    display: block;
-    pointer-events: none;
-  }
-  /* the name and the rising words sit in front of the drawing; the range only
-     hides them through a clip that follows its crest */
-  .sky {
-    position: relative;
-    z-index: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    padding-bottom: calc(var(--fs) * var(--foot));
-  }
-  .masthead {
-    margin: 0;
-    font: 500 var(--fs)/0.8 var(--font-sans);
-    letter-spacing: -0.06em;
-    white-space: nowrap;
-    padding: 0.07em 0 0.04em;
-  }
-  .masthead .in {
-    display: inline-block;
-    margin-left: -0.04em;
-    will-change: transform;
-  }
-  .masthead .ch {
-    display: inline-block;
-  }
-  .masthead .sp {
-    margin-right: -0.035em;
-  }
-  .hero-role {
-    display: block;
-    margin-top: 16px;
-    padding-left: var(--role-inset, calc(var(--name-size, var(--fs)) * 0.07));
-    font: 500 clamp(17px, 1.2vw + 12px, 28px)/1.4 var(--font-sans);
-    letter-spacing: 0.01em;
-    color: var(--ink-2);
-  }
-
-  .rise {
-    position: absolute;
-    top: 0;
-    left: var(--margin);
-    right: var(--margin);
-    align-items: start;
-  }
-  .rise > * {
-    will-change: transform;
-  }
-  .rise.is-flow {
-    position: static;
-    margin-top: clamp(24px, 4vh, 44px);
-  }
-  /* until the scene is set up, the name and the words wait out of sight */
-  &:not(.is-calm):not(.is-live) .masthead .in,
-  &:not(.is-calm):not(.is-live) .rise {
-    visibility: hidden;
-  }
-  /* what follows the hero waits too, so nothing is ever seen out of place */
-  &:not(.is-live) .after {
-    visibility: hidden;
-  }
-
-  .cover-line {
-    grid-column: 1 / 8;
-    margin: 0 0 0 -0.03em;
-    font: 400 clamp(2.75rem, 5.2vw, 5.75rem)/1 var(--font-sans);
-    letter-spacing: -0.03em;
-    color: var(--ink);
-    text-box: trim-both cap alphabetic;
-  }
-  .cover-line .line {
-    display: block;
-  }
-  .side {
-    grid-column: 8 / -1;
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
-  }
-  .dek {
-    margin: 0;
-    max-width: 30em;
-    font-size: clamp(1rem, 0.92rem + 0.25vw, 1.125rem);
-    line-height: 1.45;
-    text-wrap: pretty;
-    text-box: trim-start cap alphabetic;
-  }
-  .links {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 10px 26px;
-    margin: 0;
-    font-size: 1.0625rem;
-  }
-  /* the same black button as "Book a call" in the top bar */
-  .cta {
-    display: inline-flex;
-    align-items: center;
-    height: 52px;
-    padding: 0 24px;
-    border-radius: 999px;
-    background: var(--cta-bg);
-    color: var(--focus-ink);
-    font-weight: 500;
-    text-decoration: none;
-    transition: background-color 0.25s;
-  }
-  .cta:hover {
-    background: var(--cta-hover);
-  }
-  .quiet {
-    text-decoration: underline;
-    text-decoration-thickness: 1px;
-    text-underline-offset: 0.34em;
-    text-decoration-color: var(--rule);
-    transition: text-decoration-color 0.2s;
-  }
-  .quiet:hover {
-    text-decoration-color: var(--ink);
-  }
-  .side-flow {
-    margin-top: 28px;
-  }
-
-  .areas {
-    /* breathing room between the rule and the areas */
-    margin: clamp(24px, 4vh, 44px) 0 0;
-    padding: 0 0 16px;
-    list-style: none;
-    border-bottom: 1px solid var(--rule);
-  }
-  .areas li {
-    grid-column: span 3;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
-  .areas b {
-    font: 400 clamp(1.125rem, 0.95rem + 0.7vw, 1.625rem)/1.1 var(--font-sans);
-    letter-spacing: -0.02em;
-  }
-  .areas span {
-    color: var(--ink-2);
-    font-size: 0.8125rem;
-    line-height: 1.4;
-  }
-
-  @media (max-width: 959px) {
-    .rise {
-      right: var(--margin);
-    }
-    .cover-line,
-    .side {
-      grid-column: 1 / -1;
-    }
-    .rise.is-flow .side {
-      margin-top: 28px;
-    }
-    .areas {
-      row-gap: 16px;
-    }
-    .areas li {
-      grid-column: span 6;
-    }
-  }
-  @media (max-width: 599px) {
-    --foot: 1.18;
-    padding-bottom: max(40px, env(safe-area-inset-bottom, 0px));
-    .stage {
-      margin-top: clamp(36px, 5svh, 52px);
-    }
-    .cover-line {
-      font-size: clamp(38px, 11.6vw, 56px);
-    }
-    .hero-role {
-      margin-top: 10px;
-    }
-    .side {
-      gap: 24px;
-    }
-    .dek {
-      font-size: 1rem;
-      line-height: 1.55;
-      color: var(--ink-2);
-    }
-    .links {
-      flex-direction: column;
-      align-items: stretch;
-      gap: 8px;
-      font-size: 1rem;
-    }
-    .cta {
-      justify-content: center;
-    }
-    .quiet {
-      display: flex;
-      min-height: 44px;
-      align-items: center;
-      justify-content: center;
-    }
-    .areas {
-      margin-top: 20px;
-      padding: 0 0 20px;
-      row-gap: 18px;
-    }
-    .areas b {
-      font-size: 1rem;
-    }
-    .areas span {
-      font-size: 0.75rem;
-    }
+@media (min-width: 960px) {
+  :root {
+    --bar-h: 76px;
   }
 }
 .topbar .container {
   max-width: none;
-  padding-inline: clamp(20px, 4.5vw, 96px);
+  padding-inline: var(--frame);
 }
 @media (max-width: 959px) {
   .topbar .nav {
-    padding-inline: clamp(20px, 4.5vw, 96px);
+    padding-inline: var(--frame);
+  }
+}
+
+.cover {
+  /* the role line and the headline also place the portrait, so their sizes
+     are read here */
+  --dek: clamp(1.0625rem, 1.62vw, 1.6875rem);
+  /* the byline is set at the size of the line under the headline */
+  --role: var(--dek);
+  --h1: min(6.25vw, 11.5vh, 6rem);
+  --dek-gap: clamp(18px, 2.2vw, 30px);
+  --cta-gap: clamp(28px, 3vw, 44px);
+  /* everything down to the areas has to clear the fold of a laptop browser,
+     so the vertical rhythm is set in vh and the headline caps on height too */
+  padding: calc(var(--bar-h) + env(safe-area-inset-top, 0px) + clamp(24px, 5vh, 56px)) 0
+    clamp(32px, 6vh, 64px);
+
+  .container {
+    max-width: none;
+    padding-inline: var(--frame);
+  }
+
+  /* the role as a byline led by a short rule in the photo's grey */
+  .cover-role {
+    grid-column: 1 / 8;
+    grid-row: 1;
+    display: flex;
+    align-items: center;
+    gap: 0.85em;
+    margin: 0 0 clamp(24px, 5vh, 52px);
+    font-size: var(--role);
+    line-height: 1;
+    letter-spacing: -0.01em;
+    color: var(--ink-2);
+  }
+  .cover-role::before {
+    content: '';
+    flex: none;
+    width: 1.9em;
+    height: 1px;
+    background: var(--photo-rule);
+  }
+
+  .cover-grid {
+    row-gap: 0;
+  }
+  .cover-copy {
+    grid-column: 1 / 8;
+    grid-row: 2;
+    min-width: 0;
+  }
+  .cover-title {
+    /* the F's stem, not its side bearing, sits on the margin */
+    margin: 0 0 0 -0.045em;
+    font-size: var(--h1);
+    font-weight: 500;
+    line-height: 0.98;
+    letter-spacing: -0.04em;
+    color: var(--ink);
+  }
+  .cover-dek {
+    margin: var(--dek-gap) 0 0;
+    font-size: var(--dek);
+    line-height: 1.36;
+    letter-spacing: -0.015em;
+    color: var(--ink-2);
+    text-wrap: pretty;
+  }
+
+  .cover-actions {
+    grid-column: 1 / 8;
+    grid-row: 3;
+    margin-top: var(--cta-gap);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px clamp(28px, 3.4vw, 56px);
+    font-size: clamp(1rem, 1.35vw, 1.4375rem);
+  }
+  .quiet {
+    padding-block: 10px;
+    line-height: 1.4;
+    color: var(--ink-2);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.42em;
+    text-decoration-color: var(--photo-rule);
+    transition:
+      color 0.2s,
+      text-decoration-color 0.2s;
+  }
+  .quiet:hover {
+    color: var(--ink);
+    text-decoration-color: currentColor;
+  }
+  .quiet:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 4px;
+  }
+
+  /* the portrait: its cell spans the role line, the headline and the buttons
+     but adds no height to any row; the frame inside hangs from the cap height
+     of the role line to the foot of the buttons, and its width follows */
+  .cover-photo-cell {
+    grid-column: 8 / -1;
+    grid-row: 1 / 4;
+    position: relative;
+    container-type: size;
+  }
+  .cover-photo {
+    /* line-height 1: the caps start 0.156em into the line box */
+    --top: calc(var(--role) * 0.156);
+    position: absolute;
+    top: var(--top);
+    bottom: 0;
+    left: 50%;
+    /* square while the column is wide enough; where it isn't, the frame keeps
+       both alignments and crops a little taller */
+    width: min(100cqw, 100cqh - var(--top));
+    margin: 0;
+    translate: -50% 0;
+    overflow: hidden;
+    border-radius: 10px;
+    background: var(--panel-2);
+  }
+  .cover-photo img {
+    object-fit: cover;
+    object-position: 50% 30%;
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+
+  /* as on the LinkedIn banner: mark on top, name, one line; spread edge to
+     edge, with a hairline as tall as the items halfway between each pair */
+  .areas {
+    display: flex;
+    justify-content: space-between;
+    column-gap: clamp(20px, 2vw, 32px);
+    margin: clamp(32px, 6vh, 72px) 0 0;
+    padding: clamp(24px, 3.6vh, 40px) 0 0;
+    list-style: none;
+    border-top: 1px solid var(--photo-rule);
+  }
+  .area {
+    flex: 0 1 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: clamp(12px, 1.6vh, 18px);
+    min-width: 0;
+  }
+  .areas-sep {
+    flex: none;
+    width: 1px;
+    background: var(--photo-rule);
+  }
+  .area-icon {
+    --icon: clamp(28px, 2.3vw, 40px);
+    flex: none;
+    width: var(--icon);
+    height: var(--icon);
+    /* the marks are drawn from x 3.5 of a 24-unit box: pull them back so
+       their ink, not their box, lines up with the text under them */
+    margin-left: calc(var(--icon) * -3.5 / 24);
+    stroke: var(--photo-grey);
+    stroke-width: 1.75;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .area-icon * {
+    vector-effect: non-scaling-stroke;
+  }
+  .areas b,
+  .areas span {
+    display: block;
+  }
+  .areas b {
+    font-size: clamp(1rem, 1.32vw, 1.375rem);
+    font-weight: 600;
+    line-height: 1.3;
+    letter-spacing: -0.015em;
+    color: var(--ink);
+  }
+  .areas span {
+    margin-top: 2px;
+    font-size: clamp(0.875rem, 1.12vw, 1.1875rem);
+    line-height: 1.45;
+    color: var(--ink-2);
+    text-wrap: balance;
+  }
+
+  /* one authored moment: the portrait is unveiled upward and settles */
+  @media (prefers-reduced-motion: no-preference) {
+    .cover-photo {
+      animation: cover-unveil 1.1s var(--ease) 0.1s both;
+    }
+    .cover-photo img {
+      animation: cover-settle 1.6s var(--ease) 0.1s both;
+    }
+  }
+
+  /* narrower: the four areas become a 2x2 sheet, hairlines crossing between
+     the cells and meeting the rule above */
+  @media (max-width: 1099px) {
+    .areas {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0;
+      padding-top: 0;
+    }
+    .areas-sep {
+      display: none;
+    }
+    .area {
+      padding-block: clamp(20px, 3vh, 28px);
+    }
+    /* items sit at children 1 3 5 7 (hairlines between): left column 1 and 5,
+       second row 5 and 7 */
+    .area:nth-child(4n + 1) {
+      padding-right: clamp(16px, 3vw, 40px);
+    }
+    .area:nth-child(4n + 3) {
+      padding-left: clamp(20px, 3vw, 40px);
+      border-left: 1px solid var(--photo-rule);
+    }
+    .area:nth-child(n + 5) {
+      border-top: 1px solid var(--photo-rule);
+    }
+  }
+
+  @media (max-width: 699px) {
+    /* a phone gets the message first, then the face */
+    --h1: calc((100vw - 2 * var(--frame)) * 0.135);
+    --cta-gap: 24px;
+    padding-top: calc(var(--bar-h) + env(safe-area-inset-top, 0px) + 24px);
+    padding-bottom: max(40px, env(safe-area-inset-bottom, 0px));
+
+    .cover-role {
+      margin-bottom: 24px;
+    }
+    .cover-role,
+    .cover-copy,
+    .cover-actions,
+    .cover-photo-cell {
+      grid-column: 1 / -1;
+    }
+    .cover-photo-cell {
+      grid-row: 4;
+      margin-top: var(--cta-gap);
+      container-type: normal;
+    }
+    .cover-actions {
+      gap: 12px 24px;
+    }
+    /* the full measure, cropped 5:4 so headline, buttons and face share the
+       first screen of a phone */
+    .cover-photo {
+      position: relative;
+      inset: auto;
+      width: 100%;
+      aspect-ratio: 5 / 4;
+      translate: none;
+    }
+    .cover-photo img {
+      object-position: 50% 22%;
+    }
+    .areas {
+      margin-top: 40px;
+    }
+    .area-icon {
+      --icon: 28px;
+    }
+  }
+  @media (max-width: 359px) {
+    .cover-dek br {
+      display: none;
+    }
+  }
+}
+[data-theme='dark'] .cover .cover-photo img {
+  filter: brightness(0.9);
+}
+@keyframes cover-unveil {
+  from {
+    clip-path: inset(100% 0 0 0 round 10px);
+  }
+  to {
+    clip-path: inset(0 0 0 0 round 10px);
+  }
+}
+@keyframes cover-settle {
+  from {
+    transform: scale(1.08);
   }
 }
 @media (max-width: 599px) {
-  .topbar-inner {
-    justify-content: flex-end;
-    gap: 12px;
-  }
   .topbar-right {
     flex-shrink: 0;
   }
@@ -1924,9 +2077,10 @@ html .topbar-inner {
   font: 400 1rem/1.4 var(--font-sans);
   letter-spacing: -0.025em;
   white-space: nowrap;
-  transition:
-    color 0.8s ease-in-out,
-    opacity 0.8s ease-in-out;
+  /* the scroll sets --focus every frame and the script already eases it: a
+     colour transition here would trail the scroll by its whole length, so
+     colour only fades while the area filter is on */
+  transition: opacity 0.35s var(--ease);
 }
 .stk-word.is-key {
   font-size: 1.0625rem;
@@ -1934,6 +2088,9 @@ html .topbar-inner {
 .stk-field.is-filtering .stk-word {
   color: var(--ink-3);
   opacity: 0.55;
+  transition:
+    color 0.3s var(--ease),
+    opacity 0.35s var(--ease);
 }
 .stk-field.is-filtering .stk-word.is-match {
   color: #007d50;
@@ -2729,42 +2886,6 @@ html .topbar-inner {
   font-size: 0.875rem;
 }
 
-/* the one filled button on the site: the last thing to do */
-.c-book {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  height: clamp(68px, 9vh, 84px);
-  padding: 0 clamp(28px, 2.6vw, 40px);
-  border-radius: 999px;
-  background: var(--cta-bg);
-  color: var(--focus-ink);
-  font: 500 clamp(1.125rem, 1rem + 0.4vw, 1.375rem)/1 var(--font-sans);
-  letter-spacing: -0.01em;
-  text-decoration: none;
-  overflow: hidden;
-  isolation: isolate;
-}
-.c-book::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background: var(--cta-hover);
-  clip-path: circle(0% at var(--mx, 50%) var(--my, 50%));
-  transition: clip-path 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-.c-book:hover::before,
-.c-book:focus-visible::before {
-  clip-path: circle(150% at var(--mx, 50%) var(--my, 50%));
-}
-.c-book .label {
-  display: inline-block;
-  transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-.c-book:hover .label {
-  transform: translateX(3px);
-}
 
 .c-email {
   display: inline-flex;
@@ -2989,11 +3110,9 @@ html .topbar-inner {
   }
 }
 @media (max-width: 559px) {
-  .c-book {
-    height: 64px;
-    padding: 0 24px;
+  .c-do .book {
+    --h: 64px;
     width: 100%;
-    justify-content: center;
   }
   .c-email {
     width: 100%;

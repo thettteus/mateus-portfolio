@@ -1,5 +1,6 @@
 'use client';
-import { useEffect, useRef, useState, type CSSProperties, type PointerEvent } from 'react';
+import { useEffect, useRef, useState, type CSSProperties } from 'react';
+import BookCall from '@/components/ui/BookCall';
 
 const EMAIL = 'mateuspdasilva369@gmail.com';
 const BOOK = 'https://calendly.com/mateuspdasilva369/1-1-meeting';
@@ -51,13 +52,6 @@ export default function Contact() {
 
   useEffect(() => () => clearTimeout(copyTimer.current), []);
 
-  // the button fills from where the pointer enters
-  const fillFrom = (e: PointerEvent<HTMLAnchorElement>) => {
-    const r = e.currentTarget.getBoundingClientRect();
-    e.currentTarget.style.setProperty('--mx', `${e.clientX - r.left}px`);
-    e.currentTarget.style.setProperty('--my', `${e.clientY - r.top}px`);
-  };
-
   const copy = async () => {
     try { await navigator.clipboard.writeText(EMAIL); }
     catch {
@@ -85,9 +79,7 @@ export default function Contact() {
 
             <div className="c-actions">
               <div className="c-do">
-                <a className="c-book" href={BOOK} target="_blank" rel="noopener noreferrer" onPointerEnter={fillFrom}>
-                  <span className="label">Book a 30-minute intro call</span>
-                </a>
+                <BookCall href={BOOK} size="lg" external>Book a 30-minute intro call</BookCall>
                 <span className="c-email">
                   <span className="or">or</span>
                   <a className="c-quiet" href={`mailto:${EMAIL}`}>{EMAIL}</a>

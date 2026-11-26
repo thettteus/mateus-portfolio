@@ -1,8 +1,8 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type MouseEvent } from 'react';
 import { motion, useScroll, useSpring } from 'framer-motion';
-import { FITZ } from '@/components/sections/Hero/skyline';
+import BookCall from '@/components/ui/BookCall';
 
 // Next.js's viewport.themeColor only tracks OS prefers-color-scheme, not this
 // site's manual toggle — override the rendered meta tags so the iOS status
@@ -12,16 +12,22 @@ function syncThemeColorMeta(theme: 'light' | 'dark') {
   document.querySelectorAll('meta[name="theme-color"]').forEach((m) => m.setAttribute('content', color));
 }
 
-// the theme sweep's edge: the hero's skyline across the screen, `y` px down
-const SWEEP_POINTS = 48;
-function sweepEdge(y: number) {
-  const w = innerWidth, amp = innerHeight * 0.22;
-  const pts = [`${w}px ${innerHeight * 2}px`, `0px ${innerHeight * 2}px`];
-  for (let i = 0; i <= SWEEP_POINTS; i++) {
-    const v = FITZ[Math.round((i / SWEEP_POINTS) * (FITZ.length - 1))];
-    pts.push(`${((i / SWEEP_POINTS) * w).toFixed(1)}px ${(y + amp * v).toFixed(1)}px`);
-  }
-  return `polygon(${pts.join(', ')})`;
+// The theme change blooms out of the toggle: the new theme's snapshot is
+// masked by a soft radial gradient (solid to BLOOM_CORE of its radius, then
+// feathered to nothing) that grows from the button until it covers the
+// farthest corner. No hard edge, no shape: the new light just spreads.
+const BLOOM_CORE = 0.7;
+const BLOOM_MS = 1000;
+function bloom(from: Element | null) {
+  const r = from?.getBoundingClientRect();
+  const x = r ? r.left + r.width / 2 : innerWidth - 40;
+  const y = r ? r.top + r.height / 2 : 40;
+  const reach = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
+  const d = (2 * reach) / BLOOM_CORE; // the solid core alone reaches every corner
+  return {
+    maskSize: ['0px 0px', `${d}px ${d}px`],
+    maskPosition: [`${x}px ${y}px`, `${x - d / 2}px ${y - d / 2}px`],
+  };
 }
 
 const LINKS = [
@@ -62,8 +68,12 @@ export default function Header() {
     };
     const onScroll = () => {
       const header = headerRef.current;
-      if (!header || openRef.current) return;
+      if (!header) return;
       const y = window.scrollY;
+      // the bar's hairline only appears once there is page under it; an
+      // attribute, not a class, so React's className updates never clear it
+      header.toggleAttribute('data-scrolled', y > 8);
+      if (openRef.current) return;
       const prev = prevY.current;
       prevY.current = y;
       if (y < 80 || (y < prev && performance.now() - upAt < UP_MS)) {
@@ -78,6 +88,7 @@ export default function Header() {
     window.addEventListener('touchmove', onTouchMove, { passive: true });
     window.addEventListener('keydown', onKey);
     window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
     return () => {
       window.removeEventListener('wheel', onWheel);
       window.removeEventListener('touchstart', onTouchStart);
@@ -112,7 +123,8 @@ export default function Header() {
     return () => window.removeEventListener('keydown', onKey);
   }, [open]);
 
-  const toggleTheme = useCallback(() => {
+  const toggleTheme = useCallback((e: MouseEvent<HTMLButtonElement>) => {
+    const origin = e.currentTarget;
     const html = document.documentElement;
     const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
     const apply = () => {
@@ -130,13 +142,14 @@ export default function Header() {
       apply();
       return;
     }
-    // the new theme comes in under the range's edge, sweeping up the screen
     const vt = doc.startViewTransition(apply);
     vt.ready.then(() => {
-      html.animate(
-        { clipPath: [sweepEdge(innerHeight * 1.25), sweepEdge(-innerHeight * 0.45)] },
-        { duration: 900, easing: 'cubic-bezier(0.65, 0, 0.35, 1)', pseudoElement: '::view-transition-new(root)' },
-      );
+      html.animate(bloom(origin), {
+        duration: BLOOM_MS,
+        easing: 'cubic-bezier(0.45, 0, 0.15, 1)',
+        fill: 'forwards',
+        pseudoElement: '::view-transition-new(root)',
+      });
     }).catch(() => {});
   }, []);
 
@@ -144,6 +157,7 @@ export default function Header() {
     <header ref={headerRef} className={`topbar${open ? ' is-open' : ''}`}>
       <motion.span className="scroll-progress" style={{ scaleX: progress }} aria-hidden="true" />
       <div className="container topbar-inner">
+        <a className="tb-logo" href="#top" onClick={() => setOpen(false)}>Matt P. S.</a>
 
         <nav className="nav" id="site-nav" aria-label="Page sections">
           {LINKS.map((l) => (
@@ -153,7 +167,7 @@ export default function Header() {
         </nav>
 
         <div className="topbar-right">
-          <a className="tb-cta" href="#contact">Book a call</a>
+          <BookCall href="#contact" size="sm" className="tb-cta" />
           <button
             className="tb-menu"
             type="button"
