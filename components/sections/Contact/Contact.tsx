@@ -138,7 +138,12 @@ export default function Contact() {
             <p className="sub">Designed and built by hand.</p>
           </div>
           <div className="f-col f-end">
-            <a className="f-top" href="#top">Back to top</a>
+            <a className="f-top" href="#top">
+              <span>Back to top</span>
+              <svg viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                <path d="M6 10.5V1.5M2 5.5l4-4 4 4" />
+              </svg>
+            </a>
             <p className="sub">© {new Date().getFullYear()} {NAME}</p>
           </div>
         </nav>

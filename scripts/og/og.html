@@ -14,6 +14,7 @@
     --ink-2: #5b5b60;
     --photo-grey: #d0d0d0;
     --rule: #deded9;
+    --accent: #00a86b;
     --pad: 72px;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -35,7 +36,7 @@
     display: flex; align-items: center; gap: 18px;
     font-size: 23px; line-height: 1; color: var(--ink-2); letter-spacing: -0.01em;
   }
-  .role::before { content: ''; width: 40px; height: 1px; background: var(--photo-grey); }
+  .role::before { content: ''; width: 40px; height: 2px; background: var(--accent); }
   h1 {
     margin: 34px 0 0 -0.04em;
     font-size: 84px; font-weight: 500; line-height: 0.98; letter-spacing: -0.045em;
@@ -45,13 +46,13 @@
     font-size: 24px; line-height: 1.32; color: var(--ink-2); letter-spacing: -0.012em;
   }
 
-  /* from the role line to the foot of the dek, square, like the hero */
+  /* from the role line to the foot of the dek, 1.25:1, like the hero */
   .photo {
-    width: 308px; height: 308px; flex: none;
+    width: 385px; height: 308px; flex: none;
     margin-top: 4px; /* level with the role's cap top */
-    border-radius: 6px; overflow: hidden; background: var(--photo-grey);
+    border-radius: 16px; overflow: hidden; background: var(--photo-grey);
   }
-  .photo img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; display: block; }
+  .photo img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 20%; display: block; }
 
   .areas {
     position: absolute; left: var(--pad); right: var(--pad); bottom: 44px;
@@ -61,7 +62,7 @@
   }
   .area { display: flex; align-items: center; gap: 12px; font-size: 21px; font-weight: 600; letter-spacing: -0.015em; }
   .area svg {
-    width: 26px; height: 26px; fill: none; stroke: #a9a9a9;
+    width: 26px; height: 26px; fill: none; stroke: var(--accent);
     stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;
   }
   .sep { width: 1px; background: var(--photo-grey); }

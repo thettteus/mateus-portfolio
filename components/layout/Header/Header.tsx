@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState, type MouseEvent } from 'react';
 import { motion, useScroll, useSpring } from 'framer-motion';
 import ArrowUpRight from '@/components/ui/ArrowUpRight';
+import BookCall from '@/components/ui/BookCall';
 
 // Next.js's viewport.themeColor only tracks OS prefers-color-scheme, not this
 // site's manual toggle — override the rendered meta tags so the iOS status
@@ -35,7 +36,6 @@ const LINKS = [
   { href: '#projects', label: 'Work' },
   { href: '#leverage', label: 'Leverage' },
   { href: '#writing', label: 'Writing' },
-  { href: '#contact', label: 'Contact' },
 ];
 
 export default function Header() {
@@ -113,6 +113,21 @@ export default function Header() {
     return () => media.removeEventListener('change', onChange);
   }, []);
 
+  // While the menu sheet is open the page under it doesn't scroll, and
+  // growing past the phone layout closes it.
+  useEffect(() => {
+    if (!open) return;
+    const html = document.documentElement;
+    html.classList.add('menu-open');
+    const wide = matchMedia('(min-width: 960px)');
+    const onWide = () => { if (wide.matches) setOpen(false); };
+    wide.addEventListener('change', onWide);
+    return () => {
+      html.classList.remove('menu-open');
+      wide.removeEventListener('change', onWide);
+    };
+  }, [open]);
+
   // Close the mobile menu on Escape.
   useEffect(() => {
     if (!open) return;
@@ -161,9 +176,12 @@ export default function Header() {
 
         <nav className="nav" id="site-nav" aria-label="Page sections">
           {LINKS.map((l) => (
-            // on desktop "Book a call" stands in for Contact
-            <a key={l.href} href={l.href} className={l.href === '#contact' ? 'nav-contact' : undefined} onClick={() => setOpen(false)}>{l.label}</a>
+            <a key={l.href} href={l.href} onClick={() => setOpen(false)}>{l.label}</a>
           ))}
+          {/* phones: the menu sheet ends on the one call to action */}
+          <div className="nav-foot" onClick={() => setOpen(false)}>
+            <BookCall href="#contact" size="md" />
+          </div>
         </nav>
 
         <div className="topbar-right">

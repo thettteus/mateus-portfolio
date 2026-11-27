@@ -593,18 +593,18 @@ html .topbar-inner {
   gap: clamp(20px, 3.1vw, 56px);
   margin-right: 0;
 }
-.nav a {
+.nav > a {
   position: relative;
   font-size: clamp(0.9375rem, 1.15vw, 1.1875rem);
   white-space: nowrap;
   color: var(--ink-2);
   transition: color 0.2s;
 }
-.nav a:hover,
-.nav a.nav-active {
+.nav > a:hover,
+.nav > a.nav-active {
   color: var(--ink);
 }
-.nav a.nav-active::after {
+.nav > a.nav-active::after {
   content: '';
   position: absolute;
   bottom: -4px;
@@ -614,10 +614,15 @@ html .topbar-inner {
   background: var(--accent);
   border-radius: 8px;
 }
-.nav a.nav-contact {
+/* the sheet's call to action exists for phones only */
+.nav-foot {
   display: none;
 }
-/* "Book a call" in the bar: set like the section links, turns green on hover */
+html.menu-open {
+  overflow: hidden;
+}
+/* "Book a call" in the bar: text and arrow like the section links, in the
+   button's green, deepening on hover as the button does */
 .tb-cta {
   display: inline-flex;
   align-items: center;
@@ -625,11 +630,11 @@ html .topbar-inner {
   margin-right: clamp(10px, 1.4vw, 24px);
   font-size: clamp(0.9375rem, 1.15vw, 1.1875rem);
   white-space: nowrap;
-  color: var(--ink-2);
+  color: var(--cta-bg);
   transition: color 0.2s;
 }
 .tb-cta:hover {
-  color: var(--accent-text);
+  color: var(--cta-hover);
 }
 
 .topbar-right {
@@ -707,7 +712,7 @@ a:hover > .arrow-ur {
 .tb-cta:focus-visible,
 .theme-toggle:focus-visible,
 .tb-menu:focus-visible,
-.nav a:focus-visible {
+.nav > a:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 3px;
 }
@@ -727,32 +732,61 @@ a:hover > .arrow-ur {
   .tb-menu {
     display: inline-grid;
   }
+  /* the menu: a sheet from under the bar to the bottom of the screen,
+     four big section links on hairlines and the call to action at the foot */
   .nav {
-    position: absolute;
-    top: 100%;
+    position: fixed;
+    top: calc(var(--bar-h) + env(safe-area-inset-top, 0px));
     left: 0;
     right: 0;
-    display: none;
+    bottom: 0;
+    justify-self: stretch;
+    display: flex;
     flex-direction: column;
     gap: 0;
     margin: 0;
-    padding: 4px var(--gutter) 28px;
+    padding: 8px var(--gutter) calc(28px + env(safe-area-inset-bottom, 0px));
+    overflow-y: auto;
+    overscroll-behavior: contain;
     background: var(--bg);
-    border-bottom: 1px solid var(--rule);
+    border-top: 1px solid var(--rule);
+    visibility: hidden;
+    opacity: 0;
+    translate: 0 -10px;
+    transition:
+      opacity 0.25s var(--ease),
+      translate 0.35s var(--ease),
+      visibility 0s 0.35s;
   }
   .topbar.is-open .nav {
-    display: flex;
+    visibility: visible;
+    opacity: 1;
+    translate: none;
+    transition:
+      opacity 0.25s var(--ease),
+      translate 0.35s var(--ease);
   }
-  .nav a,
-  .nav a.nav-contact {
+  .nav > a {
     display: block;
-    padding: 10px 0;
-    font-size: 1.75rem;
+    padding: 18px 0;
+    border-bottom: 1px solid var(--rule);
+    font-size: clamp(1.75rem, 8vw, 2.25rem);
     line-height: 1.1;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.03em;
     color: var(--ink);
   }
-  .nav a.nav-active::after {
+  .nav > a.nav-active {
+    color: var(--accent-text);
+  }
+  .nav-foot {
+    display: block;
+    margin-top: auto;
+    padding-top: 32px;
+  }
+  .nav-foot .book {
+    width: 100%;
+  }
+  .nav > a.nav-active::after {
     display: none;
   }
 }
@@ -845,9 +879,9 @@ a:hover > .arrow-ur {
     padding-inline: var(--frame);
   }
 
-  /* the role as a byline led by a short rule in the photo's grey */
+  /* the role as a byline led by a short green rule */
   .cover-role {
-    grid-column: 1 / 8;
+    grid-column: 1 / 7;
     grid-row: 1;
     display: flex;
     align-items: center;
@@ -862,15 +896,15 @@ a:hover > .arrow-ur {
     content: '';
     flex: none;
     width: 1.9em;
-    height: 1px;
-    background: var(--photo-rule);
+    height: 1.5px;
+    background: var(--accent);
   }
 
   .cover-grid {
     row-gap: 0;
   }
   .cover-copy {
-    grid-column: 1 / 8;
+    grid-column: 1 / 7;
     grid-row: 2;
     min-width: 0;
   }
@@ -893,7 +927,7 @@ a:hover > .arrow-ur {
   }
 
   .cover-actions {
-    grid-column: 1 / 8;
+    grid-column: 1 / 7;
     grid-row: 3;
     margin-top: var(--cta-gap);
     display: flex;
@@ -903,19 +937,38 @@ a:hover > .arrow-ur {
     font-size: clamp(1rem, 1.35vw, 1.4375rem);
   }
   .quiet {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5em;
     padding-block: 10px;
     line-height: 1.4;
     color: var(--ink-2);
+    transition: color 0.2s;
+  }
+  /* only the words are underlined, the eye sits beside them */
+  .quiet span {
     text-decoration: underline;
     text-decoration-thickness: 1px;
     text-underline-offset: 0.42em;
     text-decoration-color: var(--photo-rule);
-    transition:
-      color 0.2s,
-      text-decoration-color 0.2s;
+    transition: text-decoration-color 0.2s;
+  }
+  .quiet-eye {
+    flex: none;
+    width: 1.15em;
+    height: 1.15em;
+    stroke: currentColor;
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .quiet-eye * {
+    vector-effect: non-scaling-stroke;
   }
   .quiet:hover {
     color: var(--ink);
+  }
+  .quiet:hover span {
     text-decoration-color: currentColor;
   }
   .quiet:focus-visible {
@@ -927,40 +980,42 @@ a:hover > .arrow-ur {
      but adds no height to any row; the frame inside hangs from the cap height
      of the role line to the foot of the buttons, and its width follows */
   .cover-photo-cell {
-    grid-column: 8 / -1;
+    grid-column: 7 / -1;
     grid-row: 1 / 4;
     position: relative;
     container-type: size;
   }
+  /* the portrait, a little wider than the square source (1.25:1): from the
+     cap top of the role line to the foot of the buttons, its right edge on the
+     same margin as the areas rule. The ~20% it loses comes mostly off the
+     bottom: the head sits only 8% under the top of the photo */
   .cover-photo {
-    /* line-height 1: the caps start 0.156em into the line box */
+    /* line-height 1: the role's caps start 0.156em into the line box */
     --top: calc(var(--role) * 0.156);
     position: absolute;
     top: var(--top);
+    right: 0;
     bottom: 0;
-    left: 50%;
-    /* square while the column is wide enough; where it isn't, the frame keeps
-       both alignments and crops a little taller */
-    width: min(100cqw, 100cqh - var(--top));
+    width: min(100cqw, (100cqh - var(--top)) * 1.25);
     margin: 0;
-    translate: -50% 0;
     overflow: hidden;
-    border-radius: 10px;
+    border-radius: 16px;
     background: var(--panel-2);
   }
   .cover-photo img {
     object-fit: cover;
-    object-position: 50% 30%;
+    object-position: 50% 20%;
     user-select: none;
     -webkit-user-drag: none;
   }
 
   /* as on the LinkedIn banner: mark on top, name, one line; spread edge to
      edge, with a hairline as tall as the items halfway between each pair */
+  /* four columns of the same width, a hairline between each pair */
   .areas {
-    display: flex;
-    justify-content: space-between;
-    column-gap: clamp(20px, 2vw, 32px);
+    display: grid;
+    grid-template-columns: 1fr 1px 1fr 1px 1fr 1px 1fr;
+    column-gap: clamp(24px, 3vw, 48px);
     margin: clamp(32px, 6vh, 72px) 0 0;
     padding: clamp(24px, 3.6vh, 40px) 0 0;
     list-style: none;
@@ -987,7 +1042,7 @@ a:hover > .arrow-ur {
     /* the marks are drawn from x 3.5 of a 24-unit box: pull them back so
        their ink, not their box, lines up with the text under them */
     margin-left: calc(var(--icon) * -3.5 / 24);
-    stroke: var(--photo-grey);
+    stroke: var(--accent);
     stroke-width: 1.75;
     stroke-linecap: round;
     stroke-linejoin: round;
@@ -1054,15 +1109,15 @@ a:hover > .arrow-ur {
   }
 
   @media (max-width: 699px) {
-    /* a phone gets the message first, then the face */
-    --h1: calc((100vw - 2 * var(--frame)) * 0.135);
+    /* a phone (his reference): role, headline, line and buttons stacked
+       tight, the portrait at full measure under them, then a compact 2x2
+       sheet of the areas */
+    --h1: calc((100vw - 2 * var(--frame)) * 0.145);
+    --dek-gap: 12px;
     --cta-gap: 24px;
     padding-top: calc(var(--bar-h) + env(safe-area-inset-top, 0px) + 24px);
     padding-bottom: max(40px, env(safe-area-inset-bottom, 0px));
 
-    .cover-role {
-      margin-bottom: 24px;
-    }
     .cover-role,
     .cover-copy,
     .cover-actions,
@@ -1071,29 +1126,59 @@ a:hover > .arrow-ur {
     }
     .cover-photo-cell {
       grid-row: 4;
-      margin-top: var(--cta-gap);
+      margin-top: 28px;
       container-type: normal;
     }
+    /* phones keep the role as a plain line, no rule */
+    .cover-role {
+      grid-row: 1;
+      margin: 0 0 18px;
+    }
+    .cover-role::before {
+      display: none;
+    }
+    .cover-copy {
+      grid-row: 2;
+    }
     .cover-actions {
+      grid-row: 3;
       gap: 12px 24px;
     }
-    /* the full measure, cropped 5:4 so headline, buttons and face share the
-       first screen of a phone */
     .cover-photo {
       position: relative;
       inset: auto;
       width: 100%;
       aspect-ratio: 5 / 4;
       translate: none;
+      border-radius: 16px;
     }
     .cover-photo img {
-      object-position: 50% 22%;
+      object-position: 50% 20%;
     }
     .areas {
-      margin-top: 40px;
+      margin-top: 28px;
+    }
+    .area {
+      gap: 8px;
+      padding-block: 16px;
+    }
+    .area:nth-child(4n + 1) {
+      padding-right: 12px;
+    }
+    .area:nth-child(4n + 3) {
+      padding-left: 16px;
     }
     .area-icon {
-      --icon: 28px;
+      --icon: 22px;
+    }
+    .areas b {
+      font-size: 1rem;
+    }
+    .areas span {
+      margin-top: 0;
+      font-size: 0.8125rem;
+      line-height: 1.4;
+      text-wrap: pretty;
     }
   }
   @media (max-width: 359px) {
@@ -3015,7 +3100,7 @@ a:hover > .arrow-ur {
   list-style: none;
 }
 .f-link,
-.f-top {
+.f-top span {
   position: relative;
   color: var(--ink);
   text-decoration: none;
@@ -3023,10 +3108,31 @@ a:hover > .arrow-ur {
   transition: background-size 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 .f-link:hover,
-.f-top:hover,
+.f-top:hover span,
 .f-link:focus-visible,
-.f-top:focus-visible {
+.f-top:focus-visible span {
   background-size: 100% 1px;
+}
+/* back to top: the words, then an arrow that lifts on hover */
+.f-top {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45em;
+  color: var(--ink);
+  text-decoration: none;
+}
+.f-top svg {
+  flex: none;
+  width: 0.85em;
+  height: 0.85em;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 0.3s var(--ease);
+}
+.f-top:hover svg {
+  transform: translateY(-2px);
 }
 .f-end {
   align-items: flex-end;
@@ -3243,31 +3349,17 @@ a:hover > .arrow-ur {
 }
 
 /* ============================================================
-   PHONES — one centred column: section titles, the toolkit, the project
-   stories, the essays, the contact screen and the footer all share the
-   same axis (the hero and the pinned drawings keep their own composition)
+   PHONES — the hero's grammar: reading text starts on the left, the
+   blocks that fill the measure are centred (the toolkit field, the contact
+   button with its e-mail and note), and structured info sits in the same
+   2x2 sheet with crossed hairlines as the hero's areas (the footer)
    ============================================================ */
 @media (max-width: 699px) {
-  .wk-top,
-  .dl-head,
-  .lev-head {
-    text-align: center;
-  }
-  .wk-top h2,
-  .dl-head h2,
-  .lev-head h2,
-  .stk-head h2,
-  .c-main h2 {
-    margin-inline: 0;
-  }
-  .wk-note,
-  .lev-intro {
-    justify-self: center;
-    margin-inline: auto;
-    text-align: center;
+  .writing .wk-top h2 {
+    grid-column: 1 / -1;
   }
 
-  /* centred paragraphs break into even lines, no one-word last line */
+  /* left-aligned paragraphs: no one-word last line */
   .wk-note,
   .lev-intro,
   .lev-say,
@@ -3276,31 +3368,11 @@ a:hover > .arrow-ur {
   .wk-detail p,
   .wr-dek,
   .c-lead {
-    text-wrap: balance;
+    text-wrap: pretty;
   }
 
-  /* the pinned scenes' captions: step, word and line on the same axis */
-  .dl-cap,
-  .lev-cap {
-    text-align: center;
-  }
-  .dl-cap h3,
-  .lev-cap h3 {
-    margin-left: 0;
-  }
-  .dl-items,
-  .lev-say {
-    margin-inline: auto;
-  }
-
-  /* toolkit */
-  .stk-head {
-    justify-content: center;
-    text-align: center;
-  }
-  .stk-head h2 {
-    max-width: none;
-  }
+  /* toolkit: the field fills the measure, so its last line and the count
+     under it sit on the centre */
   .stk-field {
     text-align-last: center;
   }
@@ -3308,88 +3380,43 @@ a:hover > .arrow-ur {
     text-align: center;
   }
 
-  /* project stories */
-  .wk-text,
-  .wk-detail {
-    text-align: center;
-  }
-  .wk-eyebrow,
-  .wk-stack,
-  .wk-links,
-  .wk-visual figcaption {
-    justify-content: center;
-  }
-  .wk-case h3 {
-    max-width: none;
-  }
-
-  .writing .wk-top h2 {
-    grid-column: 1 / -1;
-  }
-
-  /* essays: "Essay · 2026" over the title, all on the axis */
-  .wr-row a {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    column-gap: 0;
-    text-align: center;
-  }
-  .wr-kind,
-  .wr-year {
-    order: 0;
-  }
-  .wr-year::before {
-    content: '·';
-    margin: 0 0.5em;
-  }
-  .wr-title,
-  .wr-dek {
-    flex: 0 0 100%;
-    order: 1;
-  }
-  .wr-title {
-    margin-top: 6px;
-  }
-  .wr-dek {
-    margin-inline: auto;
-  }
-
-  /* contact */
-  .c-main {
-    text-align: center;
-  }
-  .c-lead {
-    margin-inline: auto;
-  }
-  .c-do {
-    justify-content: center;
-  }
+  /* contact: the fit lists in one column, a hairline between them */
   .c-side {
     display: block;
-    margin-top: 64px;
+    margin-top: 56px;
     text-align: center;
   }
   .c-side section + section {
-    margin-top: 28px;
-    padding-top: 24px;
+    margin-top: 24px;
+    padding-top: 20px;
     border-top: 1px solid var(--rule);
   }
 
-  /* footer */
+  /* footer: the hero's 2x2 sheet */
   .c-foot {
-    text-align: center;
+    column-gap: 0;
+    row-gap: 0;
+    padding-top: 0;
   }
-  .f-col {
-    align-items: center;
+  .f-col,
+  .f-end {
+    grid-column: span 6;
+    padding-block: 22px;
   }
-  .f-col:nth-child(3) {
-    grid-column: 1 / -1;
+  .f-col:nth-child(odd) {
+    padding-right: 16px;
+  }
+  .f-col:nth-child(even) {
+    padding-left: 20px;
+    border-left: 1px solid var(--rule);
+  }
+  .f-col:nth-child(n + 3) {
+    border-top: 1px solid var(--rule);
   }
   .f-end {
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;
+    justify-content: space-between;
     gap: 6px;
-    text-align: center;
   }
 }
